@@ -530,16 +530,88 @@
       "status": "RULED_OUT",
       "weight": 0.0,
       "note": "short week sloppy/low \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "wind_pass",
+      "name": "Wind suppresses passing props",
+      "cat": "weather",
+      "stat": "r=-0.167 p<1e-4; -49 pass yds/gm at 15+mph (n=1207)",
+      "status": "IN",
+      "weight": 0.7,
+      "note": "VALIDATED \u2014 scales pass/rec prop projections down in wind"
+    },
+    {
+      "id": "cold_pass",
+      "name": "Cold suppresses passing props",
+      "cat": "weather",
+      "stat": "temp vs pass yds r=+0.157 p<1e-4",
+      "status": "IN",
+      "weight": 0.5,
+      "note": "cold-weather pass unders; wired into weather.py"
+    },
+    {
+      "id": "wind_fg",
+      "name": "Wind lowers FG% (kicker fade)",
+      "cat": "weather",
+      "stat": "r=-0.025 p=0.38 (85% either way)",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD \u2014 kickers don't attempt long FGs in wind; no kicker-prop edge here"
+    },
+    {
+      "id": "adot_variance",
+      "name": "High aDOT \u2192 boom/bust variance",
+      "cat": "props",
+      "stat": "r=-0.12 p=0.08 (n=216)",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "null \u2014 don't price variance off aDOT"
+    },
+    {
+      "id": "market_trust",
+      "name": "Market-stability trust weighting",
+      "cat": "props",
+      "stat": "YoY: rec_yds .81 > rush .76 > rec'ns .61 > pass .37",
+      "status": "IN",
+      "weight": 0.8,
+      "note": "VALIDATED \u2014 demand bigger edge on pass_yds; trust rec/rush yards"
+    },
+    {
+      "id": "rz_targets_td",
+      "name": "Red-zone targets \u2192 rec TDs",
+      "cat": "coaching",
+      "stat": "r=0.82 p<1e-4; RZ share 0.44 sticky",
+      "status": "IN",
+      "weight": 0.7,
+      "note": "VALIDATED TD-prop signal; RZ share more stable than goal-line RB role"
+    },
+    {
+      "id": "targets_vs_recs",
+      "name": "Targets stickier than receptions",
+      "cat": "props",
+      "stat": "targets r=.93 vs receptions r=.61 YoY",
+      "status": "IN",
+      "weight": 0.6,
+      "note": "project receptions as target-volume \u00d7 catch-rate, not raw"
+    },
+    {
+      "id": "rush_bad_weather",
+      "name": "Bad weather \u2192 rushing volume up",
+      "cat": "weather",
+      "stat": "offenses lean run in wind/cold (candidate)",
+      "status": "MONITOR",
+      "weight": 0.3,
+      "note": "small rush-prop over nudge; validate the magnitude"
     }
   ],
-  "version": 2,
+  "version": 3,
   "updated": "2026-09-01",
   "counts": {
     "CORE": 2,
-    "IN": 15,
+    "IN": 20,
     "GATED": 1,
-    "MONITOR": 6,
-    "RULED_OUT": 35
+    "MONITOR": 7,
+    "RULED_OUT": 37
   },
-  "total_tested": 59
+  "total_tested": 67
 }

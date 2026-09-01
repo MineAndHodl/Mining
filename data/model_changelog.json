@@ -2,6 +2,20 @@
   "entries": [
     {
       "date": "2026-09-01",
+      "version": 3,
+      "active_params": 22,
+      "total_params": 67,
+      "headline": "Deep weather + prop/usage battery (the thorough pass)",
+      "changes": [
+        "VALIDATED wind\u2192passing (r=-.167, -49 pass yds/gm at 15+mph) \u2192 pass/rec prop weather adjustment live",
+        "VALIDATED cold\u2192passing (r=+.157) and market-trust ranking (rec_yds .81 > pass_yds .37)",
+        "VALIDATED red-zone targets\u2192rec TDs (r=.82) as a TD-prop signal",
+        "RULED OUT wind\u2192FG% (p=.38 \u2014 kickers adjust) and aDOT\u2192variance (p=.08)",
+        "learned: weather's edge is on PASS PROPS not game totals; pass_yds is the least-projectable market"
+      ]
+    },
+    {
+      "date": "2026-09-01",
       "version": 2,
       "active_params": 17,
       "total_params": 59,

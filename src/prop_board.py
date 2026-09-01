@@ -20,6 +20,7 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import props_model as pm
+import weather as wx
 
 API = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl"
 MARKET_MAP = {"player_reception_yds": "rec_yds", "player_receptions": "receptions",
@@ -102,7 +103,7 @@ def price_ou(mkt, mu, line, over_price, under_price):
             "over_price_kept": over_price, "under_price_kept": under_price}
 
 
-def build_prop_board(key=None, projections=None, td_rates=None, max_games=None):
+def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, weather_by_game=None):
     """Returns the full priced prop board joined to our projections, best book per prop."""
     key = key or os.environ.get("ODDS_API_KEY")
     if projections is None:
@@ -126,8 +127,15 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None):
         mu = float(pr[b["mkt"]]) if (pr is not None and b["mkt"] in pr and pd.notna(pr[b["mkt"]])) else None
         if mu is None or mu <= 0:
             continue
+        # weather adjustment (when the game's weather is known — live/gameday)
+        wg = (weather_by_game or {}).get(b["game"])
+        if wg:
+            mu = mu * wx.market_weather_mult(b["mkt"], wind=wg.get("wind"), temp=wg.get("temp"),
+                                             roof=wg.get("roof", "outdoors"))
         p = price_ou(b["mkt"], mu, b["line"], b["over_price"], b["under_price"])
-        conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
+        # confidence weighted by how projectable this market is (rec_yds trusted, pass_yds not)
+        base_conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
+        conf = base_conf * wx.MARKET_TRUST.get(b["mkt"], 0.7)
         out.append({"name": b["name"], "game": b["game"], "book": b["book"], "mkt": b["mkt"],
                     "line": b["line"], "desk_proj": round(mu, 1),
                     "position": pr["position"] if pr is not None else "?",
@@ -173,9 +181,11 @@ def classify(row):
     ratio = row["desk_proj"] / row["line"] if row["line"] else 1.0
     if not (TRUST_LO <= ratio <= TRUST_HI):
         return "REVIEW"
-    if row["confidence"] < 0.5:
+    if row["confidence"] < 0.45:
         return "REVIEW"
-    if row["edge"] < EDGE_MIN:
+    # low-trust markets (pass_yds) must clear a higher edge bar to become a pick
+    need = EDGE_MIN / wx.MARKET_TRUST.get(row.get("mkt", ""), 0.7)
+    if row["edge"] < need:
         return "PASS"
     return "PICK"
 

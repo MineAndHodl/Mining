@@ -839,50 +839,159 @@
         "status": "RULED_OUT",
         "weight": 0.0,
         "note": "short week sloppy/low \u2014 tested vs break-even, dead"
+      },
+      {
+        "id": "wind_pass",
+        "name": "Wind suppresses passing props",
+        "cat": "weather",
+        "stat": "r=-0.167 p<1e-4; -49 pass yds/gm at 15+mph (n=1207)",
+        "status": "IN",
+        "weight": 0.7,
+        "note": "VALIDATED \u2014 scales pass/rec prop projections down in wind"
+      },
+      {
+        "id": "cold_pass",
+        "name": "Cold suppresses passing props",
+        "cat": "weather",
+        "stat": "temp vs pass yds r=+0.157 p<1e-4",
+        "status": "IN",
+        "weight": 0.5,
+        "note": "cold-weather pass unders; wired into weather.py"
+      },
+      {
+        "id": "wind_fg",
+        "name": "Wind lowers FG% (kicker fade)",
+        "cat": "weather",
+        "stat": "r=-0.025 p=0.38 (85% either way)",
+        "status": "RULED_OUT",
+        "weight": 0.0,
+        "note": "DEAD \u2014 kickers don't attempt long FGs in wind; no kicker-prop edge here"
+      },
+      {
+        "id": "adot_variance",
+        "name": "High aDOT \u2192 boom/bust variance",
+        "cat": "props",
+        "stat": "r=-0.12 p=0.08 (n=216)",
+        "status": "RULED_OUT",
+        "weight": 0.0,
+        "note": "null \u2014 don't price variance off aDOT"
+      },
+      {
+        "id": "market_trust",
+        "name": "Market-stability trust weighting",
+        "cat": "props",
+        "stat": "YoY: rec_yds .81 > rush .76 > rec'ns .61 > pass .37",
+        "status": "IN",
+        "weight": 0.8,
+        "note": "VALIDATED \u2014 demand bigger edge on pass_yds; trust rec/rush yards"
+      },
+      {
+        "id": "rz_targets_td",
+        "name": "Red-zone targets \u2192 rec TDs",
+        "cat": "coaching",
+        "stat": "r=0.82 p<1e-4; RZ share 0.44 sticky",
+        "status": "IN",
+        "weight": 0.7,
+        "note": "VALIDATED TD-prop signal; RZ share more stable than goal-line RB role"
+      },
+      {
+        "id": "targets_vs_recs",
+        "name": "Targets stickier than receptions",
+        "cat": "props",
+        "stat": "targets r=.93 vs receptions r=.61 YoY",
+        "status": "IN",
+        "weight": 0.6,
+        "note": "project receptions as target-volume \u00d7 catch-rate, not raw"
+      },
+      {
+        "id": "rush_bad_weather",
+        "name": "Bad weather \u2192 rushing volume up",
+        "cat": "weather",
+        "stat": "offenses lean run in wind/cold (candidate)",
+        "status": "MONITOR",
+        "weight": 0.3,
+        "note": "small rush-prop over nudge; validate the magnitude"
       }
     ],
-    "version": 2,
+    "version": 3,
     "updated": "2026-09-01",
     "counts": {
       "CORE": 2,
-      "IN": 15,
+      "IN": 20,
       "GATED": 1,
-      "MONITOR": 6,
-      "RULED_OUT": 35
+      "MONITOR": 7,
+      "RULED_OUT": 37
     },
-    "total_tested": 59
+    "total_tested": 67
   },
   "changelog": [
     {
       "date": "2026-09-01",
-      "version": 2,
-      "active_params": 17,
-      "total_params": 59,
-      "headline": "30-day R&D sprint \u2014 validated the core, killed 13 angles",
+      "version": 3,
+      "active_params": 22,
+      "total_params": 67,
+      "headline": "Deep weather + prop/usage battery (the thorough pass)",
       "changes": [
-        "VALIDATED open\u2192close CLV (80% of lines move, avg 1.27pt) \u2192 promoted to IN, confirms beat-the-close",
-        "VALIDATED usage stickiness (targets r=.93) \u2192 prop base is solid",
-        "CORRECTED wind\u2192unders: dead vs the 52.4% break-even (p=.107), cut to RULED_OUT",
-        "RULED OUT 13 situational systems (home dogs, road favs, big favs, division dogs, rest, Thursday...) \u2014 all inside the vig",
-        "net: the edge is CLV + calibrated props, NOT situational betting \u2014 direction confirmed by subtraction"
+        "VALIDATED wind\u2192passing (r=-.167, -49 pass yds/gm at 15+mph) \u2192 pass/rec prop weather adjustment live",
+        "VALIDATED cold\u2192passing (r=+.157) and market-trust ranking (rec_yds .81 > pass_yds .37)",
+        "VALIDATED red-zone targets\u2192rec TDs (r=.82) as a TD-prop signal",
+        "RULED OUT wind\u2192FG% (p=.38 \u2014 kickers adjust) and aDOT\u2192variance (p=.08)",
+        "learned: weather's edge is on PASS PROPS not game totals; pass_yds is the least-projectable market"
       ]
     }
   ],
   "prop_picks": [
+    {
+      "name": "Rashid Shaheed",
+      "mkt": "receptions",
+      "line": 2.5,
+      "proj": 3.1,
+      "side": "Over",
+      "price": 113,
+      "vig": 0.06,
+      "edge": 0.115,
+      "ev": 0.189,
+      "book": "best",
+      "reason": "We're higher on Rashid Shaheed than the board \u2014 3.1 against a 2.5 that looks a step behind his role. We'll take the over before it catches up. Strip the 6% juice and the fair over is 44%; we make it 55%. That's +19 cents on the dollar at +113. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "TreVeyon Henderson",
+      "mkt": "rec_yds",
+      "line": 8.5,
+      "proj": 12.1,
+      "side": "Over",
+      "price": -114,
+      "vig": 0.06,
+      "edge": 0.091,
+      "ev": 0.109,
+      "book": "best",
+      "reason": "We're higher on TreVeyon Henderson than the board \u2014 12.1 against a 8.5 that looks a step behind his role. We'll take the over before it catches up. Strip the 6% juice and the fair over is 50%; we make it 59%. That's +11 cents on the dollar at -114. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
     {
       "name": "AJ Barner",
       "mkt": "receptions",
       "line": 2.5,
       "proj": 2.6,
       "side": "Under",
-      "model_p": 0.565,
       "price": 115,
       "vig": 0.06,
-      "edge": 0.126,
-      "ev": 0.215,
-      "book": "draftkings",
-      "conf": 1.0,
-      "reason": "This is a number and a price play: AJ Barner's 2.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 6% juice is 43%; we make it 56% \u2014 a +13-point edge, +22% on the ticket at +115. This is a stable, multi-year role, which is exactly where our projections grade out calibrated."
+      "edge": 0.084,
+      "ev": 0.124,
+      "book": "best",
+      "reason": "AJ Barner's 2.5 is a touch soft and the price is right, so we're on the under \u2014 a number play, not a hero call. Strip the 6% juice and the fair under is 43%; we make it 52%. That's +12 cents on the dollar at +115. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "Hunter Henry",
+      "mkt": "receptions",
+      "line": 3.5,
+      "proj": 3.5,
+      "side": "Over",
+      "price": 134,
+      "vig": 0.06,
+      "edge": 0.079,
+      "ev": 0.119,
+      "book": "best",
+      "reason": "Hunter Henry's 3.5 is a touch soft and the price is right, so we're on the over \u2014 a number play, not a hero call. Strip the 7% juice and the fair over is 39%; we make it 47%. That's +12 cents on the dollar at +134. Locked-in role, and this is the exact tier our numbers grade out sharp."
     },
     {
       "name": "Jaxon Smith-Njigba",
@@ -890,14 +999,25 @@
       "line": 82.5,
       "proj": 80.4,
       "side": "Under",
-      "model_p": 0.624,
       "price": -114,
-      "vig": 0.065,
-      "edge": 0.124,
-      "ev": 0.172,
-      "book": "fanduel",
-      "conf": 1.0,
-      "reason": "This is a number and a price play: Jaxon Smith-Njigba's 82.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 6% juice is 50%; we make it 62% \u2014 a +12-point edge, +17% on the ticket at -114. This is a stable, multi-year role, which is exactly where our projections grade out calibrated."
+      "vig": 0.06,
+      "edge": 0.073,
+      "ev": 0.076,
+      "book": "best",
+      "reason": "Jaxon Smith-Njigba's 82.5 is a touch soft and the price is right, so we're on the under \u2014 a number play, not a hero call. Strip the 6% juice and the fair under is 50%; we make it 57%. That's +8 cents on the dollar at -114. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "Rashid Shaheed",
+      "mkt": "rec_yds",
+      "line": 31.5,
+      "proj": 41.4,
+      "side": "Over",
+      "price": -109,
+      "vig": 0.06,
+      "edge": 0.063,
+      "ev": 0.068,
+      "book": "best",
+      "reason": "We're higher on Rashid Shaheed than the board \u2014 41.4 against a 31.5 that looks a step behind his role. We'll take the over before it catches up. Strip the 6% juice and the fair over is 49%; we make it 55%. That's +7 cents on the dollar at -109. Locked-in role, and this is the exact tier our numbers grade out sharp."
     },
     {
       "name": "AJ Barner",
@@ -905,29 +1025,12 @@
       "line": 24.5,
       "proj": 25.0,
       "side": "Under",
-      "model_p": 0.603,
       "price": -108,
-      "vig": 0.056,
-      "edge": 0.112,
-      "ev": 0.162,
-      "book": "draftkings",
-      "conf": 1.0,
-      "reason": "This is a number and a price play: AJ Barner's 24.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 6% juice is 49%; we make it 60% \u2014 a +11-point edge, +16% on the ticket at -108. This is a stable, multi-year role, which is exactly where our projections grade out calibrated."
-    },
-    {
-      "name": "A.J. Brown",
-      "mkt": "receptions",
-      "line": 4.5,
-      "proj": 4.6,
-      "side": "Under",
-      "model_p": 0.541,
-      "price": 116,
       "vig": 0.06,
-      "edge": 0.104,
-      "ev": 0.168,
-      "book": "draftkings",
-      "conf": 0.6,
-      "reason": "This is a number and a price play: A.J. Brown's 4.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 6% juice is 43%; we make it 54% \u2014 a +10-point edge, +17% on the ticket at +116. Role's in flux, so we're sizing this as a lean, not a hammer."
+      "edge": 0.06,
+      "ev": 0.063,
+      "book": "best",
+      "reason": "AJ Barner's 24.5 is a touch soft and the price is right, so we're on the under \u2014 a number play, not a hero call. Strip the 6% juice and the fair under is 49%; we make it 55%. That's +6 cents on the dollar at -108. Locked-in role, and this is the exact tier our numbers grade out sharp."
     },
     {
       "name": "Romeo Doubs",
@@ -935,119 +1038,12 @@
       "line": 36.5,
       "proj": 37.7,
       "side": "Under",
-      "model_p": 0.599,
       "price": -114,
-      "vig": 0.065,
-      "edge": 0.099,
-      "ev": 0.124,
-      "book": "fanduel",
-      "conf": 0.6,
-      "reason": "This is a number and a price play: Romeo Doubs's 36.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 6% juice is 50%; we make it 59% \u2014 a +10-point edge, +12% on the ticket at -114. Role's in flux, so we're sizing this as a lean, not a hammer."
-    },
-    {
-      "name": "Romeo Doubs",
-      "mkt": "receptions",
-      "line": 3.5,
-      "proj": 3.0,
-      "side": "Under",
-      "model_p": 0.655,
-      "price": -144,
       "vig": 0.06,
-      "edge": 0.098,
-      "ev": 0.11,
-      "book": "draftkings",
-      "conf": 0.6,
-      "reason": "This is a number and a price play: Romeo Doubs's 3.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 6% juice is 55%; we make it 65% \u2014 a +10-point edge, +11% on the ticket at -144. Role's in flux, so we're sizing this as a lean, not a hammer."
-    },
-    {
-      "name": "A.J. Brown",
-      "mkt": "rec_yds",
-      "line": 61.5,
-      "proj": 65.8,
-      "side": "Under",
-      "model_p": 0.583,
-      "price": -111,
-      "vig": 0.057,
-      "edge": 0.085,
-      "ev": 0.107,
-      "book": "draftkings",
-      "conf": 0.6,
-      "reason": "This is a number and a price play: A.J. Brown's 61.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 6% juice is 49%; we make it 58% \u2014 a +8-point edge, +11% on the ticket at -111. Role's in flux, so we're sizing this as a lean, not a hammer."
-    },
-    {
-      "name": "Jaxon Smith-Njigba",
-      "mkt": "receptions",
-      "line": 6.5,
-      "proj": 6.0,
-      "side": "Under",
-      "model_p": 0.591,
-      "price": -121,
-      "vig": 0.06,
-      "edge": 0.075,
-      "ev": 0.08,
-      "book": "draftkings",
-      "conf": 1.0,
-      "reason": "This is a number and a price play: Jaxon Smith-Njigba's 6.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 6% juice is 51%; we make it 59% \u2014 a +8-point edge, +8% on the ticket at -121. This is a stable, multi-year role, which is exactly where our projections grade out calibrated."
-    },
-    {
-      "name": "Rashid Shaheed",
-      "mkt": "receptions",
-      "line": 2.5,
-      "proj": 3.1,
-      "side": "Over",
-      "model_p": 0.516,
-      "price": 113,
-      "vig": 0.06,
-      "edge": 0.073,
-      "ev": 0.099,
-      "book": "draftkings",
-      "conf": 1.0,
-      "reason": "Our model sees Rashid Shaheed at 3.1 catches \u2014 a real gap on the over of 2.5. Fair on the over after stripping the 6% juice is 44%; we make it 51% \u2014 a +7-point edge, +10% on the ticket at +113. This is a stable, multi-year role, which is exactly where our projections grade out calibrated."
-    },
-    {
-      "name": "Rhamondre Stevenson",
-      "mkt": "rec_yds",
-      "line": 17.5,
-      "proj": 19.5,
-      "side": "Under",
-      "model_p": 0.566,
-      "price": -114,
-      "vig": 0.065,
-      "edge": 0.066,
-      "ev": 0.062,
-      "book": "fanduel",
-      "conf": 1.0,
-      "reason": "This is a number and a price play: Rhamondre Stevenson's 17.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 6% juice is 50%; we make it 56% \u2014 a +7-point edge, +6% on the ticket at -114. This is a stable, multi-year role, which is exactly where our projections grade out calibrated."
-    },
-    {
-      "name": "Rashid Shaheed",
-      "mkt": "rush_yds",
-      "line": 3.5,
-      "proj": 3.5,
-      "side": "Under",
-      "model_p": 0.622,
-      "price": -152,
-      "vig": 0.066,
-      "edge": 0.057,
-      "ev": 0.032,
-      "book": "fanduel",
-      "conf": 1.0,
-      "reason": "This is a number and a price play: Rashid Shaheed's 3.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 7% juice is 56%; we make it 62% \u2014 a +6-point edge, +3% on the ticket at -152. This is a stable, multi-year role, which is exactly where our projections grade out calibrated."
-    },
-    {
-      "name": "Rhamondre Stevenson",
-      "mkt": "receptions",
-      "line": 2.5,
-      "proj": 2.5,
-      "side": "Under",
-      "model_p": 0.597,
-      "price": -140,
-      "vig": 0.069,
-      "edge": 0.051,
-      "ev": 0.023,
-      "book": "fanduel",
-      "conf": 1.0,
-      "reason": "This is a number and a price play: Rhamondre Stevenson's 2.5 is a hair soft and we're buying the under while it's there. Fair on the under after stripping the 7% juice is 54%; we make it 59% \u2014 a +5-point edge, +2% on the ticket at -140. This is a stable, multi-year role, which is exactly where our projections grade out calibrated."
+      "edge": 0.048,
+      "ev": 0.029,
+      "book": "best",
+      "reason": "Romeo Doubs's 36.5 is a touch soft and the price is right, so we're on the under \u2014 a number play, not a hero call. Strip the 6% juice and the fair under is 50%; we make it 54%. That's +3 cents on the dollar at -114. Usage is settling in \u2014 we like it, but it's a lean until the snaps confirm."
     }
   ],
   "prop_review": [
@@ -1094,6 +1090,208 @@
       "reason": "We've got Cooper Kupp projected well off the 32.5 receiving yards number, which usually means the room repriced his role before we did \u2014 a committee, a target-share squeeze, or a snap change. We're flagging it, not firing it, until the depth chart and beat reports confirm the workload."
     }
   ],
-  "under_lean_note": "watching a heavy Under skew this week \u2014 validating whether it's real market over-shading or model bias",
-  "model_goal": "Every week: test new signals, cut dead ones, reweight, and check cross-correlation with the model \u2014 improve and find more winners."
+  "under_lean_note": "board now balanced + market-trust weighted (pass_yds held to a higher bar); weather scales pass props in wind/cold",
+  "model_goal": "Every week: test new signals, cut dead ones, reweight, and check cross-correlation with the model \u2014 improve and find more winners.",
+  "prop_decomp": [
+    {
+      "name": "Rashid Shaheed",
+      "mkt": "receptions",
+      "line": 2.5,
+      "proj": 3.1,
+      "side": "Over",
+      "edge": 0.115,
+      "ev": 0.189,
+      "price": 113,
+      "factors": [
+        {
+          "f": "Career baseline",
+          "v": 0.6
+        },
+        {
+          "f": "Recent form",
+          "v": 0.0
+        },
+        {
+          "f": "Regression (exp vs act)",
+          "v": -0.0
+        }
+      ],
+      "reason": "We're higher on Rashid Shaheed than the board \u2014 3.1 against a 2.5 that looks a step behind his role. We'll take the over before it catches up. Strip the 6% juice and the fair over is 44%; we make it 55%. That's +19 cents on the dollar at +113. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "TreVeyon Henderson",
+      "mkt": "rec_yds",
+      "line": 8.5,
+      "proj": 12.1,
+      "side": "Over",
+      "edge": 0.091,
+      "ev": 0.109,
+      "price": -114,
+      "factors": [
+        {
+          "f": "Career baseline",
+          "v": 4.5
+        },
+        {
+          "f": "Recent form",
+          "v": -0.9
+        },
+        {
+          "f": "Regression (exp vs act)",
+          "v": -0.0
+        }
+      ],
+      "reason": "We're higher on TreVeyon Henderson than the board \u2014 12.1 against a 8.5 that looks a step behind his role. We'll take the over before it catches up. Strip the 6% juice and the fair over is 50%; we make it 59%. That's +11 cents on the dollar at -114. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "AJ Barner",
+      "mkt": "receptions",
+      "line": 2.5,
+      "proj": 2.6,
+      "side": "Under",
+      "edge": 0.084,
+      "ev": 0.124,
+      "price": 115,
+      "factors": [
+        {
+          "f": "Career baseline",
+          "v": 0.0
+        },
+        {
+          "f": "Recent form",
+          "v": 0.1
+        },
+        {
+          "f": "Regression (exp vs act)",
+          "v": -0.0
+        }
+      ],
+      "reason": "AJ Barner's 2.5 is a touch soft and the price is right, so we're on the under \u2014 a number play, not a hero call. Strip the 6% juice and the fair under is 43%; we make it 52%. That's +12 cents on the dollar at +115. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "Hunter Henry",
+      "mkt": "receptions",
+      "line": 3.5,
+      "proj": 3.5,
+      "side": "Over",
+      "edge": 0.079,
+      "ev": 0.119,
+      "price": 134,
+      "factors": [
+        {
+          "f": "Career baseline",
+          "v": 0.1
+        },
+        {
+          "f": "Recent form",
+          "v": -0.1
+        },
+        {
+          "f": "Regression (exp vs act)",
+          "v": -0.0
+        }
+      ],
+      "reason": "Hunter Henry's 3.5 is a touch soft and the price is right, so we're on the over \u2014 a number play, not a hero call. Strip the 7% juice and the fair over is 39%; we make it 47%. That's +12 cents on the dollar at +134. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "Jaxon Smith-Njigba",
+      "mkt": "rec_yds",
+      "line": 82.5,
+      "proj": 80.4,
+      "side": "Under",
+      "edge": 0.073,
+      "ev": 0.076,
+      "price": -114,
+      "factors": [
+        {
+          "f": "Career baseline",
+          "v": -12.9
+        },
+        {
+          "f": "Recent form",
+          "v": 10.8
+        },
+        {
+          "f": "Regression (exp vs act)",
+          "v": -1.3
+        }
+      ],
+      "reason": "Jaxon Smith-Njigba's 82.5 is a touch soft and the price is right, so we're on the under \u2014 a number play, not a hero call. Strip the 6% juice and the fair under is 50%; we make it 57%. That's +8 cents on the dollar at -114. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "Rashid Shaheed",
+      "mkt": "rec_yds",
+      "line": 31.5,
+      "proj": 41.4,
+      "side": "Over",
+      "edge": 0.063,
+      "ev": 0.068,
+      "price": -109,
+      "factors": [
+        {
+          "f": "Career baseline",
+          "v": 13.1
+        },
+        {
+          "f": "Recent form",
+          "v": -3.2
+        },
+        {
+          "f": "Regression (exp vs act)",
+          "v": -0.0
+        }
+      ],
+      "reason": "We're higher on Rashid Shaheed than the board \u2014 41.4 against a 31.5 that looks a step behind his role. We'll take the over before it catches up. Strip the 6% juice and the fair over is 49%; we make it 55%. That's +7 cents on the dollar at -109. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "AJ Barner",
+      "mkt": "rec_yds",
+      "line": 24.5,
+      "proj": 25.0,
+      "side": "Under",
+      "edge": 0.06,
+      "ev": 0.063,
+      "price": -108,
+      "factors": [
+        {
+          "f": "Career baseline",
+          "v": -1.1
+        },
+        {
+          "f": "Recent form",
+          "v": 1.6
+        },
+        {
+          "f": "Regression (exp vs act)",
+          "v": -0.4
+        }
+      ],
+      "reason": "AJ Barner's 24.5 is a touch soft and the price is right, so we're on the under \u2014 a number play, not a hero call. Strip the 6% juice and the fair under is 49%; we make it 55%. That's +6 cents on the dollar at -108. Locked-in role, and this is the exact tier our numbers grade out sharp."
+    },
+    {
+      "name": "Romeo Doubs",
+      "mkt": "rec_yds",
+      "line": 36.5,
+      "proj": 37.7,
+      "side": "Under",
+      "edge": 0.048,
+      "ev": 0.029,
+      "price": -114,
+      "factors": [
+        {
+          "f": "Career baseline",
+          "v": 4.5
+        },
+        {
+          "f": "Recent form",
+          "v": -3.3
+        },
+        {
+          "f": "Regression (exp vs act)",
+          "v": -0.1
+        }
+      ],
+      "reason": "Romeo Doubs's 36.5 is a touch soft and the price is right, so we're on the under \u2014 a number play, not a hero call. Strip the 6% juice and the fair under is 50%; we make it 54%. That's +3 cents on the dollar at -114. Usage is settling in \u2014 we like it, but it's a lean until the snaps confirm."
+    }
+  ]
 }
