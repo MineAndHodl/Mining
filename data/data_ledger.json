@@ -1,0 +1,77 @@
+{
+  "updated": "2026-09-01",
+  "wired_and_active": [
+    {
+      "src": "nflverse play-by-play (1999-2025)",
+      "use": "EPA ratings, coaching PROE, goal-line/RZ usage, TD model"
+    },
+    {
+      "src": "nflverse player_stats weekly",
+      "use": "prop projection engine (usage + efficiency)"
+    },
+    {
+      "src": "nflverse depth charts + rosters (2026)",
+      "use": "role rank, vacated-opportunity, refreshed every run"
+    },
+    {
+      "src": "nflverse draft picks",
+      "use": "rookie capital priors"
+    },
+    {
+      "src": "nflverse schedules",
+      "use": "coach/QB continuity, closing lines, HFA, macro tests"
+    },
+    {
+      "src": "The Odds API (live)",
+      "use": "sides/totals/ML board + live player prop lines (all markets)"
+    },
+    {
+      "src": "ff_opportunity (fantasy expected stats)",
+      "use": "WIRED \u2014 regression signal (fade lucky / buy due), stabilizer"
+    },
+    {
+      "src": "historical open/close odds (2006-26)",
+      "use": "ingested \u2014 open\u2192close CLV backtest (pending run)"
+    },
+    {
+      "src": "referee/crew stats",
+      "use": "MONITOR overlay (weak penalty signal)"
+    }
+  ],
+  "wired_fires_in_season": [
+    {
+      "src": "nflverse injuries (Out/Doubtful/Questionable + practice)",
+      "use": "WIRED \u2014 availability multiplier; reports drop Week 1 2026"
+    },
+    {
+      "src": "in-season usage (PROE volume, goal-line/RZ shares)",
+      "use": "un-gates movers/rookies/TD props once 2026 games start"
+    }
+  ],
+  "runtime_agent_fetched": [
+    {
+      "src": "beat-writer / depth-chart news",
+      "use": "WebSearch at scheduled-run time \u2192 pick rationale + resolves REVIEW flags. Hook exists; not a cached dataset"
+    }
+  ],
+  "blocked": [
+    {
+      "src": "fantasy ADP feed (dynastyprocess/FantasyPros)",
+      "use": "403 in container; ff_opportunity substitutes"
+    },
+    {
+      "src": "aussportsbetting direct download",
+      "use": "403; Alex provided the file manually instead"
+    }
+  ],
+  "not_yet": [
+    {
+      "src": "player-specific variance shapes",
+      "use": "boom/bust vs possession \u2014 improves prop + smash pricing"
+    },
+    {
+      "src": "game-script conditioning",
+      "use": "project usage given projected game flow"
+    }
+  ]
+}

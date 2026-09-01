@@ -98,7 +98,8 @@ def price_ou(mkt, mu, line, over_price, under_price):
     ev = p * american_profit(price) - (1 - p)
     return {"side": side, "model_p": round(p, 3), "edge": round(edge, 3),
             "price": price, "vig": round(vig, 3), "fair": round(fair_o if side == "Over" else 1 - fair_o, 3),
-            "ev": round(ev, 3)}
+            "ev": round(ev, 3), "model_p_over": round(p_over, 3), "fair_over": round(fair_o, 3),
+            "over_price_kept": over_price, "under_price_kept": under_price}
 
 
 def build_prop_board(key=None, projections=None, td_rates=None, max_games=None):
@@ -137,6 +138,26 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None):
     df = pd.DataFrame(out)
     if not len(df):
         return df, rem
+    # --- neutralize the market-wide skew bias -------------------------------
+    # A projection is a MEAN; yardage is right-skewed, so P(over the mean) < .5,
+    # which silently tilts every skewed prop Under. We remove the systematic per-
+    # market component (median over-probability offset) so only PLAYER-SPECIFIC
+    # disagreements survive as edges — the board balances, unders must be earned.
+    for mkt in df["mkt"].unique():
+        m = df["mkt"] == mkt
+        offset = float((df.loc[m, "model_p_over"] - df.loc[m, "fair_over"]).median())
+        adj = (df.loc[m, "model_p_over"] - offset).clip(0.02, 0.98)
+        df.loc[m, "adj_p_over"] = adj
+        eo = adj - df.loc[m, "fair_over"]
+        eu = (1 - adj) - (1 - df.loc[m, "fair_over"])
+        df.loc[m, "side"] = np.where(eo >= eu, "Over", "Under")
+        df.loc[m, "edge"] = np.where(eo >= eu, eo, eu).round(3)
+        df.loc[m, "model_p"] = np.where(eo >= eu, adj, 1 - adj).round(3)
+        df.loc[m, "fair"] = np.where(eo >= eu, df.loc[m, "fair_over"], 1 - df.loc[m, "fair_over"]).round(3)
+        df.loc[m, "price"] = np.where(eo >= eu, df.loc[m, "over_price_kept"], df.loc[m, "under_price_kept"])
+        df.loc[m, "ev"] = (df.loc[m, "model_p"] * df.loc[m, "price"].map(american_profit)
+                           - (1 - df.loc[m, "model_p"])).round(3)
+        df.loc[m, "skew_offset"] = round(offset, 3)
     # best book per (player, market, side): max edge
     df = df.sort_values("edge", ascending=False).drop_duplicates(["name", "mkt", "side"])
     return df, rem
@@ -179,21 +200,29 @@ def reason(row, news=None):
             lead += f" Latest word: {news}"
         return lead
 
-    # PICK — pick the dominant angle
+    # PICK — lead with whatever is actually doing the work, and vary the voice
     diff = proj - line
-    if abs(diff) >= 0.15 * max(line, 1):        # our number is the story
-        lead = (f"Our model sees {name} at {proj} {mkt_lbl} — a real gap on the {side.lower()} "
-                f"of {line}. ")
-    else:                                        # the price/number is the story
-        lead = (f"This is a number and a price play: {name}'s {line} is a hair soft and we're "
-                f"buying the {side.lower()} while it's there. ")
-    body = (f"Fair on the {side.lower()} after stripping the {vig:.0f}% juice is "
-            f"{int(row['fair']*100)}%; we make it {int(row['model_p']*100)}% — a {edge_pts:+.0f}-point "
-            f"edge, {ev:+.0f}% on the ticket at {price:+d}. ")
-    trust = ("This is a stable, multi-year role, which is exactly where our projections grade out "
-             "calibrated." if row["confidence"] >= 0.67 else
-             "Role's in flux, so we're sizing this as a lean, not a hammer.")
-    tail = f" {news}" if news else ""
+    big = abs(diff) >= 0.15 * max(line, 1)
+    s = side.lower()
+    if big and side == "Under":
+        lead = (f"The room's got {name} up at {line}; we've got him at {proj}. We think they're "
+                f"a full tick high on the workload and we're taking the under back down to our number. ")
+    elif big and side == "Over":
+        lead = (f"We're higher on {name} than the board — {proj} against a {line} that looks a step "
+                f"behind his role. We'll take the over before it catches up. ")
+    else:
+        lead = (f"{name}'s {line} is a touch soft and the price is right, so we're on the {s} — "
+                f"a number play, not a hero call. ")
+    # the money line: real edge after juice, phrased like a desk
+    body = (f"Strip the {vig:.0f}% juice and the fair {s} is {int(row['fair']*100)}%; we make it "
+            f"{int(row['model_p']*100)}%. That's {ev:+.0f} cents on the dollar at {price:+d}. ")
+    if row["confidence"] >= 0.67:
+        trust = "Locked-in role, and this is the exact tier our numbers grade out sharp."
+    elif row["confidence"] >= 0.5:
+        trust = "Usage is settling in — we like it, but it's a lean until the snaps confirm."
+    else:
+        trust = "Role's still moving, so this rides light until the depth chart firms up."
+    tail = f" Word from the beat: {news}" if news else ""
     return lead + body + trust + tail
 
 
