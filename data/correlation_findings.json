@@ -1,0 +1,23 @@
+{
+ "qb_wr_same_team": {
+  "corr": 0.164,
+  "p_wr_over_given_qb_over": 0.55,
+  "p_wr_over_given_qb_under": 0.38,
+  "use": "STACK \u2014 real positive correlation"
+ },
+ "two_wr_same_team": {
+  "corr": 0.009,
+  "use": "DO NOT stack two WRs expecting correlation \u2014 independent"
+ },
+ "rb_rush_vs_qb_pass_same_team": {
+  "corr": -0.04,
+  "use": "AVOID in same slip \u2014 run vs pass script, mild negative"
+ },
+ "opposing_qbs": {
+  "corr": 0.054,
+  "use": "weak shootout correlation"
+ },
+ "def_vs_wr_persistence": 0.08,
+ "def_vs_rb_persistence": 0.26,
+ "note": "WR matchup barely persists (market prices it); RB matchup weakly sticky"
+}

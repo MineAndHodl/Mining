@@ -90,3 +90,34 @@ def price_props(rates, board, env_by_team=None, opp_by_pid=None):
                     "edge": round(edge, 3), "games": int(r["n"]),
                     "proj_mean": round(r["mean"] * env, 1), "game": b.get("game")})
     return pd.DataFrame(out).sort_values("edge", ascending=False) if out else pd.DataFrame()
+
+
+# ---- market-anchored projection (the fix for confident-wrong edges) --------
+from scipy.optimize import brentq
+
+def market_mean(mkt, line, p_over_fair):
+    """Invert: find the mean whose fitted distribution gives P(over line)=p_over_fair.
+    This anchors our projection to what the MARKET implies, so average edge ~= 0.
+    Our edge then comes ONLY from tilts we apply on top (environment, matchup)."""
+    p_over_fair = min(max(p_over_fair, 0.02), 0.98)
+    try:
+        return brentq(lambda mu: p_over(mkt, mu, line) - p_over_fair, 0.5, line * 6 + 20)
+    except Exception:
+        return line  # fallback
+
+
+def anchored_edge(mkt, line, over_price, under_price, env=1.0, opp=1.0,
+                  role_delta=0.0, max_tilt=0.14):
+    """Edge = model P(over) at a TILTED mean vs the de-vigged market prob.
+    tilt = env * opp * (1+role_delta), clipped so no single prop shows a crazy edge
+    unless the tilt genuinely warrants it. Returns (side, edge, p_model, proj_mean)."""
+    io, iu = implied(over_price), implied(under_price)
+    fair_o = io / (io + iu)
+    mu_mkt = market_mean(mkt, line, fair_o)
+    tilt = float(np.clip(env * opp * (1 + role_delta), 1 - max_tilt, 1 + max_tilt))
+    mu_model = mu_mkt * tilt
+    po = p_over(mkt, mu_model, line)
+    eo, eu = po - fair_o, (1 - po) - (1 - fair_o)
+    if eo >= eu:
+        return "Over", round(eo, 3), round(po, 3), round(mu_model, 1)
+    return "Under", round(eu, 3), round(po, 3), round(mu_model, 1)
