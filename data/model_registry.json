@@ -638,16 +638,43 @@
       "status": "RULED_OUT",
       "weight": 0.0,
       "note": "null \u2014 TD allowance too noisy/low-frequency to predict; don't build TD matchup off defense"
+    },
+    {
+      "id": "steam_chase",
+      "name": "Chasing line moves (steam) at the close",
+      "cat": "market",
+      "stat": "moved-side covers 47.9% at close (n=2497)",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "following sharp moves at the close LOSES \u2014 too late; reinforces bet-the-opener"
+    },
+    {
+      "id": "sharp_capture",
+      "name": "Sharp-money capture (Pinnacle + model)",
+      "cat": "market",
+      "stat": "Pinnacle anchor + model predicts move (r=.236)",
+      "status": "IN",
+      "weight": 0.8,
+      "note": "we already read the sharp side via the sharpest book + our early-move prediction"
+    },
+    {
+      "id": "splits_feed_paid",
+      "name": "Bet%/handle% splits feed (PAID, parked)",
+      "cat": "data",
+      "stat": "not tested \u2014 proprietary",
+      "status": "MONITOR",
+      "weight": 0.0,
+      "note": "PARKED paid-data option (Unabated/Action Network); only additive if seen EARLY before line moves; not needed for Week 1"
     }
   ],
   "version": 3,
   "updated": "2026-09-01",
   "counts": {
     "CORE": 2,
-    "IN": 21,
+    "IN": 22,
     "GATED": 1,
-    "MONITOR": 8,
-    "RULED_OUT": 39
+    "MONITOR": 9,
+    "RULED_OUT": 40
   },
-  "total_tested": 71
+  "total_tested": 74
 }
