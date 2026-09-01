@@ -60,8 +60,9 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 .flegend{font-size:11px;color:var(--dim);margin-top:9px}
 .slrow{display:grid;grid-template-columns:120px 1fr 62px;gap:9px;align-items:center;margin:5px 0;font-size:12px}
 .sltag{font-size:10.5px;text-align:right}
-.sltag.pos{color:var(--green)} .sltag.neg{color:var(--heat)} .sltag.none{color:var(--dim)}
+.sltag.pos{color:var(--green)} .sltag.neg{color:var(--heat)} .sltag.none{color:var(--muted)} .sltag.na{color:var(--dim);opacity:.7;font-style:italic}
 .sldot.none{background:var(--dim)}
+.sltrack:has(.sldot.na){opacity:.4}
 .slname{color:var(--ink);font-weight:600}
 .sltrack{position:relative;height:8px;border-radius:5px;background:linear-gradient(90deg,rgba(255,107,74,.18),var(--line2) 45%,var(--line2) 55%,rgba(46,230,166,.18))}
 .sltrack .mid{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--dim);opacity:.5}
@@ -83,7 +84,7 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
   <div class="tabhint" id="hint"></div>
   <div id="list"></div>
 
-  <div class="note">Desk Score blends edge, expected value, and role certainty — a <b>moderate</b> edge on a locked-in role outranks a huge edge on an unknown (a blowout gap usually means our number's stale, not that we found free money). Best-across shows the top plays regardless of category, so a weak category can contribute nothing. The Whale Missile primetime lotto is its own lane. Not affiliated with any sportsbook.</div>
+  <div class="note">Desk Score blends edge, expected value, and role certainty — a <b>moderate</b> edge on a locked-in role outranks a huge edge on an unknown (a blowout gap usually means our number's stale, not that we found free money). Best-across shows the top plays regardless of category, so a weak category can contribute nothing. The Whale Missile is its own lane — 8-10 near-locks across the slate, mostly minus-money, built so a lot of them hit. Not affiliated with any sportsbook.</div>
 </div>
 
 <script>
@@ -101,15 +102,20 @@ function fmtEdge(e){return e==null?"":(typeof e==="string"?e:("+"+Math.round(e*1
 function renderCard(sc){
   if(!sc) return '';
   const order=["Projected Usage","Recent Trend","Game Flow","Opponent Defense","Injury Picture","Weather","Play-Calling","Market Read","Regression"];
+  const strength=a=>a>=0.55?'strong':(a>=0.22?'clear':'slight');
   const rows=order.filter(f=>f in sc).map(f=>{
-    const v=Math.max(-1,Math.min(1,+sc[f]||0));
-    const pos=50+v*42;                       // 0=center, +1=right(supports), -1=left(against)
-    const noread=Math.abs(v)<0.06;
-    const cls=noread?'none':(v>0?'pos':'neg');
-    const tag=noread?'no read':(v>0?'supports':'against');
-    return `<div class="slrow"><span class="slname">${f}</span><div class="sltrack"><div class="mid"></div><div class="sldot ${cls}" style="left:${pos}%"></div></div><span class="sltag ${cls}">${tag}</span></div>`;
+    const raw=sc[f];
+    const na=(raw===null||raw===undefined);          // no data / no forecast yet
+    const v=na?0:Math.max(-1,Math.min(1,+raw));
+    const a=Math.abs(v);
+    const neutral=!na&&a<0.06;                        // checked, genuinely no effect (e.g. dome)
+    const pos=50+v*42;                                // 0=center, +1=right(supports), -1=left(against)
+    const cls=na?'na':(neutral?'none':(v>0?'pos':'neg'));
+    const tag=na?'n/a':(neutral?'neutral':`${strength(a)} ${v>0?'✓ supports':'✕ against'}`);
+    const dot=na?'':`<div class="sldot ${cls}" style="left:${pos}%"></div>`;
+    return `<div class="slrow"><span class="slname">${f}</span><div class="sltrack"><div class="mid"></div>${dot}</div><span class="sltag ${cls}">${tag}</span></div>`;
   }).join('');
-  return `<div style="margin-top:8px">${rows}</div><div class="flegend">← works against · supports → &nbsp;(flipped for over vs under; longer reach = stronger lean; centered = no read)</div>`;
+  return `<div style="margin-top:8px">${rows}</div><div class="flegend">← works against · supports → &nbsp;(each lever is flipped for the side we're on, so it reads right for overs and unders; longer reach = stronger lean · <b>neutral</b> = checked, no effect · <b>n/a</b> = no data yet)</div>`;
 }
 function propRow(p,i){
   const sc=+p.score||0, col=scoreColor(sc), top=i<3&&active==="best";
@@ -140,14 +146,15 @@ function render(){
   const hint=document.getElementById("hint");
   const L=document.getElementById("list");
   if(active==="missile"){
-    hint.textContent="One correlated primetime lotto (TNF/SNF/MNF) — its own lane, not blended with the ranked plays.";
+    hint.textContent="8-10 near-locks across the slate — its own lane, mostly minus-money, built so a LOT of them hit.";
     const m=D.whale_missile;
-    if(!m){L.innerHTML='<div class="empty">No primetime game this window.</div>';return;}
+    if(!m){L.innerHTML='<div class="empty">No near-lock slate yet (props not posted).</div>';return;}
+    const ng=(m.games&&m.games.length)||1;
     L.innerHTML=`<div class="play top" style="cursor:default"><div class="rank">🐋</div>
-      <div class="pmain"><div class="nm">${m.game}</div><div class="meta"><span class="chip mk">${m.n_legs} legs</span><span class="num">$100 → <b>$${Math.round(100*(m.combined_decimal||0)).toLocaleString()}</b></span></div></div>
+      <div class="pmain"><div class="nm">Whale Missile</div><div class="meta"><span class="chip mk">${m.n_legs} legs · ${ng} games</span><span class="num">$100 → <b>$${Math.round(100*(m.combined_decimal||0)).toLocaleString()}</b></span>${m.expected_hits!=null?`<span class="num" style="color:var(--muted)">~${m.expected_hits} expected to hit</span>`:''}</div></div>
       <div class="pscore"><div class="v" style="color:var(--gold)">${(m.combined_american>0?'+':'')+m.combined_american}</div><div class="l">Payout</div></div></div>`+
-      m.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta"><span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">model ${Math.round((l.p_model||0)*100)}%</span></div></div><div class="pscore"></div></div>`).join('')+
-      `<div class="note" style="margin-top:12px">${m.note||''} Size it small — it's a lottery ticket, priced for the group hitting together.</div>`;
+      m.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta">${l.lock?'<span class="vbadge v-confirmed">🔒 lock</span>':'<span class="chip mk">spice</span>'}<span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">model ${Math.round((l.p_model||0)*100)}%</span></div></div><div class="pscore"></div></div>`).join('')+
+      `<div class="note" style="margin-top:12px">${m.note||''}</div>`;
     return;
   }
   if(active==="games"){

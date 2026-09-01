@@ -222,11 +222,49 @@ def test_live(key):
     check("desk_card produced a card", isinstance(res["card"]["verdict"], str))
 
 
+def test_factor_scorecard():
+    """Factors must carry real leans (not a wall of zeros) and honor n/a vs neutral."""
+    import factor_scorecard as fsc
+    pick = {"side": "Under", "mkt": "receptions", "line": 4.5, "our_num": 2.9}
+    pr = {"own_rec_yds": 55, "role_rec_yds": 70, "proj_targets_pg": 4.2, "hist_games": 12}
+    sc = fsc.scorecard(pick, proj_row=pr, script={"team_spread": -7, "implied_team_pts": 27},
+                       weather={"roof": "outdoors", "wind": 14, "temp": 38}, matchup=-0.08, adp=95)
+    fired = sum(1 for v in sc.values() if v not in (None, 0.0))
+    check("scorecard fires most factors (>=6)", fired >= 6, f"fired={fired}")
+    check("Projected Usage supports Under (our#<line => positive lean for the under)", sc["Projected Usage"] > 0)
+    # dome -> weather neutral 0.0, NOT None
+    sd = fsc.scorecard({"side": "Over", "mkt": "rec_yds", "line": 60, "our_num": 70},
+                       proj_row=pr, weather={"roof": "dome"})
+    check("dome weather = neutral 0.0 (not n/a)", sd["Weather"] == 0.0)
+    # no weather data at all -> None (n/a)
+    sn = fsc.scorecard({"side": "Over", "mkt": "rec_yds", "line": 60, "our_num": 70}, proj_row=pr)
+    check("missing weather = n/a (None)", sn["Weather"] is None)
+
+
+def test_whale_missile_discipline():
+    """Missile locks must be minus-money (market-agreed), and mostly near-locks."""
+    import whale_missile as wm
+    import json as _j
+    d = _j.load(open(os.path.join(os.path.dirname(__file__), "..", "data", "ranked_board.json")))
+    m = d.get("whale_missile")
+    if not m:
+        check("missile present in board", False, "no whale_missile key"); return
+    legs = m["legs"]
+    check("missile has 8-10 legs", 8 <= len(legs) <= 11, f"n={len(legs)}")
+    lock_prices_ok = all(l["price"] <= -105 for l in legs if l.get("lock"))
+    check("every lock is minus-money (market-agreed)", lock_prices_ok)
+    n_lock = sum(1 for l in legs if l.get("lock"))
+    check("most legs are near-locks (>=60%)", n_lock >= 0.6 * len(legs), f"{n_lock}/{len(legs)}")
+    players = [l["name"] for l in legs]
+    check("no duplicate players in missile", len(players) == len(set(players)))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--offline", action="store_true"); a = ap.parse_args()
     print("=" * 60, "\n  DESK PIPELINE TEST SUITE\n", "=" * 60)
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
+    test_factor_scorecard(); test_whale_missile_discipline()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)
