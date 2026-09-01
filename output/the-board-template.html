@@ -1,0 +1,154 @@
+<title>The Desk — The Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&display=swap">
+<style>
+:root{
+  --bg:#0b0d12;--panel:#141821;--panel2:#1a1f2a;--line:#242a36;--line2:#323a4a;
+  --ink:#eef1f6;--muted:#8a93a6;--dim:#5d6577;
+  --green:#2ee6a6;--green-d:#12b886;--gold:#f5c518;--amber:#ff9f43;--heat:#ff6b4a;--blue:#4aa3ff;--bad:#ff5c72;
+  --disp:"Barlow Semi Condensed",system-ui,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f4f5f7;--panel:#fff;--panel2:#f6f7f9;--line:#e5e8ee;--line2:#d5dae3;
+  --ink:#151922;--muted:#5c6577;--dim:#8b93a3;--green:#0f9e73;--green-d:#0c8a63;--gold:#b8860b;--amber:#d97b1f;--heat:#e04a2c;--blue:#2b6fd0;--bad:#d43a52;}}
+:root[data-theme="light"]{--bg:#f4f5f7;--panel:#fff;--panel2:#f6f7f9;--line:#e5e8ee;--line2:#d5dae3;--ink:#151922;--muted:#5c6577;--dim:#8b93a3;--green:#0f9e73;--green-d:#0c8a63;--gold:#b8860b;--amber:#d97b1f;--heat:#e04a2c;--blue:#2b6fd0;--bad:#d43a52;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding:22px 15px 90px}
+.disp{font-family:var(--disp)}
+h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;margin:0;line-height:1}
+.eyebrow{font-family:var(--disp);font-weight:700;letter-spacing:.24em;text-transform:uppercase;font-size:12px;color:var(--green)}
+.sub{color:var(--muted);margin-top:6px;max-width:600px;font-size:14px}
+.head{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
+/* toggle */
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0 6px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+.tab{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.03em;padding:7px 14px;border-radius:999px;
+  border:1px solid var(--line2);color:var(--muted);background:var(--panel);cursor:pointer;white-space:nowrap;user-select:none}
+.tab.on{background:var(--green);color:#04130d;border-color:var(--green)}
+.tabhint{font-size:12px;color:var(--dim);margin:2px 0 14px}
+/* play row */
+.play{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;background:var(--panel);
+  border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin:9px 0;cursor:pointer;transition:border-color .15s}
+.play:hover{border-color:var(--line2)}
+.play.top{border-color:var(--gold);box-shadow:0 0 0 1px rgba(245,197,24,.25)}
+.rank{font-family:var(--disp);font-weight:800;font-size:20px;color:var(--dim);text-align:center}
+.play.top .rank{color:var(--gold)}
+.pmain .nm{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.2px}
+.pmain .meta{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.chip.mk{color:var(--blue);border-color:transparent;background:rgba(74,163,255,.12)}
+.vbadge{font-family:var(--disp);font-weight:800;font-size:9.5px;letter-spacing:.06em;padding:2px 7px;border-radius:5px}
+.v-confirmed{background:rgba(46,230,166,.16);color:var(--green)}
+.v-keep{background:var(--panel2);color:var(--muted)}
+.v-suspect{background:rgba(255,159,67,.16);color:var(--amber)}
+.num{font-family:var(--mono);color:var(--ink)}
+.num b{color:var(--green)}
+.edge{color:var(--green);font-weight:700}
+.pscore{text-align:center;min-width:64px}
+.pscore .v{font-family:var(--disp);font-weight:800;font-size:26px;line-height:1}
+.pscore .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim)}
+.sbar{height:5px;border-radius:3px;background:var(--line2);margin-top:5px;overflow:hidden}
+.sbar>i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green-d),var(--green))}
+.why{grid-column:1/-1;font-size:13.5px;color:var(--ink);background:var(--panel2);border-radius:9px;padding:11px 13px;margin-top:4px;line-height:1.5;border-left:3px solid var(--green)}
+.why.hide{display:none}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px 12px;margin-top:10px}
+.frow{display:flex;align-items:center;gap:7px;font-size:12px}
+.fdot{width:9px;height:9px;border-radius:50%;flex:none}
+.fpos{background:var(--green)} .fneg{background:var(--heat)} .fnone{background:var(--line2)}
+.frow .fl{color:var(--muted)} .frow.pos .fl{color:var(--ink)} .frow.neg .fl{color:var(--ink)}
+.flegend{font-size:11px;color:var(--dim);margin-top:9px}
+.slrow{display:grid;grid-template-columns:132px 1fr;gap:10px;align-items:center;margin:6px 0;font-size:12px}
+.slname{color:var(--ink);font-weight:600}
+.sltrack{position:relative;height:8px;border-radius:5px;background:linear-gradient(90deg,rgba(255,107,74,.18),var(--line2) 45%,var(--line2) 55%,rgba(46,230,166,.18))}
+.sltrack .mid{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--dim);opacity:.5}
+.sldot{position:absolute;top:-3px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%);border:2px solid var(--panel)}
+.sldot.pos{background:var(--green)} .sldot.neg{background:var(--heat)}
+.empty{color:var(--dim);font-size:13px;padding:20px;text-align:center}
+.note{font-size:12px;color:var(--dim);margin-top:22px;line-height:1.55;border-top:1px solid var(--line);padding-top:14px}
+.count{font-size:12px;color:var(--muted);font-family:var(--mono)}
+</style>
+
+<div class="wrap">
+  <div class="head">
+    <div class="eyebrow">The Desk · The Board</div>
+    <h1>What We're Betting, Ranked</h1>
+    <div class="sub">Every row is a real play — the number, our number, the edge, and a Desk Score for how much we like it. Toggle between the best across everything, each prop category, and the games. Tap any play for the why.</div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="tabhint" id="hint"></div>
+  <div id="list"></div>
+
+  <div class="note">Desk Score blends edge, expected value, and role certainty — a <b>moderate</b> edge on a locked-in role outranks a huge edge on an unknown (a blowout gap usually means our number's stale, not that we found free money). Best-across shows the top plays regardless of category, so a weak category can contribute nothing. The Whale Missile primetime lotto is its own lane. Not affiliated with any sportsbook.</div>
+</div>
+
+<script>
+const D = /*DATA*/{};
+const CATLABEL={rec_yds:"Receiving Yds",rush_yds:"Rushing Yds",receptions:"Receptions",anytime_td:"Anytime TD",pass_yds:"Passing Yds",rush_att:"Rush Att"};
+const VIEWS=[["best","🔥 Best Bets"],["games","🏈 Games"]];
+Object.keys(D.by_category||{}).forEach(c=>VIEWS.push([c,CATLABEL[c]||c]));
+const HINTS={best:"Top plays across every category, ranked by conviction.",games:"Spreads, totals & moneylines — best value on the slate."};
+let active="best";
+
+function scoreColor(s){return s>=85?"var(--gold)":s>=70?"var(--green)":s>=55?"var(--blue)":"var(--muted)";}
+function fmtEdge(e){return e==null?"":(typeof e==="string"?e:("+"+Math.round(e*100)+"% edge"));}
+
+
+function renderCard(sc){
+  if(!sc) return '';
+  const order=["Projected Usage","Recent Trend","Game Flow","Opponent Defense","Injury Picture","Weather","Play-Calling","Market Read","Regression"];
+  const active=order.filter(f=>f in sc && sc[f]!==0);
+  const neutral=order.filter(f=>f in sc && sc[f]===0).length;
+  if(!active.length) return '<div class="flegend">No single factor is decisive here — it\'s a straight number-vs-line value play.</div>';
+  const rows=active.map(f=>{
+    const v=sc[f]; const pos=v>0?85:15; const cls=v>0?'pos':'neg';
+    return `<div class="slrow"><span class="slname">${f}</span><div class="sltrack"><div class="mid"></div><div class="sldot ${cls}" style="left:${pos}%"></div></div></div>`;
+  }).join('');
+  return `<div style="margin-top:6px">${rows}</div><div class="flegend">← works against · supports → (flipped for over vs under). ${neutral} other factors: no impact on this pick.</div>`;
+}
+function propRow(p,i){
+  const sc=+p.score||0, col=scoreColor(sc), top=i<3&&active==="best";
+  const mk=CATLABEL[p.cat]||p.cat;
+  const price=p.price!=null?((p.price>0?"+":"")+p.price):"";
+  const num=(p.cat==="anytime_td")?`model ${Math.round((p.our_num||0)*100)}% to score`
+       :`line <b>${p.line}</b> · our # ${p.our_num}`;
+  return `<div class="play ${top?'top':''}" onclick="this.querySelector('.why').classList.toggle('hide')">
+    <div class="rank">${i+1}</div>
+    <div class="pmain"><div class="nm">${top?'🔥 ':''}${p.name} <span style="color:var(--muted);font-weight:600">${p.side||''}</span></div>
+      <div class="meta"><span class="chip mk">${mk}</span>${p.verdict&&p.verdict!=="KEEP"?`<span class="vbadge v-${p.verdict.toLowerCase()}">${p.verdict==="CONFIRMED"?"✓ confirmed":p.verdict}</span>`:""}<span class="num">${num}</span> <span class="edge">${fmtEdge(p.edge)}</span> <span class="num" style="color:var(--muted)">${price} ${p.book||''}</span></div></div>
+    <div class="pscore"><div class="v" style="color:${col}">${sc}</div><div class="l">Desk Score</div><div class="sbar"><i style="width:${sc}%;background:${col}"></i></div></div>
+    <div class="why hide">${p.reason||'—'}${renderCard(p.scorecard)}</div>
+  </div>`;
+}
+function gameRow(g,i){
+  const sc=+g.score||0,col=scoreColor(sc),top=i<3;
+  return `<div class="play ${top?'top':''}" onclick="this.querySelector('.why').classList.toggle('hide')">
+    <div class="rank">${i+1}</div>
+    <div class="pmain"><div class="nm">${top?'🔥 ':''}${g.pick}</div>
+      <div class="meta"><span class="chip mk">${g.kind}</span><span class="num">our # ${g.desk_num}</span> <span class="edge">${g.edge}</span> <span class="num" style="color:var(--muted)">${g.book||''}</span></div></div>
+    <div class="pscore"><div class="v" style="color:${col}">${sc}</div><div class="l">Desk Score</div><div class="sbar"><i style="width:${sc}%;background:${col}"></i></div></div>
+    <div class="why hide">${g.reason||'—'}</div>
+  </div>`;
+}
+function render(){
+  document.getElementById("tabs").innerHTML=VIEWS.map(v=>`<div class="tab ${v[0]===active?'on':''}" onclick="setView('${v[0]}')">${v[1]}</div>`).join("");
+  const hint=document.getElementById("hint");
+  const L=document.getElementById("list");
+  if(active==="games"){
+    hint.textContent=HINTS.games;
+    const g=D.best_games||[];
+    L.innerHTML=g.length?g.map(gameRow).join(""):'<div class="empty">No game edges clear the bar this slate.</div>';
+  }else if(active==="best"){
+    hint.textContent=HINTS.best;
+    const p=D.best_props||[];
+    L.innerHTML=p.length?`<div class="count">${p.length} plays</div>`+p.map(propRow).join(""):'<div class="empty">Nothing clears the bar.</div>';
+  }else{
+    hint.textContent=`Top plays in ${CATLABEL[active]||active}, ranked by Desk Score.`;
+    const p=(D.by_category||{})[active]||[];
+    L.innerHTML=p.length?`<div class="count">${p.length} plays</div>`+p.map(propRow).join(""):'<div class="empty">Nothing in this category clears the bar.</div>';
+  }
+}
+function setView(v){active=v;render();window.scrollTo({top:0,behavior:"smooth"});}
+render();
+</script>

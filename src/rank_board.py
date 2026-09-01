@@ -22,16 +22,15 @@ def prop_score(row):
     player, not free money. So the edge curve PEAKS around 8% and PENALIZES beyond ~11%,
     and confidence (role certainty) is weighted heavily so unknowns can't top the board."""
     edge = float(row.get("edge", 0))
-    ev = float(row.get("ev", 0))
     conf = float(row.get("confidence", 0.5))
-    # edge is monotonic (bigger IS better) — we DON'T blanket-penalize large edges; the
-    # per-play investigation (investigate.py) decides if a big edge is alpha or stale.
-    base = 40 + edge * 280 + max(ev, 0) * 18
-    conf_factor = 0.4 + 0.6 * min(conf / 0.7, 1.0)
-    s = base * conf_factor
-    # apply the investigation's verdict multiplier if present (SUSPECT gets cut, not the size)
-    s *= float(row.get("score_mult", 1.0))
-    return round(min(s, 94), 1)
+    verdict = row.get("verdict", "KEEP")
+    # Edge is the spine and the main spread-maker; confidence nudges; the per-play
+    # investigation verdict adjusts (SUSPECT cut hard, CONFIRMED small boost). Calibrated
+    # so picks span ~45 (marginal) to ~92 (elite), not everything bunched at the top.
+    base = 45 + edge * 300                          # 4%→57, 8%→69, 12%→81, 15%→90
+    conf_adj = (conf - 0.7) * 14                    # high role certainty +, low -
+    vadj = {"CONFIRMED": 2, "KEEP": 0, "SUSPECT": -30}.get(verdict, 0)
+    return round(float(np.clip(base + conf_adj + vadj, 28, 93)), 1)
 
 
 def td_score(row):
