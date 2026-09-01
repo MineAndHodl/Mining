@@ -50,6 +50,16 @@ td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12.5p
 .link b{font-weight:600}.link span{color:var(--muted);font-size:12.5px}
 .link .go{color:var(--accent);font:600 13px "Barlow Condensed";letter-spacing:.06em}
 .note{font-size:12.5px;color:var(--muted);margin-top:8px}
+.play{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0 10px 10px 0;padding:13px 16px;margin-bottom:9px}
+.pr{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.pr b{font:600 17px/1.25 "IBM Plex Sans";display:block;margin-top:3px}
+.tg{font:600 10px/1 "Barlow Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--chip);padding:4px 7px;border-radius:4px}
+.tg.gold{color:var(--gold)}.tg.lean{color:var(--muted)}
+.conf{font:700 26px/1 "Barlow Condensed",sans-serif;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
+.conf.gold{color:var(--gold)}.conf.lean{color:var(--muted)}
+.conf span{font-size:12px;color:var(--muted)}
+.pm{color:var(--muted);font-size:13px;margin-top:7px}
+.pm b{color:var(--ink)}
 .foot{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.7}
 .foot b{color:var(--accent)}
 </style>
@@ -61,8 +71,8 @@ td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12.5p
 </div></header>
 
 <nav>
-  <button class="on" data-t="over">Overview</button>
-  <button data-t="card">This Week</button>
+  <button class="on" data-t="like">What I Like</button>
+  <button data-t="board">Full Board</button>
   <button data-t="fut">Futures</button>
   <button data-t="td">TD & Missiles</button>
   <button data-t="tools">Tools</button>
@@ -70,7 +80,34 @@ td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12.5p
 
 <div class="wrap">
 
-<section class="on" id="over">
+<section class="on" id="like">
+  <h2>What I like this week</h2><hr class="rule">
+  <p style="margin-top:0">Ranked by <b>Desk Confidence</b> — my proprietary conviction rating, not a win probability. Only plays that clear the bar show up. Most weeks that's a handful. <b>Sample board below</b> — the live one drops in the Tuesday DESK LOG once Week 1's board opens.</p>
+  <div style="display:flex;gap:8px;align-items:center;margin:10px 0 4px"><span class="pill">verdict</span><span style="color:var(--muted);font-size:13px">3 elite · 2 leans — a real week</span></div>
+  <div class="play" style="border-left-color:var(--gold)">
+    <div class="pr"><div><span class="tg gold">🔒 TOP PLAY</span><b>Buffalo Bills +1</b></div><div class="conf gold">8.3<span>/10</span></div></div>
+    <div class="pm">@ Houston · Fanatics still hanging +1 after the market moved to Bills −1. Two points of stale value on the side we'd want anyway. <b>Bet at Fanatics (−115).</b></div>
+  </div>
+  <div class="play">
+    <div class="pr"><div><span class="tg">✅ STRONG</span><b>ATL/PIT Under 42.5</b></div><div class="conf">7.1<span>/10</span></div></div>
+    <div class="pm">DraftKings hangs 42.5; the sharp fair number is 41.5. A full point of the good side of a low total. <b>Bet at DraftKings (−115).</b></div>
+  </div>
+  <div class="play">
+    <div class="pr"><div><span class="tg">✅ STRONG</span><b>New York Giants +3</b></div><div class="conf">7.0<span>/10</span></div></div>
+    <div class="pm">vs Dallas · +3 crosses the key number (sharp fair 2.5). Landing the better side of 3 is worth ~2% on its own. <b>Bet at BetMGM (−115).</b></div>
+  </div>
+  <div class="play">
+    <div class="pr"><div><span class="tg lean">👀 LEAN</span><b>JSN Over 83.5 rec yds</b></div><div class="conf lean">6.8<span>/10</span></div></div>
+    <div class="pm">Model projects 91.4 in a game it sees closer than the market does. Calibrated receiving-yards model, 34 games of data.</div>
+  </div>
+  <div class="play">
+    <div class="pr"><div><span class="tg lean">👀 LEAN</span><b>Hunter Henry Over 33.5 rec yds</b></div><div class="conf lean">6.6<span>/10</span></div></div>
+    <div class="pm">Model projects 41 — Maye's security blanket in a NE catch-up script. Small unit, but we like it.</div>
+  </div>
+  <p class="note">Desk Confidence is curved: everything shown reads 6+, elite plays hit 8–9. Nothing is ever a 10 — that would be a lie. Every play here is graded against the close, win or loss.</p>
+</section>
+
+<section id="board">
   <h2>Where it stands</h2><hr class="rule">
   <div class="kpis">
     <div class="kpi"><b>0–0</b><span>Season record</span></div>
@@ -78,7 +115,7 @@ td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12.5p
     <div class="kpi"><b>20k</b><span>Sims / week</span></div>
     <div class="kpi"><b>6</b><span>Auto jobs live</span></div>
   </div>
-  <p>The model is built, backtested, and running. Season opens <b>Sept 9</b>; the first graded picks land this week. Everything below is live model output — refreshed each week by the automated desk.</p>
+  <p>The model is built, backtested, and running. Season opens <b>Sept 9</b>; the first graded picks land this week. This tab is the full context behind the picks above.</p>
   <div class="card">
     <h3>What fires, and when</h3>
     <p style="margin:8px 0 0">
@@ -177,5 +214,5 @@ td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12.5p
 const btns=[...document.querySelectorAll('nav button')], secs=[...document.querySelectorAll('section')];
 function show(t){btns.forEach(b=>b.classList.toggle('on',b.dataset.t===t));secs.forEach(s=>s.classList.toggle('on',s.id===t));window.scrollTo({top:0,behavior:'smooth'});}
 btns.forEach(b=>b.onclick=()=>{show(b.dataset.t);try{localStorage.setItem('desk_tab',b.dataset.t)}catch(e){}});
-try{const t=localStorage.getItem('desk_tab');if(t&&document.getElementById(t))show(t)}catch(e){}
+
 </script>
