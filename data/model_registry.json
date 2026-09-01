@@ -368,6 +368,24 @@
       "status": "RULED_OUT",
       "weight": 0.0,
       "note": "DEAD (noise) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "wind_unders",
+      "name": "High wind (\u226515mph) \u2192 under",
+      "cat": "weather",
+      "stat": "55.6% under, n=649, p=.005 (research bot, day 1)",
+      "status": "MONITOR",
+      "weight": 0.35,
+      "note": "CEO promoted from research \u2192 MONITOR; validate out-of-sample before live. Weather suppresses passing."
+    },
+    {
+      "id": "blowout_rb2",
+      "name": "Blowout \u2192 RB2 garbage-time rushing",
+      "cat": "props",
+      "stat": "29% of Q4 carries come with a 10+ lead",
+      "status": "MONITOR",
+      "weight": 0.3,
+      "note": "candidate for backup-RB rush-prop overs in projected blowouts"
     }
   ],
   "version": 1,
@@ -376,8 +394,8 @@
     "CORE": 2,
     "IN": 13,
     "GATED": 1,
-    "MONITOR": 4,
+    "MONITOR": 6,
     "RULED_OUT": 21
   },
-  "total_tested": 41
+  "total_tested": 43
 }

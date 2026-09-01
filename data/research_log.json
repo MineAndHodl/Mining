@@ -1,0 +1,46 @@
+{
+  "entries": [
+    {
+      "date": "2026-09-01",
+      "results": [
+        {
+          "hypothesis": "High wind (>=15mph) \u2192 under the closing total",
+          "stat": "0.556 under rate, n=649",
+          "p": 0.005,
+          "verdict": "PROMISING",
+          "recommendation": "significant \u2014 propose MONITOR, then validate out-of-sample"
+        },
+        {
+          "hypothesis": "Team off a bye (rest>=13d) covers ATS",
+          "stat": "0.493 ATS, n=879",
+          "p": 0.686,
+          "verdict": "DEAD",
+          "recommendation": "not significant \u2014 ruled out, logged as knowledge"
+        },
+        {
+          "hypothesis": "Leading teams (>=10, Q4) shift carries to backups (RB2 rush value)",
+          "stat": "0.29 of Q4 carries come with a 10+ lead",
+          "p": 0.0,
+          "verdict": "PROMISING",
+          "recommendation": "quantify RB2-specific share next; candidate for blowout rush-prop overs"
+        }
+      ],
+      "promising": [
+        {
+          "hypothesis": "High wind (>=15mph) \u2192 under the closing total",
+          "stat": "0.556 under rate, n=649",
+          "p": 0.005,
+          "verdict": "PROMISING",
+          "recommendation": "significant \u2014 propose MONITOR, then validate out-of-sample"
+        },
+        {
+          "hypothesis": "Leading teams (>=10, Q4) shift carries to backups (RB2 rush value)",
+          "stat": "0.29 of Q4 carries come with a 10+ lead",
+          "p": 0.0,
+          "verdict": "PROMISING",
+          "recommendation": "quantify RB2-specific share next; candidate for blowout rush-prop overs"
+        }
+      ]
+    }
+  ]
+}
