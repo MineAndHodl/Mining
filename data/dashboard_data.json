@@ -316,7 +316,8 @@
         "stat": "MAE 10.26 pts vs closing",
         "status": "CORE",
         "weight": 1.0,
-        "note": "pass/rush composite, 8-iteration opponent adjustment \u2014 the spine"
+        "note": "pass/rush composite, 8-iteration opponent adjustment \u2014 the spine",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "recency",
@@ -325,7 +326,8 @@
         "stat": "backtest-tuned",
         "status": "CORE",
         "weight": 1.0,
-        "note": "current form dominates within ~4 weeks"
+        "note": "current form dominates within ~4 weeks",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "asym_shrink",
@@ -334,7 +336,8 @@
         "stat": "MAE 10.30\u219210.26",
         "status": "IN",
         "weight": 1.0,
-        "note": "defense regresses harder (less stable YoY)"
+        "note": "defense regresses harder (less stable YoY)",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "coach_change_offense",
@@ -343,7 +346,8 @@
         "stat": "offense carryover corr 0.52\u21920.10 on coach change",
         "status": "IN",
         "weight": 0.9,
-        "note": "new coach \u2248 throw out prior offense; defense partly survives"
+        "note": "new coach \u2248 throw out prior offense; defense partly survives",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "multiyear_prior",
@@ -352,7 +356,8 @@
         "stat": "S-2 coef p=0.027",
         "status": "IN",
         "weight": 0.7,
-        "note": "many seasons > last season alone"
+        "note": "many seasons > last season alone",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "qb_continuity",
@@ -361,7 +366,8 @@
         "stat": "interaction p=0.87",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "tested, null \u2014 cut"
+        "note": "tested, null \u2014 cut",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "proe_tendency",
@@ -370,7 +376,8 @@
         "stat": "in-season corr 0.59; flips \u22120.67 on coach change",
         "status": "IN",
         "weight": 0.8,
-        "note": "predicts team pass/run volume; INVERT for new coaches"
+        "note": "predicts team pass/run volume; INVERT for new coaches",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "goalline_rushtd",
@@ -379,7 +386,8 @@
         "stat": "r=0.85 (vs 0.75 total carries)",
         "status": "IN",
         "weight": 0.9,
-        "note": "the goal-line back is the rush-TD play; needs current-season data"
+        "note": "the goal-line back is the rush-TD play; needs current-season data",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "rz_rectd",
@@ -388,7 +396,8 @@
         "stat": "r=0.77 (vs 0.73 overall); finds specialists",
         "status": "IN",
         "weight": 0.7,
-        "note": "RZ over-indexers (TE/big-body) print TDs the yardage misses"
+        "note": "RZ over-indexers (TE/big-body) print TDs the yardage misses",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "prop_hybrid",
@@ -397,7 +406,8 @@
         "stat": "MAE 9.5 vs 10.2 naive; Brier .051",
         "status": "IN",
         "weight": 1.0,
-        "note": "stable players use own recency-weighted usage; calibrated"
+        "note": "stable players use own recency-weighted usage; calibrated",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "prop_role_model",
@@ -406,7 +416,8 @@
         "stat": "higher variance \u2014 gated",
         "status": "GATED",
         "weight": 0.4,
-        "note": "share\u00d7volume\u00d7efficiency; waits on 2026 usage to calibrate"
+        "note": "share\u00d7volume\u00d7efficiency; waits on 2026 usage to calibrate",
+        "public_bucket": "In testing"
       },
       {
         "id": "trust_band",
@@ -415,7 +426,8 @@
         "stat": "new this week",
         "status": "IN",
         "weight": 0.8,
-        "note": "huge model-vs-line gaps flagged REVIEW, not fired \u2014 market repriced a role"
+        "note": "huge model-vs-line gaps flagged REVIEW, not fired \u2014 market repriced a role",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "offmarket_flags",
@@ -424,7 +436,8 @@
         "stat": "CLV-positive vs Pinnacle fair",
         "status": "IN",
         "weight": 0.9,
-        "note": "best bettable number per side; coherent line/book/edge"
+        "note": "best bettable number per side; coherent line/book/edge",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "wong_teaser",
@@ -433,7 +446,8 @@
         "stat": "documented +EV at standard pricing",
         "status": "IN",
         "weight": 0.6,
-        "note": "basic-strategy legs"
+        "note": "basic-strategy legs",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "sgp_qbwr",
@@ -442,7 +456,8 @@
         "stat": "+0.16",
         "status": "IN",
         "weight": 0.6,
-        "note": "real positive correlation for SGPs"
+        "note": "real positive correlation for SGPs",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "sgp_wrwr",
@@ -451,7 +466,8 @@
         "stat": "~0.00",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "no correlation \u2014 cut from SGP logic"
+        "note": "no correlation \u2014 cut from SGP logic",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "wr_def_matchup",
@@ -460,7 +476,8 @@
         "stat": "r=0.08 (noise)",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "tested, essentially random \u2014 cut"
+        "note": "tested, essentially random \u2014 cut",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rb_def_matchup",
@@ -469,7 +486,8 @@
         "stat": "r=0.26 (weak)",
         "status": "MONITOR",
         "weight": 0.3,
-        "note": "weakly sticky \u2014 watched"
+        "note": "weakly sticky \u2014 watched",
+        "public_bucket": "In testing"
       },
       {
         "id": "road_dog",
@@ -478,7 +496,8 @@
         "stat": "0.497 ATS (2023-25) \u2014 still cut",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "HFA over-pricing edge \u2014 market adjusted, decayed to a coin flip. Cut."
+        "note": "HFA over-pricing edge \u2014 market adjusted, decayed to a coin flip. Cut.",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "overs_rising",
@@ -487,7 +506,8 @@
         "stat": "scoring flat ~45 for a decade",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "myth \u2014 no such trend"
+        "note": "myth \u2014 no such trend",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "pass_rate_decline",
@@ -496,7 +516,8 @@
         "stat": "60%\u219257% (2016-25)",
         "status": "MONITOR",
         "weight": 0.3,
-        "note": "mild rushing tailwind for props"
+        "note": "mild rushing tailwind for props",
+        "public_bucket": "In testing"
       },
       {
         "id": "hfa",
@@ -505,7 +526,8 @@
         "stat": "2.4\u21921.5 (2019-25)",
         "status": "IN",
         "weight": 0.8,
-        "note": "structural collapse, priced into ratings"
+        "note": "structural collapse, priced into ratings",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "skew_under_value",
@@ -514,7 +536,8 @@
         "stat": "under investigation (11/12 picks Under wk1)",
         "status": "MONITOR",
         "weight": 0.3,
-        "note": "right-skewed yardage means P(over mean)<50%; real edge if books set at mean, artifact if at median \u2014 validating"
+        "note": "right-skewed yardage means P(over mean)<50%; real edge if books set at mean, artifact if at median \u2014 validating",
+        "public_bucket": "In testing"
       },
       {
         "id": "ref_penalty",
@@ -523,7 +546,8 @@
         "stat": "crew explains 4% of penalty variance; 11-15/gm range",
         "status": "MONITOR",
         "weight": 0.25,
-        "note": "real crew signature on flags; weak on totals \u2014 an exotic overlay we surface"
+        "note": "real crew signature on flags; weak on totals \u2014 an exotic overlay we surface",
+        "public_bucket": "In testing"
       },
       {
         "id": "ref_total",
@@ -532,7 +556,8 @@
         "stat": "weak/none once team quality controlled",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "flag-happy crews \u2260 higher totals after adjusting for teams \u2014 knowledge: don't bet totals off refs"
+        "note": "flag-happy crews \u2260 higher totals after adjusting for teams \u2014 knowledge: don't bet totals off refs",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "coach_gl_pass",
@@ -541,7 +566,8 @@
         "stat": "range 0.30 (Daboll) to 0.81 (Harbaugh) GL pass rate",
         "status": "IN",
         "weight": 0.5,
-        "note": "predicts whether a team's GL TDs go to RB (run) or WR/TE (pass) \u2014 feeds TD props"
+        "note": "predicts whether a team's GL TDs go to RB (run) or WR/TE (pass) \u2014 feeds TD props",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "gv_home_dogs_ats",
@@ -550,7 +576,8 @@
         "stat": "50.3% ATS, n=1089, p=0.856",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+        "note": "DEAD (inside vig) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_road_favs_-7_ats",
@@ -559,7 +586,8 @@
         "stat": "45.7% ATS, n=232, p=0.212",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (noise) \u2014 tested so you don't have to"
+        "note": "DEAD (noise) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_home_off_bye_ats",
@@ -568,7 +596,8 @@
         "stat": "47.3% ATS, n=241, p=0.44",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (noise) \u2014 tested so you don't have to"
+        "note": "DEAD (noise) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_away_off_bye_ats",
@@ -577,7 +606,8 @@
         "stat": "54.0% ATS, n=289, p=0.196",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (noise) \u2014 tested so you don't have to"
+        "note": "DEAD (noise) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_fade_short-rest_road_tea",
@@ -586,7 +616,8 @@
         "stat": "49.7% ATS, n=177, p=1.0",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+        "note": "DEAD (inside vig) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_division_home_dogs_ats",
@@ -595,7 +626,8 @@
         "stat": "49.9% ATS, n=411, p=1.0",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+        "note": "DEAD (inside vig) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_late-season_home_dogs",
@@ -604,7 +636,8 @@
         "stat": "50.2% ATS, n=297, p=1.0",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+        "note": "DEAD (inside vig) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_primetime_unders",
@@ -613,7 +646,8 @@
         "stat": "54.4% ATS, n=618, p=0.033",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (noise) \u2014 tested so you don't have to"
+        "note": "DEAD (noise) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_fade_dome_team_outdoors_",
@@ -622,7 +656,8 @@
         "stat": "49.7% ATS, n=173, p=1.0",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+        "note": "DEAD (inside vig) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_unders_on_50_totals",
@@ -631,7 +666,8 @@
         "stat": "51.8% ATS, n=394, p=0.513",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+        "note": "DEAD (inside vig) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_overs_on_low_(le38)_tota",
@@ -640,7 +676,8 @@
         "stat": "43.2% ATS, n=146, p=0.116",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (noise) \u2014 tested so you don't have to"
+        "note": "DEAD (noise) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_unders_on_10_spreads",
@@ -649,7 +686,8 @@
         "stat": "53.7% ATS, n=352, p=0.183",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (noise) \u2014 tested so you don't have to"
+        "note": "DEAD (noise) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_fade_west-coast_team_at_",
@@ -658,7 +696,8 @@
         "stat": "45.6% ATS, n=158, p=0.301",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (noise) \u2014 tested so you don't have to"
+        "note": "DEAD (noise) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_late_div_rematch_home_do",
@@ -667,7 +706,8 @@
         "stat": "47.5% ATS, n=242, p=0.48",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (noise) \u2014 tested so you don't have to"
+        "note": "DEAD (noise) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "gv_bounce-back_after_20_pt_",
@@ -676,7 +716,8 @@
         "stat": "52.6% ATS, n=487, p=0.277",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD (noise) \u2014 tested so you don't have to"
+        "note": "DEAD (noise) \u2014 tested so you don't have to",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "wind_unders",
@@ -685,7 +726,8 @@
         "stat": "55.6% vs 52.4% BE, p=.107 \u2014 beats 50% but NOT the vig",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "CEO corrected: promoted hastily vs 50%; against break-even it's dead"
+        "note": "CEO corrected: promoted hastily vs 50%; against break-even it's dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "blowout_rb2",
@@ -694,16 +736,18 @@
         "stat": "29% of Q4 carries come with a 10+ lead",
         "status": "MONITOR",
         "weight": 0.3,
-        "note": "candidate for backup-RB rush-prop overs in projected blowouts"
+        "note": "candidate for backup-RB rush-prop overs in projected blowouts",
+        "public_bucket": "In testing"
       },
       {
         "id": "clv_openclose",
         "name": "Open\u2192close line movement (CLV)",
         "cat": "market",
-        "stat": "80% of games move, avg 1.27 pts (n=3194)",
+        "stat": "model predicts open\u2192close direction: r=+0.236 p<1e-34 (n=2719); 51% directional on \u22651pt, 48.5% ATS at close",
         "status": "IN",
         "weight": 1.0,
-        "note": "VALIDATED foundation of beat-the-close: early numbers move ~1.3pt \u2014 capturing them is the core edge"
+        "note": "VALIDATED but MODEST: real directional CLV signal \u2014 bet early to capture it; we do NOT beat the closing line itself. Grind edge, compounds on volume.",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "clv_totals",
@@ -712,7 +756,8 @@
         "stat": "avg 1.45 pt move (n=3194)",
         "status": "MONITOR",
         "weight": 0.4,
-        "note": "soft opening totals settle \u2014 capture early"
+        "note": "soft opening totals settle \u2014 capture early",
+        "public_bucket": "In testing"
       },
       {
         "id": "usage_sticky",
@@ -721,7 +766,8 @@
         "stat": "targets r=0.93, receptions r=0.91 YoY",
         "status": "IN",
         "weight": 1.0,
-        "note": "VALIDATED: recency-weighted own usage is a rock-solid prop projection base"
+        "note": "VALIDATED: recency-weighted own usage is a rock-solid prop projection base",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "rd_wind_ge15mph_to_under",
@@ -730,7 +776,8 @@
         "stat": "0.556 vs 0.524 BE, n=649; recent 0.602 (n=88)",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "bet unders in heavy wind \u2014 tested vs break-even, dead"
+        "note": "bet unders in heavy wind \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_wind_ge20mph_to_under",
@@ -739,7 +786,8 @@
         "stat": "0.553 vs 0.524 BE, n=179",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "stronger wind cut \u2014 tested vs break-even, dead"
+        "note": "stronger wind cut \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_cold_<32f_to_under",
@@ -748,7 +796,8 @@
         "stat": "0.463 vs 0.524 BE, n=268",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "freezing games \u2014 tested vs break-even, dead"
+        "note": "freezing games \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_dome_indoor_to_over",
@@ -757,7 +806,8 @@
         "stat": "0.506 vs 0.524 BE, n=1734",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "controlled env scoring \u2014 tested vs break-even, dead"
+        "note": "controlled env scoring \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_total_ge51_to_under",
@@ -766,7 +816,8 @@
         "stat": "0.504 vs 0.524 BE, n=496",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "high totals regress \u2014 tested vs break-even, dead"
+        "note": "high totals regress \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_total_le38_to_over",
@@ -775,7 +826,8 @@
         "stat": "0.497 vs 0.524 BE, n=1126",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "low totals \u2014 tested vs break-even, dead"
+        "note": "low totals \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_home_underdogs_ats",
@@ -784,7 +836,8 @@
         "stat": "0.488 vs 0.524 BE, n=2456",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "home dogs \u2014 tested vs break-even, dead"
+        "note": "home dogs \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_road_favorites_ats",
@@ -793,7 +846,8 @@
         "stat": "0.503 vs 0.524 BE, n=4481",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "road favs \u2014 tested vs break-even, dead"
+        "note": "road favs \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_big_favorites_-10_ats",
@@ -802,7 +856,8 @@
         "stat": "0.464 vs 0.524 BE, n=870",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "double-digit favs cover? \u2014 tested vs break-even, dead"
+        "note": "double-digit favs cover? \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_rest_edge_ge3_days_(home)_",
@@ -811,7 +866,8 @@
         "stat": "0.478 vs 0.524 BE, n=621",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "rest advantage \u2014 tested vs break-even, dead"
+        "note": "rest advantage \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_division_dogs_ats",
@@ -820,7 +876,8 @@
         "stat": "0.480 vs 0.524 BE, n=986",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "familiarity \u2192 dogs \u2014 tested vs break-even, dead"
+        "note": "familiarity \u2192 dogs \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_division_games_to_under",
@@ -829,7 +886,8 @@
         "stat": "0.510 vs 0.524 BE, n=2694",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "div games lower scoring \u2014 tested vs break-even, dead"
+        "note": "div games lower scoring \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "rd_thursday_games_to_under",
@@ -838,7 +896,8 @@
         "stat": "0.495 vs 0.524 BE, n=329",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "short week sloppy/low \u2014 tested vs break-even, dead"
+        "note": "short week sloppy/low \u2014 tested vs break-even, dead",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "wind_pass",
@@ -847,7 +906,8 @@
         "stat": "r=-0.167 p<1e-4; -49 pass yds/gm at 15+mph (n=1207)",
         "status": "IN",
         "weight": 0.7,
-        "note": "VALIDATED \u2014 scales pass/rec prop projections down in wind"
+        "note": "VALIDATED \u2014 scales pass/rec prop projections down in wind",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "cold_pass",
@@ -856,7 +916,8 @@
         "stat": "temp vs pass yds r=+0.157 p<1e-4",
         "status": "IN",
         "weight": 0.5,
-        "note": "cold-weather pass unders; wired into weather.py"
+        "note": "cold-weather pass unders; wired into weather.py",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "wind_fg",
@@ -865,7 +926,8 @@
         "stat": "r=-0.025 p=0.38 (85% either way)",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "DEAD \u2014 kickers don't attempt long FGs in wind; no kicker-prop edge here"
+        "note": "DEAD \u2014 kickers don't attempt long FGs in wind; no kicker-prop edge here",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "adot_variance",
@@ -874,7 +936,8 @@
         "stat": "r=-0.12 p=0.08 (n=216)",
         "status": "RULED_OUT",
         "weight": 0.0,
-        "note": "null \u2014 don't price variance off aDOT"
+        "note": "null \u2014 don't price variance off aDOT",
+        "public_bucket": "Ruled out (knowledge)"
       },
       {
         "id": "market_trust",
@@ -883,7 +946,8 @@
         "stat": "YoY: rec_yds .81 > rush .76 > rec'ns .61 > pass .37",
         "status": "IN",
         "weight": 0.8,
-        "note": "VALIDATED \u2014 demand bigger edge on pass_yds; trust rec/rush yards"
+        "note": "VALIDATED \u2014 demand bigger edge on pass_yds; trust rec/rush yards",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "rz_targets_td",
@@ -892,7 +956,8 @@
         "stat": "r=0.82 p<1e-4; RZ share 0.44 sticky",
         "status": "IN",
         "weight": 0.7,
-        "note": "VALIDATED TD-prop signal; RZ share more stable than goal-line RB role"
+        "note": "VALIDATED TD-prop signal; RZ share more stable than goal-line RB role",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "targets_vs_recs",
@@ -901,7 +966,8 @@
         "stat": "targets r=.93 vs receptions r=.61 YoY",
         "status": "IN",
         "weight": 0.6,
-        "note": "project receptions as target-volume \u00d7 catch-rate, not raw"
+        "note": "project receptions as target-volume \u00d7 catch-rate, not raw",
+        "public_bucket": "Driving picks"
       },
       {
         "id": "rush_bad_weather",
@@ -910,19 +976,95 @@
         "stat": "offenses lean run in wind/cold (candidate)",
         "status": "MONITOR",
         "weight": 0.3,
-        "note": "small rush-prop over nudge; validate the magnitude"
+        "note": "small rush-prop over nudge; validate the magnitude",
+        "public_bucket": "In testing"
+      },
+      {
+        "id": "dvp_rb_rush",
+        "name": "RB rushing vs defense (opp-adjusted)",
+        "cat": "matchup",
+        "stat": "r=+0.086 p=3e-8 (n=4170)",
+        "status": "IN",
+        "weight": 0.4,
+        "note": "VALIDATED weak signal \u2014 small rush-prop matchup adjustment; must be opponent-adjusted",
+        "public_bucket": "Driving picks"
+      },
+      {
+        "id": "dvp_te_rec",
+        "name": "TE receiving vs defense",
+        "cat": "matchup",
+        "stat": "r=+0.043 p=.01",
+        "status": "MONITOR",
+        "weight": 0.25,
+        "note": "marginal \u2014 watch",
+        "public_bucket": "In testing"
+      },
+      {
+        "id": "dvp_wr_rec",
+        "name": "WR receiving vs defense (adjusted)",
+        "cat": "matchup",
+        "stat": "r=+0.020 p=.11 (n=6730)",
+        "status": "RULED_OUT",
+        "weight": 0.0,
+        "note": "noise even opponent-adjusted \u2014 WR matchup is mostly schedule",
+        "public_bucket": "Ruled out (knowledge)"
+      },
+      {
+        "id": "dvp_td_allowed",
+        "name": "TDs allowed by position",
+        "cat": "matchup",
+        "stat": "WR/RB/TE all p>0.25",
+        "status": "RULED_OUT",
+        "weight": 0.0,
+        "note": "null \u2014 TD allowance too noisy/low-frequency to predict; don't build TD matchup off defense",
+        "public_bucket": "Ruled out (knowledge)"
+      },
+      {
+        "id": "steam_chase",
+        "name": "Chasing line moves (steam) at the close",
+        "cat": "market",
+        "stat": "moved-side covers 47.9% at close (n=2497)",
+        "status": "RULED_OUT",
+        "weight": 0.0,
+        "note": "following sharp moves at the close LOSES \u2014 too late; reinforces bet-the-opener",
+        "public_bucket": "Ruled out (knowledge)"
+      },
+      {
+        "id": "sharp_capture",
+        "name": "Sharp-money capture (Pinnacle + model)",
+        "cat": "market",
+        "stat": "Pinnacle anchor + model predicts move (r=.236)",
+        "status": "IN",
+        "weight": 0.8,
+        "note": "we already read the sharp side via the sharpest book + our early-move prediction",
+        "public_bucket": "Driving picks"
+      },
+      {
+        "id": "splits_feed_paid",
+        "name": "Bet%/handle% splits feed (PAID, parked)",
+        "cat": "data",
+        "stat": "not tested \u2014 proprietary",
+        "status": "MONITOR",
+        "weight": 0.0,
+        "note": "PARKED paid-data option (Unabated/Action Network); only additive if seen EARLY before line moves; not needed for Week 1",
+        "public_bucket": "In testing"
       }
     ],
     "version": 3,
     "updated": "2026-09-01",
     "counts": {
       "CORE": 2,
-      "IN": 20,
+      "IN": 22,
       "GATED": 1,
-      "MONITOR": 7,
-      "RULED_OUT": 37
+      "MONITOR": 9,
+      "RULED_OUT": 40
     },
-    "total_tested": 67
+    "total_tested": 74,
+    "public_buckets": {
+      "Driving picks": 24,
+      "In testing": 10,
+      "Ruled out (knowledge)": 40
+    }
   },
   "changelog": [
     {
@@ -1293,5 +1435,92 @@
       ],
       "reason": "Romeo Doubs's 36.5 is a touch soft and the price is right, so we're on the under \u2014 a number play, not a hero call. Strip the 6% juice and the fair under is 50%; we make it 54%. That's +3 cents on the dollar at -114. Usage is settling in \u2014 we like it, but it's a lean until the snaps confirm."
     }
-  ]
+  ],
+  "public_buckets": {
+    "Driving picks": 24,
+    "In testing": 10,
+    "Ruled out (knowledge)": 40
+  },
+  "td_board": [
+    {
+      "name": "Darren Waller",
+      "game": "CHI @ CAR",
+      "price": 475,
+      "p": 0.305,
+      "imp": 0.174,
+      "edge": 0.131
+    },
+    {
+      "name": "Chimere Dike",
+      "game": "NYJ @ TEN",
+      "price": 650,
+      "p": 0.261,
+      "imp": 0.133,
+      "edge": 0.128
+    },
+    {
+      "name": "Demarcus Robinson",
+      "game": "SF @ LA",
+      "price": 900,
+      "p": 0.186,
+      "imp": 0.1,
+      "edge": 0.086
+    },
+    {
+      "name": "Tyler Higbee",
+      "game": "SF @ LA",
+      "price": 650,
+      "p": 0.21,
+      "imp": 0.133,
+      "edge": 0.076
+    },
+    {
+      "name": "Sean Tucker",
+      "game": "TB @ CIN",
+      "price": 550,
+      "p": 0.217,
+      "imp": 0.154,
+      "edge": 0.063
+    },
+    {
+      "name": "Davante Adams",
+      "game": "SF @ LA",
+      "price": 140,
+      "p": 0.476,
+      "imp": 0.417,
+      "edge": 0.059
+    }
+  ],
+  "whale_missile": {
+    "game": "Arizona Cardinals @ Los Angeles Chargers",
+    "american": 97837,
+    "payout": 97940,
+    "legs": [
+      {
+        "leg": "David Njoku anytime TD",
+        "price": 400,
+        "p": 0.291
+      },
+      {
+        "leg": "Oronde Gadsden II anytime TD",
+        "price": 425,
+        "p": 0.185
+      },
+      {
+        "leg": "Jacoby Brissett anytime TD",
+        "price": 950,
+        "p": 0.068
+      },
+      {
+        "leg": "Michael Wilson over 41.5 rec yds",
+        "price": -112,
+        "p": 0.543
+      },
+      {
+        "leg": "Trey McBride over 56.5 rec yds",
+        "price": -114,
+        "p": 0.531
+      }
+    ]
+  }
 }
