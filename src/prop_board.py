@@ -103,12 +103,12 @@ def price_ou(mkt, mu, line, over_price, under_price):
             "over_price_kept": over_price, "under_price_kept": under_price}
 
 
-def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, weather_by_game=None):
+def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, weather_by_game=None, days=14):
     """Returns the full priced prop board joined to our projections, best book per prop."""
     key = key or os.environ.get("ODDS_API_KEY")
     if projections is None:
         raise ValueError("pass projections (from props_projection.project)")
-    events = fetch_events(key)
+    events = fetch_events(key, days=days)
     ids = [e["id"] for e in events][:max_games] if max_games else [e["id"] for e in events]
     board, rem = fetch_props(key, ids)
     if not len(board):
