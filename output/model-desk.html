@@ -1,0 +1,205 @@
+<title>NFL Model Desk</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --ink:#1a1f1c; --muted:#5c655f;
+  --line:#dfe3dd; --accent:#0e6b4a; --accent-ink:#0e6b4a;
+  --neg:#a8362c; --chip:#eef2ec; --head:#10231b; --head-ink:#f2f5f0;
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141715; --surface:#1c211e; --ink:#e8ece8; --muted:#9aa69d;
+    --line:#2e352f; --accent:#3fae82; --accent-ink:#4cc492;
+    --neg:#e07b6f; --chip:#242b26; --head:#0e1a14; --head-ink:#e8ece8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141715; --surface:#1c211e; --ink:#e8ece8; --muted:#9aa69d;
+  --line:#2e352f; --accent:#3fae82; --accent-ink:#4cc492;
+  --neg:#e07b6f; --chip:#242b26; --head:#0e1a14; --head-ink:#e8ece8;
+}
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif; margin:0; padding:0 0 80px}
+.wrap{max-width:780px; margin:0 auto; padding:0 20px}
+header{background:var(--head); color:var(--head-ink); padding:40px 0 34px; margin-bottom:36px}
+header .wrap{max-width:780px}
+.kicker{font:600 13px/1 "Barlow Condensed",sans-serif; letter-spacing:.18em; text-transform:uppercase; color:var(--accent-ink); margin-bottom:12px}
+h1{font:700 44px/1.05 "Barlow Condensed",sans-serif; letter-spacing:.01em; margin:0 0 10px; text-wrap:balance}
+.sub{color:var(--head-ink); opacity:.75; max-width:56ch; margin:0}
+h2{font:700 26px/1.15 "Barlow Condensed",sans-serif; letter-spacing:.02em; text-transform:uppercase; margin:44px 0 6px; text-wrap:balance}
+h2 .n{color:var(--accent); margin-right:8px}
+p{max-width:66ch; margin:12px 0}
+.muted{color:var(--muted)}
+.rule{height:3px; width:44px; background:var(--accent); border:0; margin:0 0 14px}
+.tablebox{overflow-x:auto; background:var(--surface); border:1px solid var(--line); border-radius:6px; margin:18px 0}
+table{border-collapse:collapse; width:100%; font-size:14.5px}
+th{font:600 13px/1.2 "Barlow Condensed",sans-serif; letter-spacing:.1em; text-transform:uppercase; text-align:left; color:var(--muted); padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap}
+td{padding:8px 12px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.num, th.num{text-align:right; font-family:"IBM Plex Mono",monospace; font-size:13.5px}
+.pos{color:var(--accent-ink); font-weight:500}
+.neg{color:var(--neg); font-weight:500}
+.callout{background:var(--surface); border-left:4px solid var(--accent); border-radius:0 6px 6px 0; padding:14px 18px; margin:20px 0}
+.callout.warn{border-left-color:var(--neg)}
+.callout p{margin:6px 0}
+.chip{display:inline-block; background:var(--chip); border-radius:4px; padding:1px 8px; font:500 13px/1.7 "IBM Plex Mono",monospace}
+.twocol{display:grid; grid-template-columns:1fr 1fr; gap:0 28px}
+@media (max-width:560px){.twocol{grid-template-columns:1fr}}
+strong{font-weight:600}
+.foot{margin-top:52px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:13.5px}
+</style>
+
+<header><div class="wrap">
+  <div class="kicker">Build report · Sept 1, 2026</div>
+  <h1>NFL Model Desk</h1>
+  <p class="sub">EPA power-rating engine, walk-forward backtest 2017–2025, opening 2026 board, and the operating plan for the season.</p>
+</div></header>
+
+<div class="wrap">
+
+<h2><span class="n">01</span> What got built</h2>
+<hr class="rule">
+<p>Team offense/defense ratings from play-by-play EPA (2013–2025, ~460k plays): pass-weighted composite (62/38), opponent-adjusted iteratively, exponentially recency-weighted (10-week halflife), shrunk to league mean, with offseason staleness at each season boundary. Ratings feed three projection layers — spread (rating gap + home field 1.7 + rest), total (combined off/def efficiency + dome + wind against the current scoring environment), and moneyline (projected margin → win probability, σ = 13.2). Every backtest number below is walk-forward: each week's projection uses only games played before that week, and each season's coefficients are fit only on prior seasons.</p>
+
+<h2><span class="n">02</span> The honest backtest</h2>
+<hr class="rule">
+<p>2,335 games, 2017–2025, model vs the closing line at -110, betting whenever the model disagrees by at least the threshold:</p>
+<div class="tablebox"><table>
+<thead><tr><th class="num">Edge ≥</th><th class="num">Bets</th><th class="num">W–L</th><th class="num">Win %</th><th class="num">ROI</th></tr></thead>
+<tbody>
+<tr><td class="num">1.5 pts</td><td class="num">1,429</td><td class="num">681–716</td><td class="num">48.8</td><td class="num neg">−6.8%</td></tr>
+<tr><td class="num">2.5 pts</td><td class="num">936</td><td class="num">446–474</td><td class="num">48.5</td><td class="num neg">−7.3%</td></tr>
+<tr><td class="num">4.0 pts</td><td class="num">450</td><td class="num">224–220</td><td class="num">50.5</td><td class="num neg">−3.6%</td></tr>
+<tr><td class="num">Totals, 2.5</td><td class="num">1,130</td><td class="num">560–560</td><td class="num">50.0</td><td class="num neg">−4.5%</td></tr>
+</tbody></table></div>
+<p>Breakeven at -110 is 52.4%. The model never gets there. The sharper test: regressing actual margins on the closing line <em>and</em> the model number, the model's coefficient is zero (p = 0.35; totals p = 0.62) — the closing line already contains everything the model knows, plus injuries, weather forecasts, and sharp money it can't see. Model error vs actual margin: 10.30 points; the market's: 9.86.</p>
+<div class="callout warn">
+<p><strong>The finding, plainly:</strong> no model built on public data beats NFL closing lines. Not this one, not the paid ones. Any handicapper claiming 55%+ against the close is selling variance. That's not the end of the project — it defines where the real edge is.</p>
+</div>
+
+<h2><span class="n">03</span> Where the alpha actually is</h2>
+<hr class="rule">
+<p><strong>Off-market numbers.</strong> The closing consensus is efficient; individual books at individual moments are not. The pipeline de-vigs Pinnacle (the sharp anchor) and flags any retail book whose spread or total sits 1+ point off the fair number — 0.5 when it crosses 3 or 7 — or whose moneyline price clears +2% EV against fair probability. Betting numbers that already beat the sharp price is positive expected CLV by construction. This is how winning retail bettors actually win, and it's fully automatable with a live odds feed.</p>
+<p><strong>Early-week lines.</strong> Tuesday openers are softer than Sunday closers. The Tuesday card catches numbers before the market finishes correcting; the Sunday pass catches late off-market moves and injury repricing.</p>
+<p><strong>Key numbers.</strong> Landing the better side of 3 and 7 is worth roughly 2 points of win probability per crossing. The flagger treats key-number crossings as bets even at half the normal threshold.</p>
+<p><strong>Props (phase 2).</strong> Player prop markets carry more vig but far less sharp attention. Same architecture — usage-based projections vs cross-book outliers — once the core loop is running.</p>
+<p><strong>The model's real job</strong> is context, not picks: an independent number to judge which off-market flags are real, a sanity check when news breaks, and a prior in thin early-season markets. One tested overlay worth knowing: 10+ mph wind games went under at 58% from 2017–2023 — then 45% in 2024 and 53% in 2025. The market patched it. That's the pattern with published angles, and why the desk anchors on prices, not narratives.</p>
+
+<h2><span class="n">04</span> Opening 2026 power ratings</h2>
+<hr class="rule">
+<p class="muted">Net EPA/play vs league average, carried from 2025 with regression. No offseason adjustments yet — QB and roster moves get overlaid before Week 1 bets, so treat the tails as provisional.</p>
+<div class="twocol">
+<div class="tablebox"><table>
+<thead><tr><th>#</th><th>Team</th><th class="num">Net</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>NE</td><td class="num pos">+.098</td></tr>
+<tr><td>2</td><td>SEA</td><td class="num pos">+.095</td></tr>
+<tr><td>3</td><td>BUF</td><td class="num pos">+.090</td></tr>
+<tr><td>4</td><td>PHI</td><td class="num pos">+.076</td></tr>
+<tr><td>5</td><td>LAR</td><td class="num pos">+.074</td></tr>
+<tr><td>6</td><td>DEN</td><td class="num pos">+.064</td></tr>
+<tr><td>7</td><td>JAX</td><td class="num pos">+.060</td></tr>
+<tr><td>8</td><td>HOU</td><td class="num pos">+.050</td></tr>
+<tr><td>9</td><td>DET</td><td class="num pos">+.045</td></tr>
+<tr><td>10</td><td>BAL</td><td class="num pos">+.041</td></tr>
+<tr><td>11</td><td>GB</td><td class="num pos">+.035</td></tr>
+<tr><td>12</td><td>LAC</td><td class="num pos">+.033</td></tr>
+<tr><td>13</td><td>MIN</td><td class="num pos">+.028</td></tr>
+<tr><td>14</td><td>CHI</td><td class="num pos">+.022</td></tr>
+<tr><td>15</td><td>SF</td><td class="num pos">+.012</td></tr>
+<tr><td>16</td><td>KC</td><td class="num pos">+.002</td></tr>
+</tbody></table></div>
+<div class="tablebox"><table>
+<thead><tr><th>#</th><th>Team</th><th class="num">Net</th></tr></thead>
+<tbody>
+<tr><td>17</td><td>PIT</td><td class="num pos">+.001</td></tr>
+<tr><td>18</td><td>IND</td><td class="num neg">−.002</td></tr>
+<tr><td>19</td><td>TB</td><td class="num neg">−.004</td></tr>
+<tr><td>20</td><td>NO</td><td class="num neg">−.010</td></tr>
+<tr><td>21</td><td>ATL</td><td class="num neg">−.010</td></tr>
+<tr><td>22</td><td>CIN</td><td class="num neg">−.033</td></tr>
+<tr><td>23</td><td>NYG</td><td class="num neg">−.039</td></tr>
+<tr><td>24</td><td>CLE</td><td class="num neg">−.050</td></tr>
+<tr><td>25</td><td>MIA</td><td class="num neg">−.052</td></tr>
+<tr><td>26</td><td>WAS</td><td class="num neg">−.057</td></tr>
+<tr><td>27</td><td>ARI</td><td class="num neg">−.059</td></tr>
+<tr><td>28</td><td>DAL</td><td class="num neg">−.063</td></tr>
+<tr><td>29</td><td>CAR</td><td class="num neg">−.071</td></tr>
+<tr><td>30</td><td>TEN</td><td class="num neg">−.108</td></tr>
+<tr><td>31</td><td>LV</td><td class="num neg">−.116</td></tr>
+<tr><td>32</td><td>NYJ</td><td class="num neg">−.153</td></tr>
+</tbody></table></div>
+</div>
+
+<h2><span class="n">05</span> Week 1 board · model vs market</h2>
+<hr class="rule">
+<p class="muted">Kickoff Sept 9–14. Deltas are context, not picks — per §02, fading the market on model disagreement alone is -EV, and the biggest gaps mostly mark offseason changes the model can't see yet.</p>
+<div class="tablebox"><table>
+<thead><tr><th>Game</th><th class="num">Market</th><th class="num">Model</th><th class="num">Δ Spread</th><th class="num">Mkt Tot</th><th class="num">Mod Tot</th></tr></thead>
+<tbody>
+<tr><td>NE @ SEA</td><td class="num">SEA −3.5</td><td class="num">SEA −1.6</td><td class="num">1.9 NE</td><td class="num">44.5</td><td class="num">48.6</td></tr>
+<tr><td>SF @ LAR</td><td class="num">LAR −3.5</td><td class="num">LAR −3.5</td><td class="num">—</td><td class="num">48.5</td><td class="num">51.6</td></tr>
+<tr><td>CHI @ CAR</td><td class="num">CHI −2.5</td><td class="num">CHI −3.5</td><td class="num">1.0 CHI</td><td class="num">47.5</td><td class="num">47.4</td></tr>
+<tr><td>TB @ CIN</td><td class="num">CIN −3.5</td><td class="num">PK</td><td class="num">3.4 TB</td><td class="num">51.5</td><td class="num">48.2</td></tr>
+<tr><td>NO @ DET</td><td class="num">DET −7.0</td><td class="num">DET −4.8</td><td class="num">2.2 NO</td><td class="num">49.5</td><td class="num">46.3</td></tr>
+<tr><td>BUF @ HOU</td><td class="num">BUF −1.5</td><td class="num">BUF −0.5</td><td class="num">1.0 HOU</td><td class="num">44.5</td><td class="num">47.1</td></tr>
+<tr><td>BAL @ IND</td><td class="num">BAL −3.5</td><td class="num">BAL −0.6</td><td class="num">2.9 IND</td><td class="num">48.5</td><td class="num">48.8</td></tr>
+<tr><td>CLE @ JAX</td><td class="num">JAX −7.5</td><td class="num">JAX −7.9</td><td class="num">0.4 JAX</td><td class="num">40.5</td><td class="num">41.3</td></tr>
+<tr><td>ATL @ PIT</td><td class="num">PIT −3.0</td><td class="num">PIT −2.4</td><td class="num">0.6 ATL</td><td class="num">42.5</td><td class="num">46.4</td></tr>
+<tr><td>NYJ @ TEN</td><td class="num">TEN −1.5</td><td class="num">TEN −4.2</td><td class="num">2.7 TEN</td><td class="num">38.5</td><td class="num">44.0</td></tr>
+<tr><td>ARI @ LAC</td><td class="num">LAC −10.5</td><td class="num">LAC −6.9</td><td class="num">3.6 ARI</td><td class="num">46.5</td><td class="num">46.6</td></tr>
+<tr><td>MIA @ LV</td><td class="num">LV −3.5</td><td class="num">MIA −1.8</td><td class="num">5.3 MIA</td><td class="num">40.5</td><td class="num">43.2</td></tr>
+<tr><td>GB @ MIN</td><td class="num">MIN −1.5</td><td class="num">MIN −1.3</td><td class="num">0.2 GB</td><td class="num">45.5</td><td class="num">44.7</td></tr>
+<tr><td>WAS @ PHI</td><td class="num">PHI −4.5</td><td class="num">PHI −9.1</td><td class="num">4.6 PHI</td><td class="num">45.5</td><td class="num">47.9</td></tr>
+<tr><td>DAL @ NYG</td><td class="num">DAL −2.5</td><td class="num">NYG −3.1</td><td class="num">5.6 NYG</td><td class="num">48.5</td><td class="num">49.5</td></tr>
+<tr><td>DEN @ KC</td><td class="num">KC −3.0</td><td class="num">DEN −1.7</td><td class="num">4.7 DEN</td><td class="num">42.5</td><td class="num">45.6</td></tr>
+</tbody></table></div>
+<p class="muted">Model totals run ~2.5 points over market on this slate — the total layer gets recalibrated against live 2026 numbers before it flags anything.</p>
+
+<h2><span class="n">05b</span> 2026 futures board · 20,000 simulated seasons</h2>
+<hr class="rule">
+<p class="muted">Full 2026 schedule simulated 20,000 times from the ratings engine (margin model per game, division/seeding/playoff brackets played out). Market: DraftKings win totals, July 23 — stale by six weeks; live futures pricing comes with the odds feed.</p>
+<h3 style="font:600 17px/1.3 'Barlow Condensed',sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:20px 0 4px">Super Bowl probabilities (top 10)</h3>
+<div class="tablebox"><table>
+<thead><tr><th>Team</th><th class="num">Mean wins</th><th class="num">Div %</th><th class="num">Conf %</th><th class="num">SB %</th><th class="num">Fair odds</th></tr></thead>
+<tbody>
+<tr><td>SEA</td><td class="num">11.2</td><td class="num">53.9</td><td class="num">23.4</td><td class="num">13.0</td><td class="num">+667</td></tr>
+<tr><td>NE</td><td class="num">11.0</td><td class="num">51.6</td><td class="num">21.2</td><td class="num">11.8</td><td class="num">+747</td></tr>
+<tr><td>PHI</td><td class="num">10.9</td><td class="num">78.9</td><td class="num">20.2</td><td class="num">10.7</td><td class="num">+831</td></tr>
+<tr><td>BUF</td><td class="num">10.8</td><td class="num">46.0</td><td class="num">18.8</td><td class="num">10.6</td><td class="num">+840</td></tr>
+<tr><td>LAR</td><td class="num">10.3</td><td class="num">32.6</td><td class="num">14.3</td><td class="num">7.4</td><td class="num">+1244</td></tr>
+<tr><td>DEN</td><td class="num">10.3</td><td class="num">55.2</td><td class="num">13.5</td><td class="num">6.8</td><td class="num">+1373</td></tr>
+<tr><td>JAX</td><td class="num">10.1</td><td class="num">42.0</td><td class="num">11.5</td><td class="num">5.9</td><td class="num">+1606</td></tr>
+<tr><td>HOU</td><td class="num">10.0</td><td class="num">40.1</td><td class="num">9.6</td><td class="num">4.7</td><td class="num">+2051</td></tr>
+<tr><td>DET</td><td class="num">9.9</td><td class="num">35.7</td><td class="num">9.5</td><td class="num">4.5</td><td class="num">+2142</td></tr>
+<tr><td>BAL</td><td class="num">9.9</td><td class="num">51.9</td><td class="num">8.9</td><td class="num">4.3</td><td class="num">+2253</td></tr>
+</tbody></table></div>
+<h3 style="font:600 17px/1.3 'Barlow Condensed',sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:20px 0 4px">Win totals · biggest model-vs-market gaps</h3>
+<div class="tablebox"><table>
+<thead><tr><th>Team</th><th class="num">Market O/U</th><th class="num">Model mean</th><th class="num">Gap</th><th>Read</th></tr></thead>
+<tbody>
+<tr><td>ARI</td><td class="num">3.5</td><td class="num">6.7</td><td class="num pos">O +3.2</td><td>Gap too big — market pricing offseason news the model can't see. No bet until diagnosed.</td></tr>
+<tr><td>DAL</td><td class="num">9.5</td><td class="num">6.6</td><td class="num neg">U −2.9</td><td>Same caveat, other direction — market upgraded DAL hard vs 2025 tape.</td></tr>
+<tr><td>CIN</td><td class="num">10.5</td><td class="num">7.9</td><td class="num neg">U −2.6</td><td>Market pricing a bounce-back the ratings don't show. Diagnose before betting.</td></tr>
+<tr><td>MIA</td><td class="num">4.5</td><td class="num">6.8</td><td class="num pos">O +2.3</td><td>Deep-pessimism line; model sees a bad-not-historic team. Candidate.</td></tr>
+<tr><td>CLE</td><td class="num">5.5</td><td class="num">7.7</td><td class="num pos">O +2.2</td><td>Candidate, offseason check needed.</td></tr>
+<tr><td>KC</td><td class="num">10.5</td><td class="num">8.4</td><td class="num neg">U −2.1</td><td>Market still paying for the dynasty; 2025 ratings don't. Strongest narrative-vs-numbers spot.</td></tr>
+<tr><td>JAX</td><td class="num">8.5</td><td class="num">10.1</td><td class="num pos">O +1.6</td><td>Moderate gap, rating-driven. Best clean candidate on the board.</td></tr>
+<tr><td>BAL</td><td class="num">11.5</td><td class="num">9.9</td><td class="num neg">U −1.6</td><td>Market a full 1.5 above the sims. Candidate.</td></tr>
+<tr><td>IND</td><td class="num">7.5</td><td class="num">8.7</td><td class="num pos">O +1.2</td><td>Candidate.</td></tr>
+<tr><td>NO</td><td class="num">7.5</td><td class="num">8.7</td><td class="num pos">O +1.2</td><td>Candidate.</td></tr>
+</tbody></table></div>
+<p class="muted">Reading the gaps honestly: the model carries zero 2026 offseason information, so the very largest gaps (ARI, DAL, CIN) are more likely measuring roster news than market error — those get diagnosed, not bet. The playable class is the moderate gaps where nothing obvious changed: JAX o8.5, BAL u11.5, MIA o4.5, IND/NO o7.5, KC u10.5 after a narrative check. Futures also lock capital for five months and carry heavy vig — small units, and only where the gap survives the offseason-news check.</p>
+
+<h2><span class="n">06</span> Operating plan</h2>
+<hr class="rule">
+<p><strong>Tuesday, 10am</strong> — card drops: off-market flags vs Pinnacle fair across every book on the feed, key-number opportunities, model deltas as context, injury/news notes. You review, push back, approve.</p>
+<p><strong>Sunday, 9am</strong> — final pass: line moves since Tuesday, late off-market numbers, inactives.</p>
+<p><strong>Monday</strong> — grading: every flagged number logged with the price taken and the closing price. <strong>CLV is the KPI</strong>, not weekly W-L — beating the close consistently is the only early signal that generalizes, and 30 bets of results is noise. Verdict on whether the desk is +EV comes at ~100 tracked bets; if CLV is flat-to-negative by then, we change the approach rather than the story.</p>
+<div class="callout">
+<p><strong>To go live, one thing:</strong> a free key from <span class="chip">the-odds-api.com</span> — sign up, key arrives by email, paste it in chat. 500 requests/month covers the Tue/Sun cadence with room to spare and unlocks the whole loop: multi-book spreads, totals, and moneylines including Pinnacle.</p>
+</div>
+<p class="foot">All backtest code is walk-forward with no leakage; results reproducible in the session workspace. Sizing decisions stay with you — the desk flags numbers and tracks whether they beat the close. Variance in this market is brutal even with real CLV; judge the operation on the tracked record, not any single week.</p>
+
+</div>
