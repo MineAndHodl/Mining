@@ -373,10 +373,10 @@
       "id": "wind_unders",
       "name": "High wind (\u226515mph) \u2192 under",
       "cat": "weather",
-      "stat": "55.6% under, n=649, p=.005 (research bot, day 1)",
-      "status": "MONITOR",
-      "weight": 0.35,
-      "note": "CEO promoted from research \u2192 MONITOR; validate out-of-sample before live. Weather suppresses passing."
+      "stat": "55.6% vs 52.4% BE, p=.107 \u2014 beats 50% but NOT the vig",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "CEO corrected: promoted hastily vs 50%; against break-even it's dead"
     },
     {
       "id": "blowout_rb2",
@@ -386,16 +386,160 @@
       "status": "MONITOR",
       "weight": 0.3,
       "note": "candidate for backup-RB rush-prop overs in projected blowouts"
+    },
+    {
+      "id": "clv_openclose",
+      "name": "Open\u2192close line movement (CLV)",
+      "cat": "market",
+      "stat": "80% of games move, avg 1.27 pts (n=3194)",
+      "status": "IN",
+      "weight": 1.0,
+      "note": "VALIDATED foundation of beat-the-close: early numbers move ~1.3pt \u2014 capturing them is the core edge"
+    },
+    {
+      "id": "clv_totals",
+      "name": "Totals drift open\u2192close",
+      "cat": "market",
+      "stat": "avg 1.45 pt move (n=3194)",
+      "status": "MONITOR",
+      "weight": 0.4,
+      "note": "soft opening totals settle \u2014 capture early"
+    },
+    {
+      "id": "usage_sticky",
+      "name": "Usage stickiness (prop base)",
+      "cat": "props",
+      "stat": "targets r=0.93, receptions r=0.91 YoY",
+      "status": "IN",
+      "weight": 1.0,
+      "note": "VALIDATED: recency-weighted own usage is a rock-solid prop projection base"
+    },
+    {
+      "id": "rd_wind_ge15mph_to_under",
+      "name": "Wind \u226515mph \u2192 under",
+      "cat": "weather",
+      "stat": "0.556 vs 0.524 BE, n=649; recent 0.602 (n=88)",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "bet unders in heavy wind \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_wind_ge20mph_to_under",
+      "name": "Wind \u226520mph \u2192 under",
+      "cat": "weather",
+      "stat": "0.553 vs 0.524 BE, n=179",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "stronger wind cut \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_cold_<32f_to_under",
+      "name": "Cold <32\u00b0F \u2192 under",
+      "cat": "weather",
+      "stat": "0.463 vs 0.524 BE, n=268",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "freezing games \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_dome_indoor_to_over",
+      "name": "Dome/indoor \u2192 over",
+      "cat": "weather",
+      "stat": "0.506 vs 0.524 BE, n=1734",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "controlled env scoring \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_total_ge51_to_under",
+      "name": "Total \u226551 \u2192 under",
+      "cat": "totals",
+      "stat": "0.504 vs 0.524 BE, n=496",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "high totals regress \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_total_le38_to_over",
+      "name": "Total \u226438 \u2192 over",
+      "cat": "totals",
+      "stat": "0.497 vs 0.524 BE, n=1126",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "low totals \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_home_underdogs_ats",
+      "name": "Home underdogs ATS",
+      "cat": "situational",
+      "stat": "0.488 vs 0.524 BE, n=2456",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "home dogs \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_road_favorites_ats",
+      "name": "Road favorites ATS",
+      "cat": "situational",
+      "stat": "0.503 vs 0.524 BE, n=4481",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "road favs \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_big_favorites_-10_ats",
+      "name": "Big favorites \u221210+ ATS",
+      "cat": "situational",
+      "stat": "0.464 vs 0.524 BE, n=870",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "double-digit favs cover? \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_rest_edge_ge3_days_(home)_",
+      "name": "Rest edge \u22653 days (home) ATS",
+      "cat": "situational",
+      "stat": "0.478 vs 0.524 BE, n=621",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "rest advantage \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_division_dogs_ats",
+      "name": "Division dogs ATS",
+      "cat": "situational",
+      "stat": "0.480 vs 0.524 BE, n=986",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "familiarity \u2192 dogs \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_division_games_to_under",
+      "name": "Division games \u2192 under",
+      "cat": "situational",
+      "stat": "0.510 vs 0.524 BE, n=2694",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "div games lower scoring \u2014 tested vs break-even, dead"
+    },
+    {
+      "id": "rd_thursday_games_to_under",
+      "name": "Thursday games \u2192 under",
+      "cat": "slot",
+      "stat": "0.495 vs 0.524 BE, n=329",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "short week sloppy/low \u2014 tested vs break-even, dead"
     }
   ],
-  "version": 1,
+  "version": 2,
   "updated": "2026-09-01",
   "counts": {
     "CORE": 2,
-    "IN": 13,
+    "IN": 15,
     "GATED": 1,
     "MONITOR": 6,
-    "RULED_OUT": 21
+    "RULED_OUT": 35
   },
-  "total_tested": 43
+  "total_tested": 59
 }

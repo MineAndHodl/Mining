@@ -2,6 +2,20 @@
   "entries": [
     {
       "date": "2026-09-01",
+      "version": 2,
+      "active_params": 17,
+      "total_params": 59,
+      "headline": "30-day R&D sprint \u2014 validated the core, killed 13 angles",
+      "changes": [
+        "VALIDATED open\u2192close CLV (80% of lines move, avg 1.27pt) \u2192 promoted to IN, confirms beat-the-close",
+        "VALIDATED usage stickiness (targets r=.93) \u2192 prop base is solid",
+        "CORRECTED wind\u2192unders: dead vs the 52.4% break-even (p=.107), cut to RULED_OUT",
+        "RULED OUT 13 situational systems (home dogs, road favs, big favs, division dogs, rest, Thursday...) \u2014 all inside the vig",
+        "net: the edge is CLV + calibrated props, NOT situational betting \u2014 direction confirmed by subtraction"
+      ]
+    },
+    {
+      "date": "2026-09-01",
       "version": 1,
       "active_params": 15,
       "total_params": 41,

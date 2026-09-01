@@ -2,6 +2,31 @@
   "entries": [
     {
       "date": "2026-09-01",
+      "type": "30-day sprint",
+      "tested": 17,
+      "promoted": [
+        "Lines move open\u2192close (CLV exists to capture)",
+        "Target volume is sticky YoY (role persistence)",
+        "Receptions/gm sticky YoY"
+      ],
+      "dead": [
+        "Wind \u226515mph \u2192 under",
+        "Wind \u226520mph \u2192 under",
+        "Cold <32\u00b0F \u2192 under",
+        "Dome/indoor \u2192 over",
+        "Total \u226551 \u2192 under",
+        "Total \u226438 \u2192 over",
+        "Home underdogs ATS",
+        "Road favorites ATS",
+        "Big favorites \u221210+ ATS",
+        "Rest edge \u22653 days (home) ATS",
+        "Division dogs ATS",
+        "Division games \u2192 under",
+        "Thursday games \u2192 under"
+      ]
+    },
+    {
+      "date": "2026-09-01",
       "results": [
         {
           "hypothesis": "High wind (>=15mph) \u2192 under the closing total",
