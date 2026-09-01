@@ -24,13 +24,14 @@ def prop_score(row):
     edge = float(row.get("edge", 0))
     ev = float(row.get("ev", 0))
     conf = float(row.get("confidence", 0.5))
-    if edge <= 0.11:
-        edge_pts = edge * 360                      # 4%~14, 8%~29, 11%~40
-    else:
-        edge_pts = 0.11 * 360 - (edge - 0.11) * 500  # discount suspiciously large edges
-    base = 42 + max(edge_pts, 0) + max(ev, 0) * 20
-    conf_factor = 0.35 + 0.65 * min(conf / 0.7, 1.0)   # low-conf (rookie) ~0.35x, stable ~1.0x
-    return round(min(base * conf_factor, 97), 1)
+    # edge is monotonic (bigger IS better) — we DON'T blanket-penalize large edges; the
+    # per-play investigation (investigate.py) decides if a big edge is alpha or stale.
+    base = 40 + edge * 280 + max(ev, 0) * 18
+    conf_factor = 0.4 + 0.6 * min(conf / 0.7, 1.0)
+    s = base * conf_factor
+    # apply the investigation's verdict multiplier if present (SUSPECT gets cut, not the size)
+    s *= float(row.get("score_mult", 1.0))
+    return round(min(s, 94), 1)
 
 
 def td_score(row):
@@ -44,19 +45,24 @@ def game_score(desk_conf):
     return round((float(desk_conf) - 6.0) / 3.6 * 60 + 40, 1)   # 6.0->40, 9.6->100
 
 
-def build_ranked(prop_board=None, td_board=None, games=None, top=10):
+def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
     """Returns the toggleable structure: per-category top N, best-across-props top N, and
-    best games top N. prop_board/td_board are DataFrames; games is a list of scored dicts."""
+    best games top N. Each big edge is investigated individually (investigate.py) using ADP
+    consensus — CONFIRMED alpha is boosted, SUSPECT (stale) is cut, the rest kept."""
     out = {"by_category": {}, "best_props": [], "best_games": []}
-
     rows = []
     if prop_board is not None and len(prop_board):
         pb = prop_board[prop_board.get("status", "PICK").eq("PICK")] if "status" in prop_board else prop_board
-        for _, r in pb.iterrows():
+        recs = pb.to_dict("records")
+        if adp is not None and len(adp):
+            import investigate as inv
+            recs = inv.adjudicate_board(recs, adp)   # attaches verdict/note/score_mult
+        for r in recs:
             rows.append({"cat": r["mkt"], "score": prop_score(r), "name": r["name"],
                          "game": r.get("game"), "line": r.get("line"), "side": r.get("side"),
                          "our_num": r.get("desk_proj"), "edge": r.get("edge"), "ev": r.get("ev"),
                          "price": r.get("price"), "book": r.get("book"),
+                         "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),
                          "reason": r.get("reason", "")})
     if td_board is not None and len(td_board):
         for _, r in td_board[td_board["edge"].notna()].iterrows():
