@@ -1,0 +1,55 @@
+player,market,line,over,under,game,proj,side,edge,games,rated,sc,desk_conf,tier
+Jadarian Price,player_anytime_td,,115,,NE @ SEA,,,,,False,0.0,,
+Jaxon Smith-Njigba,player_anytime_td,,125,,NE @ SEA,,,,,False,0.0,,
+Rhamondre Stevenson,player_anytime_td,,135,,NE @ SEA,,,,,False,0.0,,
+A.J. Brown,player_anytime_td,,175,,NE @ SEA,,,,,False,0.0,,
+George Holani,player_anytime_td,,210,,NE @ SEA,,,,,False,0.0,,
+Cooper Kupp,player_anytime_td,,225,,NE @ SEA,,,,,False,0.0,,
+AJ Barner,player_anytime_td,,280,,NE @ SEA,,,,,False,0.0,,
+Rashid Shaheed,player_anytime_td,,285,,NE @ SEA,,,,,False,0.0,,
+TreVeyon Henderson,player_anytime_td,,285,,NE @ SEA,,,,,False,0.0,,
+Romeo Doubs,player_anytime_td,,295,,NE @ SEA,,,,,False,0.0,,
+Hunter Henry,player_anytime_td,,320,,NE @ SEA,,,,,False,0.0,,
+Drake Maye,player_anytime_td,,360,,NE @ SEA,,,,,False,0.0,,
+Emanuel Wilson,player_anytime_td,,475,,NE @ SEA,,,,,False,0.0,,
+Seattle Seahawks D/ST,player_anytime_td,,500,,NE @ SEA,,,,,False,0.0,,
+New England Patriots D/ST,player_anytime_td,,600,,NE @ SEA,,,,,False,0.0,,
+DeMario Douglas,player_anytime_td,,700,,NE @ SEA,,,,,False,0.0,,
+Mack Hollins,player_anytime_td,,800,,NE @ SEA,,,,,False,0.0,,
+Sam Darnold,player_anytime_td,,1000,,NE @ SEA,,,,,False,0.0,,
+Elijah Arroyo,player_anytime_td,,1100,,NE @ SEA,,,,,False,0.0,,
+Kyle Williams,player_anytime_td,,1300,,NE @ SEA,,,,,False,0.0,,
+Eli Raridon,player_anytime_td,,1400,,NE @ SEA,,,,,False,0.0,,
+Eric Saubert,player_anytime_td,,2000,,NE @ SEA,,,,,False,0.0,,
+Nick Kallerup,player_anytime_td,,2500,,NE @ SEA,,,,,False,0.0,,
+Efton Chism III,player_anytime_td,,4000,,NE @ SEA,,,,,False,0.0,,
+Sam Darnold,player_pass_tds,1.5,104,-133.0,NE @ SEA,,,,,False,0.0,,
+Drake Maye,player_pass_tds,1.5,156,-201.0,NE @ SEA,,,,,False,0.0,,
+Sam Darnold,player_pass_yds,227.5,-113,-111.0,NE @ SEA,210.7,Under,0.095,40.0,False,0.0,,
+Drake Maye,player_pass_yds,226.5,-112,-112.0,NE @ SEA,207.8,Under,0.104,30.0,False,0.0,,
+Jaxon Smith-Njigba,player_reception_yds,81.5,-114,-110.0,NE @ SEA,76.2,Under,0.147,51.0,True,76.1742590393402,8.3,TOP PLAY
+A.J. Brown,player_reception_yds,61.5,-113,-111.0,NE @ SEA,68.8,Under,0.065,45.0,True,54.9952919538235,6.9,LEAN
+Romeo Doubs,player_reception_yds,35.5,-112,-112.0,NE @ SEA,41.1,Under,0.048,46.0,True,50.41798904921694,6.6,LEAN
+Hunter Henry,player_reception_yds,34.5,-111,-113.0,NE @ SEA,39.9,Under,0.046,46.0,True,50.02999144845103,6.5,LEAN
+Cooper Kupp,player_reception_yds,32.5,-109,-115.0,NE @ SEA,41.0,Under,0.004,40.0,True,39.156870757362206,,
+Rashid Shaheed,player_reception_yds,31.5,-110,-114.0,NE @ SEA,37.0,Under,0.037,39.0,True,47.70602517689851,6.4,LEAN
+AJ Barner,player_reception_yds,24.5,-112,-112.0,NE @ SEA,26.0,Under,0.087,30.0,True,60.625134690377465,7.3,STRONG
+DeMario Douglas,player_reception_yds,17.5,-112,-112.0,NE @ SEA,32.2,Over,0.138,45.0,True,73.92169057022998,8.2,TOP PLAY
+Rhamondre Stevenson,player_reception_yds,17.5,-112,-112.0,NE @ SEA,19.6,Under,0.063,40.0,True,54.39139882008965,6.8,LEAN
+TreVeyon Henderson,player_reception_yds,9.5,-112,-112.0,NE @ SEA,16.0,Over,0.105,13.0,True,64.58728677832859,7.5,STRONG
+Jaxon Smith-Njigba,player_receptions,6.5,-105,-121.0,NE @ SEA,5.8,Under,0.096,51.0,False,0.0,,
+A.J. Brown,player_receptions,4.5,-148,116.0,NE @ SEA,5.1,Under,0.054,45.0,False,0.0,,
+Romeo Doubs,player_receptions,3.5,113,-144.0,NE @ SEA,3.5,Under,0.02,44.0,False,0.0,,
+Hunter Henry,player_receptions,3.5,114,-146.0,NE @ SEA,3.6,Over,0.008,44.0,False,0.0,,
+Cooper Kupp,player_receptions,2.5,-156,122.0,NE @ SEA,3.6,Over,0.005,39.0,False,0.0,,
+AJ Barner,player_receptions,2.5,-138,108.0,NE @ SEA,2.8,Under,0.08,30.0,False,0.0,,
+Rhamondre Stevenson,player_receptions,2.5,109,-139.0,NE @ SEA,2.6,Under,0.028,36.0,False,0.0,,
+Rashid Shaheed,player_receptions,2.5,113,-144.0,NE @ SEA,3.3,Over,0.1,35.0,False,0.0,,
+DeMario Douglas,player_receptions,1.5,-152,119.0,NE @ SEA,2.8,Over,0.061,45.0,False,0.0,,
+TreVeyon Henderson,player_receptions,1.5,-121,-105.0,NE @ SEA,2.4,Over,0.06,13.0,False,0.0,,
+Jadarian Price,player_rush_yds,51.5,-113,-111.0,NE @ SEA,,,,,False,0.0,,
+Rhamondre Stevenson,player_rush_yds,42.5,-110,-114.0,NE @ SEA,44.5,Under,0.093,41.0,False,0.0,,
+TreVeyon Henderson,player_rush_yds,30.5,-115,-109.0,NE @ SEA,45.9,Over,0.046,17.0,False,0.0,,
+Drake Maye,player_rush_yds,24.5,-110,-114.0,NE @ SEA,26.0,Under,0.087,29.0,False,0.0,,
+George Holani,player_rush_yds,19.5,-108,-116.0,NE @ SEA,12.7,Under,0.284,5.0,False,0.0,,
+Sam Darnold,player_rush_yds,5.5,-112,-112.0,NE @ SEA,8.9,Over,0.08,37.0,False,0.0,,
