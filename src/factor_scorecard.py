@@ -24,74 +24,87 @@ DESC = {
 }
 
 
+def _clip(x):
+    return max(-1.0, min(1.0, x))
+
+
 def _for_side(raises_stat, side):
-    if raises_stat == 0:
-        return 0
+    """raises_stat is a lean in [-1,1] (how much it pushes the STAT up). Flip for unders."""
     return raises_stat if side in ("Over", "Yes") else -raises_stat
 
 
 def scorecard(pick, proj_row=None, script=None, weather=None, matchup=None,
-              adp_role=None, regression=None):
+              adp_role=None, adp=None, regression=None):
+    """Continuous lean in [-1,1] for EVERY factor (0 = no read). Signs flipped for the
+    side so it reads correctly for overs and unders. Each factor is independent."""
     side = pick.get("side", "Over"); mkt = pick.get("mkt", "")
     line = float(pick.get("line", 0) or 0)
     our = float(pick.get("our_num", pick.get("desk_proj", line)) or line)
+    pr = proj_row or {}
     sc = {}
-    sc["Projected Usage"] = _for_side(1 if our > line else -1 if our < line else 0, side)
 
-    fd = (proj_row or {}).get("_form_delta") if proj_row else None
-    sc["Recent Trend"] = _for_side(1 if (fd or 0) > 1 else -1 if (fd or 0) < -1 else 0, side) if fd is not None else 0
+    # Projected Usage: how far our number sits from the line, normalized (scales with gap)
+    gap = (our - line) / max(abs(line), 1.0)
+    sc["Projected Usage"] = _for_side(_clip(gap / 0.25), side)
 
-    sc["Game Flow"] = 0
+    # Recent Trend: form delta vs career (yards), continuous
+    fd = pr.get("_form_delta")
+    sc["Recent Trend"] = _for_side(_clip((fd or 0) / 12.0), side) if fd is not None else 0.0
+
+    # Game Flow: continuous off the spread (dog throws, favorite runs)
+    gf = 0.0
     if script:
-        ts = script.get("team_spread", 0)
+        ts = script.get("team_spread", 0) or 0
         if mkt in ("rec_yds", "receptions", "pass_yds"):
-            sc["Game Flow"] = _for_side(1 if ts >= 3 else -1 if ts <= -6 else 0, side)
+            gf = _clip(ts / 9.0)              # +ts (dog) raises passing
         elif mkt in ("rush_yds", "rush_att"):
-            sc["Game Flow"] = _for_side(1 if ts <= -6 else -1 if ts >= 4 else 0, side)
+            gf = _clip(-ts / 9.0)            # -ts (favorite) raises rushing
         elif mkt == "anytime_td":
-            it = script.get("implied_team_pts", 22)
-            sc["Game Flow"] = _for_side(1 if it >= 26 else -1 if it <= 18 else 0, side)
+            gf = _clip((script.get("implied_team_pts", 22) - 22) / 8.0)
+    sc["Game Flow"] = _for_side(gf, side)
 
-    sc["Opponent Defense"] = 0
+    # Opponent Defense: validated only for rush (RB-rush signal); continuous
+    od = 0.0
     if mkt in ("rush_yds", "rush_att") and matchup is not None:
-        sc["Opponent Defense"] = _for_side(1 if matchup > 0.05 else -1 if matchup < -0.05 else 0, side)
+        od = _clip(matchup / 0.15)
+    sc["Opponent Defense"] = _for_side(od, side)
 
-    sc["Injury Picture"] = 0
+    # Injury Picture
+    inj = 0.0
     if pick.get("_health"):
-        h = pick["_health"]
-        if h.get("status") in ("Out", "Doubtful"):
-            sc["Injury Picture"] = _for_side(-1, side)
-        elif h.get("status") == "Questionable" and side in ("Over", "Yes"):
-            sc["Injury Picture"] = _for_side(-1, side)
-        elif h.get("opportunity"):
-            sc["Injury Picture"] = _for_side(1, side)
+        h = pick["_health"]; st = h.get("status")
+        if st in ("Out", "Doubtful"): inj = -1.0
+        elif st == "Questionable": inj = -0.4
+        elif h.get("opportunity"): inj = 0.6
+    sc["Injury Picture"] = _for_side(inj, side)
 
-    sc["Weather"] = 0
-    if weather and ((weather.get("wind", 0) or 0) >= 12 or (weather.get("temp", 99) or 99) <= 35):
-        if mkt in ("rec_yds", "receptions", "pass_yds"):
-            sc["Weather"] = _for_side(-1, side)
-        elif mkt in ("rush_yds", "rush_att"):
-            sc["Weather"] = _for_side(1, side)
+    # Weather (pass markets down, rush up) — magnitude by severity
+    wx = 0.0
+    if weather:
+        wind = weather.get("wind", 0) or 0; temp = weather.get("temp", 70) or 70
+        sev = _clip(max(wind - 8, 0) / 15.0 + max(55 - temp, 0) / 40.0)
+        if mkt in ("rec_yds", "receptions", "pass_yds"): wx = -sev
+        elif mkt in ("rush_yds", "rush_att"): wx = sev * 0.5
+    sc["Weather"] = _for_side(wx, side)
 
-    sc["Play-Calling"] = _for_side((proj_row or {}).get("_coach_signal", 0), side) if proj_row else 0
+    # Play-Calling: coach signal from projection layer (continuous if provided)
+    sc["Play-Calling"] = _for_side(_clip(pr.get("_coach_signal", 0)), side)
 
-    sc["Market Read"] = 0
-    if adp_role in ("big", "rotational"):
-        sc["Market Read"] = _for_side(1, side)
-    elif adp_role in ("undrafted", "deep"):
-        sc["Market Read"] = _for_side(-1, side)
+    # Market Read: ADP rank → role read, continuous (early pick = big role)
+    mr = 0.0
+    if adp is not None and not (isinstance(adp, float) and adp != adp):
+        mr = _clip((80 - float(adp)) / 80.0)     # ADP 1 → +0.99, 80 → 0, 160 → -1
+    elif adp_role in ("big", "rotational"): mr = 0.6
+    elif adp_role in ("undrafted", "deep"): mr = -0.6
+    sc["Market Read"] = _for_side(mr, side)
 
-    sc["Regression"] = 0
+    # Regression (luck): overperformer → down, underperformer → up, continuous
+    rg = 0.0
     if regression is not None:
-        sc["Regression"] = _for_side(-1 if regression > 0.2 else 1 if regression < -0.2 else 0, side)
-    return sc
+        rg = _clip(-regression)                  # +regression (overperformed) lowers stat
+    sc["Regression"] = _for_side(rg, side)
 
-
-def top_factors(sc, n=6):
-    active = [(f, v) for f, v in sc.items() if v != 0]
-    order = {f: i for i, f in enumerate(FACTORS)}
-    active.sort(key=lambda x: (x[1] < 0, order.get(x[0], 99)))
-    return active[:n], sum(1 for v in sc.values() if v == 0)
+    return {k: round(float(v), 2) for k, v in sc.items()}
 
 
 if __name__ == "__main__":
