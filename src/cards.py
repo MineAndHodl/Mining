@@ -5,8 +5,8 @@ Brand is configurable; 'BEAT THE CLOSE' is the placeholder identity.
 import os
 from playwright.sync_api import sync_playwright
 
-BRAND = os.environ.get("BRAND_NAME", "BEAT THE CLOSE")
-HANDLE = os.environ.get("BRAND_HANDLE", "@beattheclose")
+BRAND = os.environ.get("BRAND_NAME", "THE DESK")
+HANDLE = os.environ.get("BRAND_HANDLE", "@TheDeskNFL")
 
 BASE_CSS = """
 *{margin:0;padding:0;box-sizing:border-box}
