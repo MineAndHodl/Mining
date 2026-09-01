@@ -1,0 +1,14 @@
+{
+  "PROE_within_season_corr": 0.59,
+  "PROE_yoy_coach_stay": 0.44,
+  "PROE_yoy_coach_change": -0.67,
+  "goal_line_lead_back_share": 0.55,
+  "gl_back_yoy_continuity": 0.29,
+  "rz_target_lead_share": 0.26,
+  "overall_target_lead_share": 0.24,
+  "rec_td_corr_overall_tgt": 0.73,
+  "rec_td_corr_rz_tgt": 0.77,
+  "rush_td_corr_total_car": 0.75,
+  "rush_td_corr_gl_car": 0.85,
+  "takeaway": "Coach pass tendency (PROE) stable in-season (0.59), persists if coach stays (0.44) but FLIPS on coaching change (-0.67). Goal-line carries predict rush TDs better than total carries; RZ targets predict rec TDs better than overall targets. All require CURRENT-season data (GL role only 29% sticky YoY)."
+}

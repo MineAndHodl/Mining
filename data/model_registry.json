@@ -1,0 +1,383 @@
+{
+  "params": [
+    {
+      "id": "epa_ratings",
+      "name": "Opponent-adjusted EPA power ratings",
+      "cat": "team",
+      "stat": "MAE 10.26 pts vs closing",
+      "status": "CORE",
+      "weight": 1.0,
+      "note": "pass/rush composite, 8-iteration opponent adjustment \u2014 the spine"
+    },
+    {
+      "id": "recency",
+      "name": "Recency weighting (10-wk half-life)",
+      "cat": "team",
+      "stat": "backtest-tuned",
+      "status": "CORE",
+      "weight": 1.0,
+      "note": "current form dominates within ~4 weeks"
+    },
+    {
+      "id": "asym_shrink",
+      "name": "Asymmetric off/def shrinkage",
+      "cat": "team",
+      "stat": "MAE 10.30\u219210.26",
+      "status": "IN",
+      "weight": 1.0,
+      "note": "defense regresses harder (less stable YoY)"
+    },
+    {
+      "id": "coach_change_offense",
+      "name": "Coaching-change resets offense",
+      "cat": "continuity",
+      "stat": "offense carryover corr 0.52\u21920.10 on coach change",
+      "status": "IN",
+      "weight": 0.9,
+      "note": "new coach \u2248 throw out prior offense; defense partly survives"
+    },
+    {
+      "id": "multiyear_prior",
+      "name": "Two-year preseason prior",
+      "cat": "continuity",
+      "stat": "S-2 coef p=0.027",
+      "status": "IN",
+      "weight": 0.7,
+      "note": "many seasons > last season alone"
+    },
+    {
+      "id": "qb_continuity",
+      "name": "QB continuity boosts carryover",
+      "cat": "continuity",
+      "stat": "interaction p=0.87",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "tested, null \u2014 cut"
+    },
+    {
+      "id": "proe_tendency",
+      "name": "Coach pass-over-expected tendency",
+      "cat": "coaching",
+      "stat": "in-season corr 0.59; flips \u22120.67 on coach change",
+      "status": "IN",
+      "weight": 0.8,
+      "note": "predicts team pass/run volume; INVERT for new coaches"
+    },
+    {
+      "id": "goalline_rushtd",
+      "name": "Goal-line carry share \u2192 rush TD",
+      "cat": "coaching",
+      "stat": "r=0.85 (vs 0.75 total carries)",
+      "status": "IN",
+      "weight": 0.9,
+      "note": "the goal-line back is the rush-TD play; needs current-season data"
+    },
+    {
+      "id": "rz_rectd",
+      "name": "Red-zone target index \u2192 rec TD",
+      "cat": "coaching",
+      "stat": "r=0.77 (vs 0.73 overall); finds specialists",
+      "status": "IN",
+      "weight": 0.7,
+      "note": "RZ over-indexers (TE/big-body) print TDs the yardage misses"
+    },
+    {
+      "id": "prop_hybrid",
+      "name": "Prop projection (recency-own for stable)",
+      "cat": "props",
+      "stat": "MAE 9.5 vs 10.2 naive; Brier .051",
+      "status": "IN",
+      "weight": 1.0,
+      "note": "stable players use own recency-weighted usage; calibrated"
+    },
+    {
+      "id": "prop_role_model",
+      "name": "Prop role model (movers/rookies)",
+      "cat": "props",
+      "stat": "higher variance \u2014 gated",
+      "status": "GATED",
+      "weight": 0.4,
+      "note": "share\u00d7volume\u00d7efficiency; waits on 2026 usage to calibrate"
+    },
+    {
+      "id": "trust_band",
+      "name": "Prop trust band vs market line",
+      "cat": "props",
+      "stat": "new this week",
+      "status": "IN",
+      "weight": 0.8,
+      "note": "huge model-vs-line gaps flagged REVIEW, not fired \u2014 market repriced a role"
+    },
+    {
+      "id": "offmarket_flags",
+      "name": "Off-market / key-number flags",
+      "cat": "sides",
+      "stat": "CLV-positive vs Pinnacle fair",
+      "status": "IN",
+      "weight": 0.9,
+      "note": "best bettable number per side; coherent line/book/edge"
+    },
+    {
+      "id": "wong_teaser",
+      "name": "Wong teasers (through 3 & 7)",
+      "cat": "sides",
+      "stat": "documented +EV at standard pricing",
+      "status": "IN",
+      "weight": 0.6,
+      "note": "basic-strategy legs"
+    },
+    {
+      "id": "sgp_qbwr",
+      "name": "QB + own-WR stack correlation",
+      "cat": "parlay",
+      "stat": "+0.16",
+      "status": "IN",
+      "weight": 0.6,
+      "note": "real positive correlation for SGPs"
+    },
+    {
+      "id": "sgp_wrwr",
+      "name": "Two same-team WRs correlation",
+      "cat": "parlay",
+      "stat": "~0.00",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "no correlation \u2014 cut from SGP logic"
+    },
+    {
+      "id": "wr_def_matchup",
+      "name": "WR vs defense matchup",
+      "cat": "props",
+      "stat": "r=0.08 (noise)",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "tested, essentially random \u2014 cut"
+    },
+    {
+      "id": "rb_def_matchup",
+      "name": "RB vs defense matchup",
+      "cat": "props",
+      "stat": "r=0.26 (weak)",
+      "status": "MONITOR",
+      "weight": 0.3,
+      "note": "weakly sticky \u2014 watched"
+    },
+    {
+      "id": "road_dog",
+      "name": "Road-dog ATS edge",
+      "cat": "macro",
+      "stat": "0.497 ATS (2023-25) \u2014 still cut",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "HFA over-pricing edge \u2014 market adjusted, decayed to a coin flip. Cut."
+    },
+    {
+      "id": "overs_rising",
+      "name": "'Overs keep rising' scoring trend",
+      "cat": "macro",
+      "stat": "scoring flat ~45 for a decade",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "myth \u2014 no such trend"
+    },
+    {
+      "id": "pass_rate_decline",
+      "name": "League pass-rate decline",
+      "cat": "macro",
+      "stat": "60%\u219257% (2016-25)",
+      "status": "MONITOR",
+      "weight": 0.3,
+      "note": "mild rushing tailwind for props"
+    },
+    {
+      "id": "hfa",
+      "name": "Home-field advantage = 1.5 pts",
+      "cat": "team",
+      "stat": "2.4\u21921.5 (2019-25)",
+      "status": "IN",
+      "weight": 0.8,
+      "note": "structural collapse, priced into ratings"
+    },
+    {
+      "id": "skew_under_value",
+      "name": "Skew-driven Under value",
+      "cat": "props",
+      "stat": "under investigation (11/12 picks Under wk1)",
+      "status": "MONITOR",
+      "weight": 0.3,
+      "note": "right-skewed yardage means P(over mean)<50%; real edge if books set at mean, artifact if at median \u2014 validating"
+    },
+    {
+      "id": "ref_penalty",
+      "name": "Referee crew penalty tendency",
+      "cat": "referee",
+      "stat": "crew explains 4% of penalty variance; 11-15/gm range",
+      "status": "MONITOR",
+      "weight": 0.25,
+      "note": "real crew signature on flags; weak on totals \u2014 an exotic overlay we surface"
+    },
+    {
+      "id": "ref_total",
+      "name": "Referee crew \u2192 total (scoring)",
+      "cat": "referee",
+      "stat": "weak/none once team quality controlled",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "flag-happy crews \u2260 higher totals after adjusting for teams \u2014 knowledge: don't bet totals off refs"
+    },
+    {
+      "id": "coach_gl_pass",
+      "name": "Coach goal-line pass tendency",
+      "cat": "coaching",
+      "stat": "range 0.30 (Daboll) to 0.81 (Harbaugh) GL pass rate",
+      "status": "IN",
+      "weight": 0.5,
+      "note": "predicts whether a team's GL TDs go to RB (run) or WR/TE (pass) \u2014 feeds TD props"
+    },
+    {
+      "id": "gv_home_dogs_ats",
+      "name": "Home dogs ATS",
+      "cat": "graveyard",
+      "stat": "50.3% ATS, n=1089, p=0.856",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_road_favs_-7_ats",
+      "name": "Road favs -7+ ATS",
+      "cat": "graveyard",
+      "stat": "45.7% ATS, n=232, p=0.212",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (noise) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_home_off_bye_ats",
+      "name": "Home off bye ATS",
+      "cat": "graveyard",
+      "stat": "47.3% ATS, n=241, p=0.44",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (noise) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_away_off_bye_ats",
+      "name": "Away off bye ATS",
+      "cat": "graveyard",
+      "stat": "54.0% ATS, n=289, p=0.196",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (noise) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_fade_short-rest_road_tea",
+      "name": "Fade short-rest road team",
+      "cat": "graveyard",
+      "stat": "49.7% ATS, n=177, p=1.0",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_division_home_dogs_ats",
+      "name": "Division home dogs ATS",
+      "cat": "graveyard",
+      "stat": "49.9% ATS, n=411, p=1.0",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_late-season_home_dogs",
+      "name": "Late-season home dogs",
+      "cat": "graveyard",
+      "stat": "50.2% ATS, n=297, p=1.0",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_primetime_unders",
+      "name": "Primetime unders",
+      "cat": "graveyard",
+      "stat": "54.4% ATS, n=618, p=0.033",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (noise) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_fade_dome_team_outdoors_",
+      "name": "Fade dome team outdoors Dec+",
+      "cat": "graveyard",
+      "stat": "49.7% ATS, n=173, p=1.0",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_unders_on_50_totals",
+      "name": "Unders on 50+ totals",
+      "cat": "graveyard",
+      "stat": "51.8% ATS, n=394, p=0.513",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (inside vig) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_overs_on_low_(le38)_tota",
+      "name": "Overs on low (<=38) totals",
+      "cat": "graveyard",
+      "stat": "43.2% ATS, n=146, p=0.116",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (noise) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_unders_on_10_spreads",
+      "name": "Unders on 10+ spreads",
+      "cat": "graveyard",
+      "stat": "53.7% ATS, n=352, p=0.183",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (noise) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_fade_west-coast_team_at_",
+      "name": "Fade west-coast team @ 1pm ET",
+      "cat": "graveyard",
+      "stat": "45.6% ATS, n=158, p=0.301",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (noise) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_late_div_rematch_home_do",
+      "name": "Late div rematch home dogs",
+      "cat": "graveyard",
+      "stat": "47.5% ATS, n=242, p=0.48",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (noise) \u2014 tested so you don't have to"
+    },
+    {
+      "id": "gv_bounce-back_after_20_pt_",
+      "name": "Bounce-back after 20+ pt loss",
+      "cat": "graveyard",
+      "stat": "52.6% ATS, n=487, p=0.277",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "DEAD (noise) \u2014 tested so you don't have to"
+    }
+  ],
+  "version": 1,
+  "updated": "2026-09-01",
+  "counts": {
+    "CORE": 2,
+    "IN": 13,
+    "GATED": 1,
+    "MONITOR": 4,
+    "RULED_OUT": 21
+  },
+  "total_tested": 41
+}

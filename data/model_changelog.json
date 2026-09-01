@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "date": "2026-09-01",
+      "version": 1,
+      "active_params": 15,
+      "total_params": 41,
+      "headline": "Model knowledge base initialized \u2014 41 parameters tested",
+      "changes": [
+        "ADDED coach-change-resets-offense (offense carryover 0.52\u21920.10 on a new coach, p<.05)",
+        "ADDED goal-line carry share \u2192 rush TD (r=0.85, best rush-TD signal found)",
+        "ADDED red-zone target index \u2192 rec TD (r=0.77) + RZ-specialist detection",
+        "ADDED coach PROE pass tendency (in-season 0.59; inverts \u22120.67 on coach change)",
+        "ADDED two-year preseason prior (season S-2 significant, p=.027)",
+        "ADDED prop trust-band (huge model-vs-line gaps \u2192 REVIEW, not fired)",
+        "RULED OUT QB-continuity (null, p=.87), WR-defense matchup (noise r=.08), 2-WR SGP correlation (~0)",
+        "RULED OUT road-dog edge (decayed 53.8%\u2192~50% since 2023 \u2014 market adjusted) and 16 Graveyard angles",
+        "MONITOR referee crew (real but weak \u2014 4% of penalty variance; ruled out for totals)",
+        "weekly cycle now also tests WEIGHTS + cross-correlation vs the existing model, not just isolated significance"
+      ]
+    }
+  ]
+}
