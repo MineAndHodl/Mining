@@ -1,0 +1,276 @@
+<title>The Desk — Model Output</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#0b0d12; --panel:#141821; --panel2:#1a1f2a; --line:#252b38; --line2:#323a4a;
+  --ink:#eaedf3; --muted:#8a93a6; --dim:#5d6577;
+  --green:#2ee6a6; --green-d:#12b886; --gold:#f5c518; --amber:#ff9f43; --heat:#ff6b4a;
+  --blue:#4aa3ff; --good:#2ee6a6; --bad:#ff5c72;
+  --disp:"Barlow Semi Condensed",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+:root[data-theme="light"]{
+  --bg:#f4f5f7; --panel:#ffffff; --panel2:#f7f8fa; --line:#e5e8ee; --line2:#d5dae3;
+  --ink:#151922; --muted:#5c6577; --dim:#8b93a3;
+  --green:#0f9e73; --green-d:#0c8a63; --gold:#b8860b; --amber:#d97b1f; --heat:#e04a2c;
+  --blue:#2b6fd0; --good:#0f9e73; --bad:#d43a52;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f4f5f7; --panel:#ffffff; --panel2:#f7f8fa; --line:#e5e8ee; --line2:#d5dae3;
+  --ink:#151922; --muted:#5c6577; --dim:#8b93a3;
+  --green:#0f9e73; --green-d:#0c8a63; --gold:#b8860b; --amber:#d97b1f; --heat:#e04a2c;
+  --blue:#2b6fd0; --good:#0f9e73; --bad:#d43a52;
+}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);margin:0;
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:22px 16px 90px}
+.disp{font-family:var(--disp)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+h1{font-family:var(--disp);font-weight:800;font-size:34px;letter-spacing:.2px;margin:0;line-height:1}
+h2{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin:36px 0 14px;display:flex;align-items:center;gap:9px}
+h2 .em{font-size:17px}
+.eyebrow{font-family:var(--disp);font-weight:700;letter-spacing:.24em;text-transform:uppercase;
+  font-size:12px;color:var(--green)}
+.head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;
+  border-bottom:1px solid var(--line);padding-bottom:16px}
+.head .sub{color:var(--muted);margin-top:6px;max-width:560px}
+.stamp{font-family:var(--mono);font-size:12px;color:var(--dim);text-align:right}
+.stamp .live{color:var(--green);font-weight:700}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.grid{display:grid;gap:14px}
+@media(min-width:780px){.g2{grid-template-columns:1.15fr .85fr}.g2b{grid-template-columns:1fr 1fr}}
+.k{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  font-size:11px;color:var(--muted)}
+.big{font-family:var(--disp);font-weight:800;font-size:40px;line-height:1;letter-spacing:.5px}
+.metrics{display:flex;gap:26px;flex-wrap:wrap;margin-top:6px}
+.metric .big{color:var(--green)}
+.metric .lbl{font-size:12px;color:var(--muted);margin-top:3px}
+.chartbox{position:relative;height:260px}
+.cap{font-size:12.5px;color:var(--muted);margin-top:10px}
+.cap b{color:var(--green)}
+/* confidence spectrum */
+.spectrum{position:relative;height:74px;margin:6px 0 2px}
+.axis{position:absolute;left:0;right:0;top:44px;height:12px;border-radius:7px;
+  background:linear-gradient(90deg,#3a4457,var(--blue),var(--gold),var(--green))}
+.tick{position:absolute;top:60px;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--dim)}
+.chip{position:absolute;top:2px;transform:translateX(-50%);text-align:center}
+.chip .dot{width:13px;height:13px;border-radius:50%;margin:26px auto 0;border:2px solid var(--bg);
+  box-shadow:0 0 0 1px var(--line2)}
+.chip .cn{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+.chip .cv{font-family:var(--disp);font-weight:800;font-size:13px}
+/* segment / table */
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:14px}
+th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:11px;color:var(--muted)}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.badge{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.05em;padding:2px 8px;border-radius:6px;display:inline-block}
+.b-top{background:rgba(245,197,24,.16);color:var(--gold)}
+.b-strong{background:rgba(46,230,166,.14);color:var(--green)}
+.b-lean{background:rgba(138,147,166,.16);color:var(--muted)}
+.seg-tab{display:inline-block;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--blue);background:rgba(74,163,255,.12);padding:2px 8px;border-radius:6px}
+.dcbar{display:inline-block;height:7px;border-radius:4px;background:var(--green);vertical-align:middle}
+.dctrack{display:inline-block;width:72px;height:7px;border-radius:4px;background:var(--line2);vertical-align:middle;margin-right:7px;overflow:hidden}
+/* projection / smash bars */
+.rowbar{display:grid;grid-template-columns:180px 1fr 62px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.rowbar .nm{font-weight:600;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rowbar .nm .pos{font-family:var(--mono);font-size:11px;color:var(--dim);margin-left:6px}
+.track{height:16px;border-radius:5px;background:var(--panel2);overflow:hidden;border:1px solid var(--line)}
+.fill{height:100%;border-radius:5px 0 0 5px;background:linear-gradient(90deg,var(--green-d),var(--green))}
+.fill.amber{background:linear-gradient(90deg,#c9631f,var(--amber))}
+.rowbar .val{text-align:right;font-family:var(--mono);font-weight:700;font-size:13px}
+.stars{letter-spacing:1px;font-size:12px}
+.chk{color:var(--green);font-weight:800}
+/* macro */
+.macro-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.macro-row .vb{font-family:var(--disp);font-weight:800;font-size:12px;letter-spacing:.06em;padding:3px 9px;border-radius:6px;min-width:96px;text-align:center}
+.v-myth{background:rgba(255,92,114,.14);color:var(--bad)} .v-real{background:rgba(46,230,166,.14);color:var(--green)}
+.macro-row .cl{font-weight:600} .macro-row .dt{color:var(--muted);font-size:13px}
+/* health */
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.hrow .cn{font-weight:600;font-size:14px} .hrow .cd{font-size:12.5px;color:var(--muted)}
+.st{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.05em;padding:3px 9px;border-radius:6px;white-space:nowrap}
+.s-cal{background:rgba(46,230,166,.14);color:var(--green)} .s-live{background:rgba(255,159,67,.14);color:var(--amber)}
+.s-gate{background:rgba(138,147,166,.16);color:var(--muted)} .s-build{background:rgba(74,163,255,.13);color:var(--blue)}
+.note{font-size:12px;color:var(--dim);margin-top:12px;line-height:1.55}
+.legend{font-size:12px;color:var(--muted);margin:2px 0 0;display:flex;gap:16px;flex-wrap:wrap}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+</style>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <div class="eyebrow">The Desk · Model Output</div>
+      <h1>What We Like &amp; Why</h1>
+      <div class="sub">Every number is model-derived and the probabilities are calibrated — when we say 45%, it hits 44%. Below: where each play sits on the confidence spectrum, the full prop board, and the smash spots where the stars align.</div>
+    </div>
+    <div class="stamp">generated <span id="gen"></span><br><span class="live">● MODEL LIVE</span> · Week 1 board<br>40/40 tests green ✓</div>
+  </div>
+
+  <h2><span class="em">🎯</span> Are our numbers real? — Calibration</h2>
+  <div class="grid g2">
+    <div class="panel">
+      <div class="k">Reliability — predicted vs actual hit rate</div>
+      <div class="chartbox"><canvas id="calib"></canvas></div>
+      <div class="legend"><span><span class="sw" style="background:var(--green)"></span>The Desk</span><span><span class="sw" style="background:var(--dim)"></span>perfect calibration</span></div>
+      <div class="cap">4,105 stable-player prop samples, 2024–25. Our line sits right on the diagonal — the model's probabilities mean what they say. <b>That's the whole game.</b></div>
+    </div>
+    <div class="panel">
+      <div class="k">Model health</div>
+      <div class="metrics">
+        <div class="metric"><div class="big" id="brier">0.051</div><div class="lbl">Brier score<br>(lower = sharper)</div></div>
+        <div class="metric"><div class="big" id="slope">0.92</div><div class="lbl">calibration slope<br>(1.0 = perfect)</div></div>
+      </div>
+      <div id="health" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <h2><span class="em">📊</span> The confidence spectrum — where each play lands</h2>
+  <div class="panel">
+    <div class="spectrum" id="spectrum"></div>
+    <div class="cap">Desk Confidence is our conviction rating (not a win probability): <b>6.0</b> is the floor to make the board, <b>8–9</b> is elite, and nothing is ever a 10. 🔥 = top play.</div>
+  </div>
+
+  <h2><span class="em">✅</span> What I Like — this week, by segment</h2>
+  <div class="panel scroll">
+    <table>
+      <thead><tr><th>Pick</th><th>Seg</th><th class="n">Desk #</th><th class="n">Play to</th><th>Best now</th><th class="n">Edge</th><th>Desk Confidence</th></tr></thead>
+      <tbody id="flags"></tbody>
+    </table>
+    <div class="note">The <b>Desk #</b> is our projection; <b>Play to</b> is the worst number we'd still fire. When the market number is better than ours (Bills +1 vs our −1), that's the soft early gift — bet it before it moves.</div>
+  </div>
+
+  <div class="grid g2b">
+    <div>
+      <h2><span class="em">🎯</span> Prop projections — stable board</h2>
+      <div class="panel">
+        <div class="k" style="margin-bottom:8px">Projected receiving yards / game · all calibrated ✓</div>
+        <div id="proj"></div>
+        <div class="note">Stable, high-confidence players (multi-year role). Movers &amp; rookies are projected too but sit at lower confidence until 2026 usage lands.</div>
+      </div>
+    </div>
+    <div>
+      <h2><span class="em">⭐</span> Smash spots — stars aligning</h2>
+      <div class="panel">
+        <div class="k" style="margin-bottom:8px">Model ceiling probability · longshots priced off the tail</div>
+        <div id="smash"></div>
+        <div class="note">The ceiling outcome from our distribution — surfaced only when factors stack (⭐ role · environment · script · pace). Live, these fire vs lazy longshot prices.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2><span class="em">🧠</span> Macro tailwinds — myth vs real</h2>
+  <div class="panel" id="macro"></div>
+
+  <div class="note" style="margin-top:22px">The Desk · numbers are model-derived and verified against raw data before anything ships. Calibration, tests, and this board refresh every week. This is our own work product, not affiliated with any sportsbook.</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const D = {"generated": "2026-09-01", "calibration": {"prop_reliability": [{"pred": 0.245, "obs": 0.251, "n": 830}, {"pred": 0.356, "obs": 0.348, "n": 1450}, {"pred": 0.452, "obs": 0.435, "n": 907}, {"pred": 0.559, "obs": 0.52, "n": 412}, {"pred": 0.612, "obs": 0.608, "n": 506}], "prop_brier": 0.051, "prop_slope": 0.92, "prop_intercept": 0.02, "n_samples": 4105}, "flags": [{"pick": "Buffalo Bills +1", "seg": "side", "desk_num": "BUF -1", "play_to": "BUF -1", "best": "+1 @ Fanatics", "edge": "+2.0 pts", "dc": 8.3, "tier": "TOP"}, {"pick": "Washington +5.5", "seg": "side", "desk_num": "WAS +4", "play_to": "+4.5", "best": "+5.5 @ FanDuel", "edge": "+1.5 pts", "dc": 7.7, "tier": "STRONG"}, {"pick": "Cleveland +8.5", "seg": "side", "desk_num": "CLE +7.5", "play_to": "+8", "best": "+8.5 @ BetRivers", "edge": "+1.0 pt", "dc": 7.1, "tier": "STRONG"}, {"pick": "Falcons/Steelers Under 42.5", "seg": "total", "desk_num": "41.4", "play_to": "U 41.5", "best": "42.5 @ DK", "edge": "+1.0 pt", "dc": 7.1, "tier": "STRONG"}, {"pick": "Ravens/Colts Under 48.5", "seg": "total", "desk_num": "47.5", "play_to": "U 47.5", "best": "48.5 @ DK", "edge": "+1.0 pt", "dc": 7.1, "tier": "STRONG"}, {"pick": "Saints/Lions Over 49.5", "seg": "total", "desk_num": "50.6", "play_to": "O 50.5", "best": "49.5 @ DK", "edge": "+1.0 pt", "dc": 7.1, "tier": "STRONG"}, {"pick": "Titans -1.5", "seg": "side", "desk_num": "TEN -2.5", "play_to": "-2.5", "best": "-1.5 @ DK", "edge": "+1.0 pt", "dc": 7.1, "tier": "STRONG"}], "projections": [{"n": "Puka Nacua", "pos": "WR", "tm": "LA", "rec_yds": 96.7, "rec": 7.3, "conf": 1.0}, {"n": "Ja'Marr Chase", "pos": "WR", "tm": "CIN", "rec_yds": 88.5, "rec": 7.2, "conf": 1.0}, {"n": "CeeDee Lamb", "pos": "WR", "tm": "DAL", "rec_yds": 82.7, "rec": 6.3, "conf": 1.0}, {"n": "Jaxon Smith-Njigba", "pos": "WR", "tm": "SEA", "rec_yds": 80.4, "rec": 6.0, "conf": 1.0}, {"n": "Amon-Ra St. Brown", "pos": "WR", "tm": "DET", "rec_yds": 79.4, "rec": 6.8, "conf": 1.0}, {"n": "Justin Jefferson", "pos": "WR", "tm": "MIN", "rec_yds": 78.2, "rec": 5.6, "conf": 1.0}, {"n": "Nico Collins", "pos": "WR", "tm": "HOU", "rec_yds": 73.7, "rec": 4.8, "conf": 1.0}, {"n": "George Pickens", "pos": "WR", "tm": "DAL", "rec_yds": 72.0, "rec": 4.6, "conf": 1.0}], "smash": [{"n": "Puka Nacua", "spot": "8+ catches", "p": 0.49, "f": ["role"]}, {"n": "Ja'Marr Chase", "spot": "8+ catches", "p": 0.485, "f": ["role"]}, {"n": "Amon-Ra St. Brown", "spot": "8+ catches", "p": 0.45, "f": ["role"]}, {"n": "Trey McBride", "spot": "8+ catches", "p": 0.419, "f": ["role"]}, {"n": "Puka Nacua", "spot": "100+ rec yds", "p": 0.409, "f": ["role"]}, {"n": "Derrick Henry", "spot": "100+ rush yds", "p": 0.406, "f": ["role"]}, {"n": "Jonathan Taylor", "spot": "100+ rush yds", "p": 0.383, "f": ["role"]}, {"n": "Saquon Barkley", "spot": "100+ rush yds", "p": 0.345, "f": ["role"]}], "macro": [{"claim": "\"Overs keep rising\"", "verdict": "MYTH", "detail": "Scoring flat ~45 pts/g for a decade", "real": false}, {"claim": "Home-field advantage", "verdict": "COLLAPSED", "detail": "2.4 \u2192 1.5 pts (2019-25)", "real": true}, {"claim": "\"Road dogs still print\"", "verdict": "DEAD", "detail": "53.8% \u2192 ~50% since 2023, priced out", "real": false}, {"claim": "Pass rate", "verdict": "DECLINING", "detail": "60% \u2192 57%, mild rushing tailwind", "real": true}, {"claim": "O/U vs closing total", "verdict": "EFFICIENT", "detail": "48.8% over \u2014 no blanket edge", "real": true}], "health": {"tests": "40/40", "prop_brier": 0.051, "prop_slope": 0.92, "spread_mae": 10.26, "components": [{"c": "EPA power ratings", "s": "calibrated", "d": "MAE 10.26 pts (market level)"}, {"c": "Prop projections (stable)", "s": "calibrated", "d": "Brier 0.051, slope 0.92"}, {"c": "Anytime-TD model", "s": "calibrated", "d": "25%\u219226% out-of-sample"}, {"c": "Smash-spot tails", "s": "live", "d": "distribution-derived, factor-gated"}, {"c": "Props (movers/rookies)", "s": "gated", "d": "low-confidence until 2026 usage"}, {"c": "Open\u2192close CLV engine", "s": "building", "d": "historical data ingested"}]}};
+document.getElementById('gen').textContent = D.generated;
+document.getElementById('brier').textContent = D.calibration.prop_brier.toFixed(3);
+document.getElementById('slope').textContent = D.calibration.prop_slope.toFixed(2);
+
+// --- health ---
+document.getElementById('health').innerHTML = D.health.components.map(c=>{
+  const cls = c.s==='calibrated'?'s-cal':c.s==='live'?'s-live':c.s==='gated'?'s-gate':'s-build';
+  const mk = c.s==='calibrated'?'✓ ':'';
+  return `<div class="hrow"><div><div class="cn">${c.c}</div><div class="cd">${c.d}</div></div>
+    <span class="st ${cls}">${mk}${c.s}</span></div>`;
+}).join('');
+
+// --- confidence spectrum ---
+(function(){
+  const el=document.getElementById('spectrum'); const lo=6, hi=9.6;
+  let h='<div class="axis"></div>';
+  [6,7,8,9,9.6].forEach(t=>{const x=((t-lo)/(hi-lo))*100;h+=`<div class="tick" style="left:${x}%">${t}</div>`;});
+  // spread flags across x by dc; jitter labels alternately above
+  D.flags.forEach((f,i)=>{
+    const x=Math.max(2,Math.min(98,((f.dc-lo)/(hi-lo))*100));
+    const col=f.tier==='TOP'?'var(--gold)':f.dc>=7.5?'var(--green)':'var(--blue)';
+    const nm=f.pick.length>16?f.pick.slice(0,15)+'…':f.pick;
+    h+=`<div class="chip" style="left:${x}%">
+      <div class="cv" style="color:${col}">${f.tier==='TOP'?'🔥':''}${f.dc}</div>
+      <div class="cn">${nm}</div>
+      <div class="dot" style="background:${col}"></div></div>`;
+  });
+  el.innerHTML=h;
+})();
+
+// --- flags table ---
+document.getElementById('flags').innerHTML = D.flags.map(f=>{
+  const w=((f.dc-6)/(9.6-6))*100;
+  const bcls=f.tier==='TOP'?'b-top':f.tier==='STRONG'?'b-strong':'b-lean';
+  const col=f.tier==='TOP'?'var(--gold)':'var(--green)';
+  return `<tr>
+    <td><b>${f.tier==='TOP'?'🔥 ':''}${f.pick}</b></td>
+    <td><span class="seg-tab">${f.seg}</span></td>
+    <td class="n">${f.desk_num}</td><td class="n">${f.play_to}</td>
+    <td>${f.best}</td><td class="n" style="color:var(--green)">${f.edge}</td>
+    <td><span class="dctrack"><span class="dcbar" style="width:${w}%;background:${col}"></span></span>
+        <b class="mono" style="color:${col}">${f.dc}</b> <span class="badge ${bcls}">${f.tier}</span></td>
+  </tr>`;
+}).join('');
+
+// --- projections bars ---
+(function(){
+  const mx=Math.max(...D.projections.map(p=>p.rec_yds));
+  document.getElementById('proj').innerHTML=D.projections.map(p=>{
+    const w=(p.rec_yds/mx)*100;
+    return `<div class="rowbar"><div class="nm">${p.n}<span class="pos">${p.pos}·${p.tm}</span></div>
+      <div class="track"><div class="fill" style="width:${w}%"></div></div>
+      <div class="val">${p.rec_yds.toFixed(1)} <span class="chk">✓</span></div></div>`;
+  }).join('');
+})();
+
+// --- smash spots bars ---
+(function(){
+  document.getElementById('smash').innerHTML=D.smash.map(s=>{
+    const w=s.p*100;
+    const stars='⭐'.repeat(Math.max(1,s.f.length));
+    return `<div class="rowbar"><div class="nm">${s.n}<span class="pos">${s.spot}</span></div>
+      <div class="track"><div class="fill amber" style="width:${w}%"></div></div>
+      <div class="val">${(s.p*100).toFixed(0)}%</div></div>`;
+  }).join('');
+})();
+
+// --- macro ---
+document.getElementById('macro').innerHTML=D.macro.map(m=>{
+  const cls=m.real?'v-real':'v-myth'; const mk=m.real?'✅':'❌';
+  return `<div class="macro-row"><span class="vb ${cls}">${mk} ${m.verdict}</span>
+    <div><span class="cl">${m.claim}</span> — <span class="dt">${m.detail}</span></div></div>`;
+}).join('');
+
+// --- calibration chart ---
+(function(){
+  const R=D.calibration.prop_reliability;
+  const theme = getComputedStyle(document.documentElement);
+  const grid = theme.getPropertyValue('--line2')||'#333';
+  const ink = theme.getPropertyValue('--muted')||'#888';
+  new Chart(document.getElementById('calib'),{
+    type:'line',
+    data:{datasets:[
+      {label:'The Desk',data:R.map(r=>({x:r.pred*100,y:r.obs*100})),
+        borderColor:'#2ee6a6',backgroundColor:'#2ee6a6',pointRadius:5,pointHoverRadius:7,borderWidth:3,tension:.2,
+        pointBackgroundColor:'#2ee6a6'},
+      {label:'perfect',data:[{x:15,y:15},{x:70,y:70}],borderColor:ink,borderDash:[6,6],pointRadius:0,borderWidth:1.5}
+    ]},
+    options:{maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`pred ${c.parsed.x.toFixed(0)}% → hit ${c.parsed.y.toFixed(0)}%`}}},
+      scales:{
+        x:{type:'linear',min:15,max:70,title:{display:true,text:'model predicted %',color:ink},
+           grid:{color:grid},ticks:{color:ink,callback:v=>v+'%'}},
+        y:{min:15,max:70,title:{display:true,text:'actual hit %',color:ink},
+           grid:{color:grid},ticks:{color:ink,callback:v=>v+'%'}}
+      }}
+  });
+})();
+</script>

@@ -1,0 +1,310 @@
+{
+  "generated": "2026-09-01",
+  "calibration": {
+    "prop_reliability": [
+      {
+        "pred": 0.245,
+        "obs": 0.251,
+        "n": 830
+      },
+      {
+        "pred": 0.356,
+        "obs": 0.348,
+        "n": 1450
+      },
+      {
+        "pred": 0.452,
+        "obs": 0.435,
+        "n": 907
+      },
+      {
+        "pred": 0.559,
+        "obs": 0.52,
+        "n": 412
+      },
+      {
+        "pred": 0.612,
+        "obs": 0.608,
+        "n": 506
+      }
+    ],
+    "prop_brier": 0.051,
+    "prop_slope": 0.92,
+    "prop_intercept": 0.02,
+    "n_samples": 4105
+  },
+  "flags": [
+    {
+      "pick": "Buffalo Bills +1",
+      "seg": "side",
+      "desk_num": "BUF -1",
+      "play_to": "BUF -1",
+      "best": "+1 @ Fanatics",
+      "edge": "+2.0 pts",
+      "dc": 8.3,
+      "tier": "TOP"
+    },
+    {
+      "pick": "Washington +5.5",
+      "seg": "side",
+      "desk_num": "WAS +4",
+      "play_to": "+4.5",
+      "best": "+5.5 @ FanDuel",
+      "edge": "+1.5 pts",
+      "dc": 7.7,
+      "tier": "STRONG"
+    },
+    {
+      "pick": "Cleveland +8.5",
+      "seg": "side",
+      "desk_num": "CLE +7.5",
+      "play_to": "+8",
+      "best": "+8.5 @ BetRivers",
+      "edge": "+1.0 pt",
+      "dc": 7.1,
+      "tier": "STRONG"
+    },
+    {
+      "pick": "Falcons/Steelers Under 42.5",
+      "seg": "total",
+      "desk_num": "41.4",
+      "play_to": "U 41.5",
+      "best": "42.5 @ DK",
+      "edge": "+1.0 pt",
+      "dc": 7.1,
+      "tier": "STRONG"
+    },
+    {
+      "pick": "Ravens/Colts Under 48.5",
+      "seg": "total",
+      "desk_num": "47.5",
+      "play_to": "U 47.5",
+      "best": "48.5 @ DK",
+      "edge": "+1.0 pt",
+      "dc": 7.1,
+      "tier": "STRONG"
+    },
+    {
+      "pick": "Saints/Lions Over 49.5",
+      "seg": "total",
+      "desk_num": "50.6",
+      "play_to": "O 50.5",
+      "best": "49.5 @ DK",
+      "edge": "+1.0 pt",
+      "dc": 7.1,
+      "tier": "STRONG"
+    },
+    {
+      "pick": "Titans -1.5",
+      "seg": "side",
+      "desk_num": "TEN -2.5",
+      "play_to": "-2.5",
+      "best": "-1.5 @ DK",
+      "edge": "+1.0 pt",
+      "dc": 7.1,
+      "tier": "STRONG"
+    }
+  ],
+  "projections": [
+    {
+      "n": "Puka Nacua",
+      "pos": "WR",
+      "tm": "LA",
+      "rec_yds": 96.7,
+      "rec": 7.3,
+      "conf": 1.0
+    },
+    {
+      "n": "Ja'Marr Chase",
+      "pos": "WR",
+      "tm": "CIN",
+      "rec_yds": 88.5,
+      "rec": 7.2,
+      "conf": 1.0
+    },
+    {
+      "n": "CeeDee Lamb",
+      "pos": "WR",
+      "tm": "DAL",
+      "rec_yds": 82.7,
+      "rec": 6.3,
+      "conf": 1.0
+    },
+    {
+      "n": "Jaxon Smith-Njigba",
+      "pos": "WR",
+      "tm": "SEA",
+      "rec_yds": 80.4,
+      "rec": 6.0,
+      "conf": 1.0
+    },
+    {
+      "n": "Amon-Ra St. Brown",
+      "pos": "WR",
+      "tm": "DET",
+      "rec_yds": 79.4,
+      "rec": 6.8,
+      "conf": 1.0
+    },
+    {
+      "n": "Justin Jefferson",
+      "pos": "WR",
+      "tm": "MIN",
+      "rec_yds": 78.2,
+      "rec": 5.6,
+      "conf": 1.0
+    },
+    {
+      "n": "Nico Collins",
+      "pos": "WR",
+      "tm": "HOU",
+      "rec_yds": 73.7,
+      "rec": 4.8,
+      "conf": 1.0
+    },
+    {
+      "n": "George Pickens",
+      "pos": "WR",
+      "tm": "DAL",
+      "rec_yds": 72.0,
+      "rec": 4.6,
+      "conf": 1.0
+    }
+  ],
+  "smash": [
+    {
+      "n": "Puka Nacua",
+      "spot": "8+ catches",
+      "p": 0.49,
+      "f": [
+        "role"
+      ]
+    },
+    {
+      "n": "Ja'Marr Chase",
+      "spot": "8+ catches",
+      "p": 0.485,
+      "f": [
+        "role"
+      ]
+    },
+    {
+      "n": "Amon-Ra St. Brown",
+      "spot": "8+ catches",
+      "p": 0.45,
+      "f": [
+        "role"
+      ]
+    },
+    {
+      "n": "Trey McBride",
+      "spot": "8+ catches",
+      "p": 0.419,
+      "f": [
+        "role"
+      ]
+    },
+    {
+      "n": "Puka Nacua",
+      "spot": "100+ rec yds",
+      "p": 0.409,
+      "f": [
+        "role"
+      ]
+    },
+    {
+      "n": "Derrick Henry",
+      "spot": "100+ rush yds",
+      "p": 0.406,
+      "f": [
+        "role"
+      ]
+    },
+    {
+      "n": "Jonathan Taylor",
+      "spot": "100+ rush yds",
+      "p": 0.383,
+      "f": [
+        "role"
+      ]
+    },
+    {
+      "n": "Saquon Barkley",
+      "spot": "100+ rush yds",
+      "p": 0.345,
+      "f": [
+        "role"
+      ]
+    }
+  ],
+  "macro": [
+    {
+      "claim": "\"Overs keep rising\"",
+      "verdict": "MYTH",
+      "detail": "Scoring flat ~45 pts/g for a decade",
+      "real": false
+    },
+    {
+      "claim": "Home-field advantage",
+      "verdict": "COLLAPSED",
+      "detail": "2.4 \u2192 1.5 pts (2019-25)",
+      "real": true
+    },
+    {
+      "claim": "\"Road dogs still print\"",
+      "verdict": "DEAD",
+      "detail": "53.8% \u2192 ~50% since 2023, priced out",
+      "real": false
+    },
+    {
+      "claim": "Pass rate",
+      "verdict": "DECLINING",
+      "detail": "60% \u2192 57%, mild rushing tailwind",
+      "real": true
+    },
+    {
+      "claim": "O/U vs closing total",
+      "verdict": "EFFICIENT",
+      "detail": "48.8% over \u2014 no blanket edge",
+      "real": true
+    }
+  ],
+  "health": {
+    "tests": "40/40",
+    "prop_brier": 0.051,
+    "prop_slope": 0.92,
+    "spread_mae": 10.26,
+    "components": [
+      {
+        "c": "EPA power ratings",
+        "s": "calibrated",
+        "d": "MAE 10.26 pts (market level)"
+      },
+      {
+        "c": "Prop projections (stable)",
+        "s": "calibrated",
+        "d": "Brier 0.051, slope 0.92"
+      },
+      {
+        "c": "Anytime-TD model",
+        "s": "calibrated",
+        "d": "25%\u219226% out-of-sample"
+      },
+      {
+        "c": "Smash-spot tails",
+        "s": "live",
+        "d": "distribution-derived, factor-gated"
+      },
+      {
+        "c": "Props (movers/rookies)",
+        "s": "gated",
+        "d": "low-confidence until 2026 usage"
+      },
+      {
+        "c": "Open\u2192close CLV engine",
+        "s": "building",
+        "d": "historical data ingested"
+      }
+    ]
+  }
+}
