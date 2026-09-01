@@ -17,8 +17,8 @@ from scipy.stats import gamma, norm
 SHRINK_GAMES = 5.0
 # per-market game-to-game coefficient of variation (from 2023-25 fit), used for the
 # distribution spread; yards are right-skewed (gamma), counts use normal approx.
-CV = {"rec_yds": 0.85, "rush_yds": 0.88, "pass_yds": 0.34, "receptions": 0.62}
-DIST = {"rec_yds": "gamma", "rush_yds": "gamma", "pass_yds": "normal", "receptions": "count"}
+CV = {"rec_yds": 0.85, "rush_yds": 0.88, "pass_yds": 0.34, "receptions": 0.62, "rush_att": 0.45, "pass_att": 0.20, "pass_cmp": 0.22}
+DIST = {"rec_yds": "gamma", "rush_yds": "gamma", "pass_yds": "normal", "receptions": "count", "rush_att": "count", "pass_att": "normal", "pass_cmp": "normal"}
 MIN_GAMES = 6           # data-confidence floor to be eligible as a pick
 EDGE_MIN = 0.045        # model P(over/under) minus de-vigged implied, to flag
 

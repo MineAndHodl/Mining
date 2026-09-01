@@ -24,7 +24,9 @@ import weather as wx
 
 API = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl"
 MARKET_MAP = {"player_reception_yds": "rec_yds", "player_receptions": "receptions",
-              "player_rush_yds": "rush_yds", "player_pass_yds": "pass_yds"}
+              "player_rush_yds": "rush_yds", "player_pass_yds": "pass_yds",
+              "player_rush_attempts": "rush_att", "player_pass_attempts": "pass_att",
+              "player_pass_completions": "pass_cmp"}
 BOOKS = "draftkings,fanduel,betmgm"
 EDGE_MIN = 0.04
 

@@ -264,6 +264,7 @@ def project(season, team_vol_season=None):
     out["rec_yds"] = wt * own_rec_yds.fillna(role_rec_yds) + (1 - wt) * role_rec_yds
     out["receptions"] = wt * own_receptions.fillna(role_receptions) + (1 - wt) * role_receptions
     out["rush_yds"] = wt * own_rush_yds.fillna(role_rush_yds) + (1 - wt) * role_rush_yds
+    out["rush_att"] = out["proj_carries_pg"]   # rush attempts projection = projected carries/game
     out["role_rec_yds"] = role_rec_yds; out["own_rec_yds"] = own_rec_yds
 
     # confidence: high for established stable players (projection beats naive, unbiased);
