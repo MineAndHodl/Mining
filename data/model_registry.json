@@ -391,10 +391,10 @@
       "id": "clv_openclose",
       "name": "Open\u2192close line movement (CLV)",
       "cat": "market",
-      "stat": "80% of games move, avg 1.27 pts (n=3194)",
+      "stat": "model predicts open\u2192close direction: r=+0.236 p<1e-34 (n=2719); 51% directional on \u22651pt, 48.5% ATS at close",
       "status": "IN",
       "weight": 1.0,
-      "note": "VALIDATED foundation of beat-the-close: early numbers move ~1.3pt \u2014 capturing them is the core edge"
+      "note": "VALIDATED but MODEST: real directional CLV signal \u2014 bet early to capture it; we do NOT beat the closing line itself. Grind edge, compounds on volume."
     },
     {
       "id": "clv_totals",
@@ -602,16 +602,52 @@
       "status": "MONITOR",
       "weight": 0.3,
       "note": "small rush-prop over nudge; validate the magnitude"
+    },
+    {
+      "id": "dvp_rb_rush",
+      "name": "RB rushing vs defense (opp-adjusted)",
+      "cat": "matchup",
+      "stat": "r=+0.086 p=3e-8 (n=4170)",
+      "status": "IN",
+      "weight": 0.4,
+      "note": "VALIDATED weak signal \u2014 small rush-prop matchup adjustment; must be opponent-adjusted"
+    },
+    {
+      "id": "dvp_te_rec",
+      "name": "TE receiving vs defense",
+      "cat": "matchup",
+      "stat": "r=+0.043 p=.01",
+      "status": "MONITOR",
+      "weight": 0.25,
+      "note": "marginal \u2014 watch"
+    },
+    {
+      "id": "dvp_wr_rec",
+      "name": "WR receiving vs defense (adjusted)",
+      "cat": "matchup",
+      "stat": "r=+0.020 p=.11 (n=6730)",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "noise even opponent-adjusted \u2014 WR matchup is mostly schedule"
+    },
+    {
+      "id": "dvp_td_allowed",
+      "name": "TDs allowed by position",
+      "cat": "matchup",
+      "stat": "WR/RB/TE all p>0.25",
+      "status": "RULED_OUT",
+      "weight": 0.0,
+      "note": "null \u2014 TD allowance too noisy/low-frequency to predict; don't build TD matchup off defense"
     }
   ],
   "version": 3,
   "updated": "2026-09-01",
   "counts": {
     "CORE": 2,
-    "IN": 20,
+    "IN": 21,
     "GATED": 1,
-    "MONITOR": 7,
-    "RULED_OUT": 37
+    "MONITOR": 8,
+    "RULED_OUT": 39
   },
-  "total_tested": 67
+  "total_tested": 71
 }
