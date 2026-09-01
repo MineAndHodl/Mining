@@ -1,0 +1,130 @@
+<title>The Desk — Command Center</title>
+<style>
+:root{
+  --bg:#f5f4f0; --panel:#fffefb; --ink:#17181c; --muted:#5c6069; --line:#e3e0d8;
+  --accent:#0f7b6c; --accent2:#c2410c; --gold:#a97b1f; --chip:#efece3;
+  --good:#0f7b6c; --warn:#c2410c; --dead:#8a8f98; --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101216; --panel:#181b21; --ink:#eceef2; --muted:#9aa0ab; --line:#282c34;
+  --accent:#3fbfab; --accent2:#f2833f; --gold:#d7ad55; --chip:#20242c; --dead:#6b7280;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{
+  --bg:#101216; --panel:#181b21; --ink:#eceef2; --muted:#9aa0ab; --line:#282c34;
+  --accent:#3fbfab; --accent2:#f2833f; --gold:#d7ad55; --chip:#20242c; --dead:#6b7280;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding:26px 18px 80px}
+.mono{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+h1{font-size:30px;letter-spacing:-.5px;margin:0 0 2px}
+h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:34px 0 12px;font-weight:700}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 9px;vertical-align:middle}
+.lede{font-size:18px;line-height:1.5;color:var(--ink);max-width:760px;margin:14px 0 6px}
+.lede b{color:var(--accent)}
+.sub{color:var(--muted);max-width:760px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin:12px 0}
+.grid{display:grid;gap:12px}
+@media(min-width:720px){.g3{grid-template-columns:1fr 1fr 1fr}.g2{grid-template-columns:1fr 1fr}}
+.k{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.big{font-size:26px;font-weight:800;letter-spacing:-.5px;margin-top:2px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:640px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.pill{font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;display:inline-block}
+.top{background:rgba(15,123,108,.14);color:var(--accent)}
+.strong{background:rgba(169,123,31,.16);color:var(--gold)}
+.lean{background:var(--chip);color:var(--muted)}
+.dc{font-weight:800;font-variant-numeric:tabular-nums}
+.ledger div{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--line)}
+.ledger .st{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;min-width:74px}
+.real{color:var(--good)} .build{color:var(--gold)} .cut{color:var(--dead)}
+.small{font-size:13px;color:var(--muted)}
+a{color:var(--accent)}
+.links a{display:inline-block;margin:0 14px 8px 0;font-weight:600}
+.note{font-size:12.5px;color:var(--muted);margin-top:8px}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+.flow .step{background:var(--chip);border-radius:8px;padding:6px 10px;font-weight:600}
+.flow .arw{color:var(--muted)}
+.hl{background:linear-gradient(transparent 60%,rgba(15,123,108,.18) 0)}
+</style>
+
+<div class="wrap">
+  <span class="tag">Command Center · rebuilt Sep 1 2026</span>
+  <h1>The Desk</h1>
+  <div class="lede">We don't out-predict the market. <b>We beat the close.</b> The Desk posts a number early — while the book's number is still soft — and you're already up by kickoff.</div>
+  <div class="sub">Every pick states three things: <b>our projection</b> (the Desk number), <b>the line we'll play it up to / down to</b>, and <b>the best number on the board right now</b>. No number, no pick.</div>
+
+  <h2>How the edge actually works</h2>
+  <div class="panel">
+    <div class="flow">
+      <span class="step">Model sets our number</span><span class="arw">→</span>
+      <span class="step">Market opens soft</span><span class="arw">→</span>
+      <span class="step">We post it Tuesday, early</span><span class="arw">→</span>
+      <span class="step">Line moves toward our number</span><span class="arw">→</span>
+      <span class="step">You already beat the close</span>
+    </div>
+    <div class="note">The honest core finding, from 2,335 backtested games: <b>no public model beats the NFL closing line outright</b> (~48–50% ATS). So we don't try to. The winnable game is <b>open→close</b>: openers are soft, and if we can predict which way a number drifts, betting it early is positive expected CLV even when we can't beat the close itself. Cross-book shopping is a secondary confirmation, not the product — most people don't have six apps open.</div>
+  </div>
+
+  <h2>What I Like — this week <span class="small" style="text-transform:none;letter-spacing:0;font-weight:400">· Week 1 board loads Tue; format shown below</span></h2>
+  <div class="panel scroll">
+    <table>
+      <thead><tr>
+        <th>Pick</th><th>Market</th><th class="num">Desk #</th><th class="num">Play to</th><th>Best now</th><th class="num">Edge</th><th class="num">Desk Conf</th><th>Tier</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Bills +1</td><td>spread</td><td class="num">BUF −1</td><td class="num">BUF −1</td><td>+1 @ Fanatics</td><td class="num">+2.0</td><td class="num dc">8.3</td><td><span class="pill top">TOP PLAY</span></td></tr>
+        <tr><td>Commanders +5.5</td><td>spread</td><td class="num">WAS +4</td><td class="num">+4.5</td><td>+5.5 @ FanDuel</td><td class="num">+1.5</td><td class="num dc">7.7</td><td><span class="pill strong">STRONG</span></td></tr>
+        <tr><td>Falcons/Steelers U 42.5</td><td>total</td><td class="num">41.4</td><td class="num">U 41.5</td><td>42.5 @ DK</td><td class="num">+1.0</td><td class="num dc">7.1</td><td><span class="pill strong">STRONG</span></td></tr>
+        <tr><td>A. St. Brown Over 55.5 rec yds</td><td>prop</td><td class="num">63.0</td><td class="num">O 59.5</td><td>55.5 @ FanDuel</td><td class="num">5.6%</td><td class="num dc">6.5</td><td><span class="pill lean">LEAN</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note"><b>Read it like this:</b> "Desk #" is our proprietary projection. "Play to" is the worst number we'd still fire — bet it at that line or better, skip it past that. When the market number is <i>better than our number</i> (Bills +1 vs our −1), that's the soft early gift. This is illustrative formatting from live Week-1 data; the graded board posts Tuesday.</div>
+  </div>
+
+  <h2>The model — what's real, what's building, what's cut</h2>
+  <div class="panel ledger">
+    <div><span class="st real">REAL</span><div><b>EPA power ratings.</b> Opponent-adjusted, recency-weighted, asymmetric shrinkage. Backtested to market level (MAE 10.26 pts). This is the spine.</div></div>
+    <div><span class="st real">REAL</span><div><b>Off-market / key-number flags.</b> Coherent now — one best <i>bettable</i> number per side, edge measured against that same number (fixed the venue-mismatch bug).</div></div>
+    <div><span class="st real">REAL</span><div><b>Continuity preseason prior.</b> ~50% of a rating carries year-to-year. A <b>coaching change nearly voids the prior OFFENSE</b> (corr 0.52→0.10) while defense partly survives (0.47→0.24). Two prior seasons beat one (S-2 significant, p=.03). QB continuity tested → null. Weeks 1–4 stop flying blind.</div></div>
+    <div><span class="st real">REAL</span><div><b>Anytime-TD model.</b> Calibrated Poisson (25%→26% out-of-sample). Drives the Touchdown Tax parlays.</div></div>
+    <div><span class="st build">BUILDING</span><div><b>Open→close movement engine.</b> The headline edge. Backtestable via historical odds snapshots (2020+) — needs a credit-budget go-ahead to run the study.</div></div>
+    <div><span class="st build">BUILDING</span><div><b>Props beyond receiving yards.</b> Rush/pass/receptions gated until an in-season usage layer (2026 snaps) un-biases them. Market-anchored so edges don't lie.</div></div>
+    <div><span class="st build">BUILDING</span><div><b>QB-continuity on offense.</b> Washed out on net rating; likely real on offense specifically — next continuity test.</div></div>
+    <div><span class="st cut">RETHINK</span><div><b>Cross-book shopping as a headline.</b> Demoted to a confirmation signal. The masses don't shop books.</div></div>
+    <div><span class="st cut">RETHINK</span><div><b>"Beat the Close" as the automation's name.</b> Scheduled tasks still say it. Renaming + re-pointing them to the open→close thesis is queued.</div></div>
+  </div>
+
+  <h2>Proven / tested — the receipts</h2>
+  <div class="grid g3">
+    <div class="panel"><div class="k">YoY carryover</div><div class="big">0.51</div><div class="small">rating persistence when the coach stays — vs <b>0.13</b> when he's fired</div></div>
+    <div class="panel"><div class="k">Angles tested</div><div class="big">~30</div><div class="small">famous betting systems run to ground — almost all dead. See the Graveyard.</div></div>
+    <div class="panel"><div class="k">Pipeline tests</div><div class="big">40/40</div><div class="small">full suite green — coherence, sign logic, dedup, live-board invariants</div></div>
+  </div>
+
+  <h2>System status</h2>
+  <div class="panel">
+    <div class="scroll"><table style="min-width:520px">
+      <thead><tr><th>Automation</th><th>Cadence</th><th>Does</th></tr></thead>
+      <tbody>
+        <tr><td>Tuesday Card</td><td>Tue 9:32a CT</td><td>early board, flags, model deltas → DESK LOG email</td></tr>
+        <tr><td>Touchdown Tax</td><td>Thu 12:01p CT</td><td>two model-picked anytime-TD parlays for Sun/Mon</td></tr>
+        <tr><td>Sunday Final</td><td>Sun 8:30a CT</td><td>still-live vs window-closed; closing snapshot</td></tr>
+        <tr><td>Monday Grading</td><td>Mon 10:05a CT</td><td>grades every pick + <b>beat-the-close rate</b></td></tr>
+        <tr><td>Engagement Lab</td><td>Mon 5:08p CT</td><td>self-tuning content plan, no bait</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note">All runs verify every number against raw JSON + an adversarial audit before anything sends. Next upgrade to this stack: fold the continuity prior into the Tuesday model context, and add the open→close capture so the Monday grade reports real CLV from our own archived openers.</div>
+  </div>
+
+  <h2>The rest of the desk</h2>
+  <div class="panel">
+    <div class="small">Supporting pages (each its own artifact): <b>The Graveyard</b> (~30 dead betting angles), <b>The Prop Desk</b>, <b>20,000 Seasons</b>, <b>Run the Table</b>, <b>Growth Playbook</b>. Real assets and marketing toys — but not the product.</div>
+    <div class="note">The product is the number we post before it moves.</div>
+  </div>
+</div>

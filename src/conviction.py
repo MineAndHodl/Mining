@@ -79,7 +79,16 @@ def build_card(flags=None, props=None, max_plays=7):
     for c in cands:
         c["desk_conf"] = desk_confidence(c["score"])
     cands.sort(key=lambda x: x["score"], reverse=True)
-    top = cands[:max_plays]
+    # dedup: one play per identity (game+market+side), keep the highest-scored copy
+    # (same side flagged at several books must not appear as multiple plays).
+    seen, deduped = set(), []
+    for c in cands:
+        k = c.get("dedup") or (c.get("game"), c.get("market"), c.get("label"))
+        if k in seen:
+            continue
+        seen.add(k)
+        deduped.append(c)
+    top = deduped[:max_plays]
     n_elite = sum(1 for c in top if c["tier"] in ("TOP PLAY", "STRONG"))
     return {
         "plays": top,

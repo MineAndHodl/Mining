@@ -32,7 +32,11 @@ def verify_card(board: pd.DataFrame, flags: pd.DataFrame, max_age_min=30):
             continue
         g = grp.sort_values("point")
         fav = g.iloc[0]
-        if fav["point"] <= -1.5:  # clear favorite by the spread
+        # Only assert when there's a CLEAR favorite: a field-goal+ spread, OR a
+        # smaller spread whose juice also sits on the favorite. At pick'em (e.g.
+        # -1 priced at +102) the ML can legitimately favor the other side — not a bug.
+        clear_fav = fav["point"] <= -2.5 or (fav["point"] <= -1.5 and fav["price"] <= -112)
+        if clear_fav:
             m = ml[ml["game"] == game]
             if len(m) == 2:
                 probs = {r["side"]: implied(r["price"]) for _, r in m.iterrows()}

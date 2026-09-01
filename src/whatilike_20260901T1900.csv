@@ -1,0 +1,8 @@
+score,label,market,game,edge_pts,where,kind,dedup,tier,lane,desk_conf
+76.0,Buffalo Bills +1,spreads,Buffalo Bills @ Houston Texans,2.0,fanatics,off-market,"('Buffalo Bills @ Houston Texans', 'spreads', 'Buffalo Bills')",TOP PLAY,core,8.3
+67.0,Washington Commanders +5.5,spreads,Washington Commanders @ Philadelphia Eagles,1.5,fanduel,off-market,"('Washington Commanders @ Philadelphia Eagles', 'spreads', 'Washington Commanders')",STRONG,core,7.7
+58.0,Under 42.5,totals,Atlanta Falcons @ Pittsburgh Steelers,1.0,draftkings,off-market,"('Atlanta Falcons @ Pittsburgh Steelers', 'totals', 'Under')",STRONG,core,7.1
+58.0,Under 48.5,totals,Baltimore Ravens @ Indianapolis Colts,1.0,draftkings,off-market,"('Baltimore Ravens @ Indianapolis Colts', 'totals', 'Under')",STRONG,core,7.1
+58.0,Cleveland Browns +8.5,spreads,Cleveland Browns @ Jacksonville Jaguars,1.0,betrivers,off-market,"('Cleveland Browns @ Jacksonville Jaguars', 'spreads', 'Cleveland Browns')",STRONG,core,7.1
+58.0,Under 48.5,totals,Dallas Cowboys @ New York Giants,1.0,draftkings,off-market,"('Dallas Cowboys @ New York Giants', 'totals', 'Under')",STRONG,core,7.1
+58.0,Over 49.5,totals,New Orleans Saints @ Detroit Lions,1.0,draftkings,off-market,"('New Orleans Saints @ Detroit Lions', 'totals', 'Over')",STRONG,core,7.1

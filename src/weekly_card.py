@@ -39,9 +39,15 @@ def fmt_line(side, point):
 def implied(o):
     return 100/(o+100) if o > 0 else abs(o)/(abs(o)+100)
 
-def fetch_odds(key):
+def fetch_odds(key, days=8):
+    """Fetch odds for the CURRENT slate only. The /odds endpoint otherwise returns
+    the entire posted season (~270 games), which floods the card with stale
+    far-future lines. commenceTimeFrom/To windows it to the next `days` days."""
+    now = datetime.datetime.now(datetime.timezone.utc)
+    frm = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    to = (now + datetime.timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
     url = (f"{API}?apiKey={key}&regions=us,eu&markets=h2h,spreads,totals"
-           f"&oddsFormat=american")
+           f"&oddsFormat=american&commenceTimeFrom={frm}&commenceTimeTo={to}")
     with urllib.request.urlopen(url, timeout=30) as r:
         remaining = r.headers.get("x-requests-remaining")
         data = json.load(r)
@@ -80,33 +86,64 @@ def pinnacle_fair(board):
         }
     return out
 
-def find_off_market(board, fair, min_pt=1.0, min_ev=0.02):
-    """Retail numbers beating the Pinnacle fair line."""
+def _best_number(grp, market, side):
+    """Row offering the best number for `side`: spreads -> most points; totals ->
+    higher for Under, lower for Over; h2h -> best (max) price."""
+    if market == "spreads":
+        return grp.loc[grp["point"].idxmax()]
+    if market == "totals":
+        return grp.loc[grp["point"].idxmax() if side == "Under" else grp["point"].idxmin()]
+    return grp.loc[grp["price"].idxmax()]
+
+
+def find_off_market(board, fair, min_pt=1.0, min_ev=0.02, bettable_only=True):
+    """Off-market flags, derived ONLY from the best number a bettable book actually
+    offers on each side. One row per (game, market, side); the displayed line, book
+    and edge are the SAME bettable number, so the play is always coherent and
+    executable (no offshore-sourced or venue-mismatched lines).
+    Set bettable_only=False to survey offshore books as market intel."""
     flags = []
-    retail = board[~board["book"].isin(SHARP_BOOKS)]
-    for _, r in retail.iterrows():
-        f = fair.get((r["game"], r["market"]), {}).get(r["side"])
+    if not len(board):
+        return pd.DataFrame()
+    if bettable_only:
+        books = [b for b in BETTABLE_BOOKS if b in set(board["book"])]
+    else:
+        books = [b for b in board["book"].unique() if b not in SHARP_BOOKS]
+    retail = board[board["book"].isin(books)]
+    for (game, market, side), grp in retail.groupby(["game", "market", "side"]):
+        f = fair.get((game, market), {}).get(side)
         if not f:
             continue
-        if r["market"] in ("spreads", "totals") and r["point"] is not None and f["point"] is not None:
-            # for spreads: getting MORE points on same side is better.
-            diff = (r["point"] - f["point"]) if r["market"] == "spreads" else 0
-            if r["market"] == "totals":
-                diff = (r["point"] - f["point"]) if r["side"] == "Under" else (f["point"] - r["point"])
-            crosses_key = any(min(r["point"] or 0, f["point"] or 0) < k <= max(r["point"] or 0, f["point"] or 0)
-                              for k in KEY_NUMBERS) if r["market"] == "spreads" else False
+        if market in ("spreads", "totals"):
+            if f["point"] is None:
+                continue
+            g2 = grp.dropna(subset=["point"])
+            if not len(g2):
+                continue
+            best = _best_number(g2, market, side)
+            pt = float(best["point"])
+            if market == "spreads":
+                diff = pt - f["point"]
+            else:
+                diff = (pt - f["point"]) if side == "Under" else (f["point"] - pt)
+            crosses_key = any(min(pt, f["point"]) < k <= max(pt, f["point"]) for k in KEY_NUMBERS) \
+                if market == "spreads" else False
             if diff >= min_pt or (diff >= 0.5 and crosses_key):
-                flags.append({**r.to_dict(), "vs_fair_pts": round(diff, 1),
-                              "fair_point": f["point"],
-                              "line_str": fmt_line(r["side"], r["point"]),
-                              "fair_str": fmt_line(r["side"], f["point"]),
-                              "class": "FLAG" if r["book"] in BETTABLE_BOOKS else "intel",
-                              "type": "off-market line"})
-        elif r["market"] == "h2h":
-            ev = f["fair_p"] * (r["price"]/100 if r["price"] > 0 else 100/abs(r["price"])) - (1 - f["fair_p"])
+                flags.append({"game": game, "market": market, "side": side, "point": pt,
+                              "price": best["price"], "book": best["book"],
+                              "bet_at": best["book"], "bet_point": pt, "bet_price": best["price"],
+                              "vs_fair_pts": round(diff, 1), "fair_point": f["point"],
+                              "line_str": fmt_line(side, pt), "fair_str": fmt_line(side, f["point"]),
+                              "crosses_key": crosses_key, "class": "FLAG", "type": "off-market line"})
+        elif market == "h2h":
+            best = grp.loc[grp["price"].idxmax()]
+            price = best["price"]
+            ev = f["fair_p"] * (price/100 if price > 0 else 100/abs(price)) - (1 - f["fair_p"])
             if ev >= min_ev:
-                flags.append({**r.to_dict(), "ev": round(ev, 3),
-                              "fair_p": round(f["fair_p"], 3), "type": "ML +EV vs fair"})
+                flags.append({"game": game, "market": market, "side": side, "price": price,
+                              "book": best["book"], "bet_at": best["book"],
+                              "ev": round(ev, 3), "fair_p": round(f["fair_p"], 3),
+                              "class": "FLAG", "type": "ML +EV vs fair"})
     return pd.DataFrame(flags)
 
 def model_numbers(data_dir):
