@@ -1,0 +1,181 @@
+<title>The Desk</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f6f5f1; --surface:#fff; --ink:#161b18; --muted:#5c655f; --line:#e2e5df;
+  --accent:#0e6b4a; --accent2:#12805a; --gold:#a9791b; --neg:#a8362c; --chip:#eef2ec; --head:#0f2019;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1311; --surface:#171d19; --ink:#e9ede9; --muted:#95a099; --line:#28302b;
+  --accent:#4cc492; --accent2:#3fae82; --gold:#e8c15a; --neg:#e07b6f; --chip:#212824; --head:#0c1712;
+}}
+:root[data-theme="dark"]{
+  --bg:#0f1311; --surface:#171d19; --ink:#e9ede9; --muted:#95a099; --line:#28302b;
+  --accent:#4cc492; --accent2:#3fae82; --gold:#e8c15a; --neg:#e07b6f; --chip:#212824; --head:#0c1712;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 80px}
+header{background:var(--head);color:#eaf1ec;padding:26px 0 22px;margin-bottom:0}
+.hin{max-width:760px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px}
+.logo{width:46px;height:46px;flex:none}
+.brand{font:700 30px/1 "Barlow Condensed",sans-serif;letter-spacing:.02em}
+.brandsub{color:#9fb0a6;font:500 12px/1.4 "IBM Plex Mono",monospace;margin-top:3px}
+.status{margin-left:auto;text-align:right;font:500 12px/1.4 "IBM Plex Mono",monospace;color:#9fb0a6}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:5px;vertical-align:middle}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:2px;overflow-x:auto;padding:8px 12px}
+nav button{flex:none;background:none;border:0;color:var(--muted);font:600 13px/1 "Barlow Condensed",sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:9px 13px;border-radius:7px;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--chip);color:var(--accent)}
+section{display:none;padding-top:22px}
+section.on{display:block}
+h2{font:700 22px/1.1 "Barlow Condensed",sans-serif;letter-spacing:.03em;text-transform:uppercase;margin:6px 0 4px}
+.rule{height:3px;width:38px;background:var(--accent);border:0;margin:0 0 14px}
+p{color:var(--muted);max-width:64ch;margin:10px 0}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 10px;text-align:center}
+.kpi b{display:block;font:700 24px/1 "Barlow Condensed",sans-serif;font-variant-numeric:tabular-nums}
+.kpi span{color:var(--muted);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;color:var(--muted);font:600 11px/1.2 "Barlow Condensed",sans-serif;letter-spacing:.09em;text-transform:uppercase;padding:9px 11px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 11px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+.pos{color:var(--accent2);font-weight:600}.negc{color:var(--neg);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+.card h3{font:600 15px/1.3 "IBM Plex Sans";margin:0 0 4px}
+.pill{display:inline-block;font:500 11px/1 "IBM Plex Mono",monospace;padding:4px 9px;border-radius:5px;background:var(--chip);color:var(--accent);margin-right:6px}
+.pill.wait{color:var(--gold)}
+.link{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:9px;text-decoration:none;color:var(--ink)}
+.link b{font-weight:600}.link span{color:var(--muted);font-size:12.5px}
+.link .go{color:var(--accent);font:600 13px "Barlow Condensed";letter-spacing:.06em}
+.note{font-size:12.5px;color:var(--muted);margin-top:8px}
+.foot{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.7}
+.foot b{color:var(--accent)}
+</style>
+
+<header><div class="hin">
+  <svg class="logo" viewBox="0 0 400 400"><rect width="400" height="400" rx="70" fill="#0c120e"/><rect x="264" y="86" width="16" height="228" rx="8" fill="#e8c15a"/><polyline points="72,300 148,256 196,280 330,120" fill="none" stroke="#4cc492" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/><polygon points="342,108 334,158 292,128" fill="#4cc492"/></svg>
+  <div><div class="brand">THE DESK</div><div class="brandsub">beat the close · your private view</div></div>
+  <div class="status"><span class="dot"></span>model live<br>updated Sep 1 · Wk 1</div>
+</div></header>
+
+<nav>
+  <button class="on" data-t="over">Overview</button>
+  <button data-t="card">This Week</button>
+  <button data-t="fut">Futures</button>
+  <button data-t="td">TD & Missiles</button>
+  <button data-t="tools">Tools</button>
+</nav>
+
+<div class="wrap">
+
+<section class="on" id="over">
+  <h2>Where it stands</h2><hr class="rule">
+  <div class="kpis">
+    <div class="kpi"><b>0–0</b><span>Season record</span></div>
+    <div class="kpi"><b>27</b><span>Seasons ingested</span></div>
+    <div class="kpi"><b>20k</b><span>Sims / week</span></div>
+    <div class="kpi"><b>6</b><span>Auto jobs live</span></div>
+  </div>
+  <p>The model is built, backtested, and running. Season opens <b>Sept 9</b>; the first graded picks land this week. Everything below is live model output — refreshed each week by the automated desk.</p>
+  <div class="card">
+    <h3>What fires, and when</h3>
+    <p style="margin:8px 0 0">
+    <span class="pill">Tue 10a</span> the card — off-market flags<br>
+    <span class="pill">Thu 12p</span> Touchdown Tax — TD parlays<br>
+    <span class="pill">Sun 9a</span> final pass + closing snapshot<br>
+    <span class="pill">Mon 10a</span> grading — CLV receipts<br>
+    <span class="pill">Mon 5p</span> engagement lab</p>
+    <p class="note">Each run emails you a DESK LOG. Once the X account clears review, these post publicly too.</p>
+  </div>
+  <div class="card">
+    <h3>The honest headline</h3>
+    <p style="margin:8px 0 0">No public-data model beats NFL closing lines — ours included (48–50% ATS in an honest 2,335-game backtest). The edge is <b>off-market prices</b> vs the sharp anchor, <b>key numbers</b>, <b>Wong teasers</b>, and <b>calibrated TD props</b> — not fading the market on model disagreement. Every pick is graded against the close, win or loss.</p>
+  </div>
+</section>
+
+<section id="card">
+  <h2>Week 1 board</h2><hr class="rule">
+  <p>Model spread & total vs the market, all 16 games. Kickoff Sept 9–14. <b>Deltas are context, not picks</b> — the biggest gaps mostly mark offseason roster news, and fading the market on disagreement alone is −EV (see Overview).</p>
+  <div class="tablebox"><table>
+  <thead><tr><th>Game</th><th class="n">Mkt spread</th><th class="n">Model</th><th class="n">Mkt tot</th><th class="n">Model</th></tr></thead>
+  <tbody>
+  <tr><td>NE @ SEA</td><td class="n">SEA −3.5</td><td class="n">SEA −1.6</td><td class="n">44.5</td><td class="n">48.6</td></tr>
+  <tr><td>SF @ LAR</td><td class="n">LAR −3.5</td><td class="n">LAR −3.5</td><td class="n">48.5</td><td class="n">51.6</td></tr>
+  <tr><td>TB @ CIN</td><td class="n">CIN −3.5</td><td class="n">PK</td><td class="n">51.5</td><td class="n">48.2</td></tr>
+  <tr><td>NO @ DET</td><td class="n">DET −7</td><td class="n">DET −4.8</td><td class="n">49.5</td><td class="n">46.3</td></tr>
+  <tr><td>BAL @ IND</td><td class="n">BAL −3.5</td><td class="n">BAL −0.6</td><td class="n">48.5</td><td class="n">48.8</td></tr>
+  <tr><td>ARI @ LAC</td><td class="n">LAC −10.5</td><td class="n">LAC −6.9</td><td class="n">46.5</td><td class="n">46.6</td></tr>
+  <tr><td>MIA @ LV</td><td class="n">LV −3.5</td><td class="n">MIA −1.8</td><td class="n">40.5</td><td class="n">43.2</td></tr>
+  <tr><td>WAS @ PHI</td><td class="n">PHI −4.5</td><td class="n">PHI −9.1</td><td class="n">45.5</td><td class="n">47.9</td></tr>
+  <tr><td>DAL @ NYG</td><td class="n">DAL −2.5</td><td class="n">NYG −3.1</td><td class="n">48.5</td><td class="n">49.5</td></tr>
+  <tr><td>DEN @ KC</td><td class="n">KC −3</td><td class="n">DEN −1.7</td><td class="n">42.5</td><td class="n">45.6</td></tr>
+  </tbody></table></div>
+  <p class="note">Live off-market flags (the actual bets) drop in the Tuesday DESK LOG once each week's board is open. This is the model's read on the slate.</p>
+</section>
+
+<section id="fut">
+  <h2>2026 futures</h2><hr class="rule">
+  <p>The full season simulated 20,000 times, QB moves overlaid. This is the stuff we like — and it's the model's own numbers, not the market's.</p>
+  <h3 style="font:600 13px/1 'Barlow Condensed';letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px">Super Bowl — model odds</h3>
+  <div class="tablebox"><table>
+  <thead><tr><th>Team</th><th class="n">Proj W</th><th class="n">Playoffs</th><th class="n">Div</th><th class="n">SB fair</th></tr></thead>
+  <tbody>
+  <tr><td>NE</td><td class="n">11.4</td><td class="n">90%</td><td class="n">55%</td><td class="n">+563</td></tr>
+  <tr><td>BUF</td><td class="n">11.0</td><td class="n">86%</td><td class="n">44%</td><td class="n">+738</td></tr>
+  <tr><td>SEA</td><td class="n">10.8</td><td class="n">78%</td><td class="n">44%</td><td class="n">+968</td></tr>
+  <tr><td>PHI</td><td class="n">10.5</td><td class="n">79%</td><td class="n">70%</td><td class="n">+1066</td></tr>
+  <tr><td>LAR</td><td class="n">10.5</td><td class="n">73%</td><td class="n">37%</td><td class="n">+1093</td></tr>
+  <tr><td>DEN</td><td class="n">10.3</td><td class="n">79%</td><td class="n">63%</td><td class="n">+1453</td></tr>
+  <tr><td>JAX</td><td class="n">9.9</td><td class="n">70%</td><td class="n">42%</td><td class="n">+1941</td></tr>
+  <tr><td>BAL</td><td class="n">10.1</td><td class="n">73%</td><td class="n">53%</td><td class="n">+1958</td></tr>
+  </tbody></table></div>
+  <h3 style="font:600 13px/1 'Barlow Condensed';letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px">Win totals — biggest model vs market gaps</h3>
+  <div class="tablebox"><table>
+  <thead><tr><th>Team</th><th class="n">Market</th><th class="n">Model</th><th class="n">Gap</th><th>Read</th></tr></thead>
+  <tbody>
+  <tr><td>KC</td><td class="n">10.5</td><td class="n">7.0</td><td class="n negc">−3.5</td><td>Market pays the dynasty; ratings don't. Narrative check.</td></tr>
+  <tr><td>ARI</td><td class="n">3.5</td><td class="n">6.8</td><td class="n pos">+3.3</td><td>Too big — likely offseason news. Diagnose, don't bet.</td></tr>
+  <tr><td>DAL</td><td class="n">9.5</td><td class="n">7.2</td><td class="n negc">−2.3</td><td>Market upgraded hard vs 2025 tape.</td></tr>
+  <tr><td>CIN</td><td class="n">10.5</td><td class="n">8.4</td><td class="n negc">−2.1</td><td>Bounce-back priced in the ratings don't see.</td></tr>
+  <tr><td>MIA</td><td class="n">4.5</td><td class="n">6.1</td><td class="n pos">+1.6</td><td>Deep-pessimism line; clean over candidate.</td></tr>
+  <tr><td>JAX</td><td class="n">8.5</td><td class="n">9.9</td><td class="n pos">+1.4</td><td>Rating-driven — best clean over on the board.</td></tr>
+  </tbody></table></div>
+  <p class="note">Live futures pricing comes with the odds feed; market column is DK's July board. Futures lock capital 5 months at heavy vig — small units, only where the gap survives an offseason-news check.</p>
+</section>
+
+<section id="td">
+  <h2>TD props & missiles</h2><hr class="rule">
+  <p>The touchdown model prices every scorer's real probability against the book's number. Out-of-sample calibrated: when it says 25%, it hits 26%. This drives the Touchdown Tax parlays and the Whale Missiles.</p>
+  <div class="card">
+    <h3>🐋🚀 The Whale Missile — opener</h3>
+    <p style="margin:6px 0 0"><span class="pill">NE @ SEA · 9/9</span><span class="pill">9 legs · +12000</span><span class="pill wait">PENDING</span></p>
+    <p style="margin:8px 0 0">Maye 226+ pass / 25+ rush · Darnold 235+ pass · JSN 7+ rec + anytime TD · Kupp 3+ rec · AJ Brown 5+ rec · Henry 34+ rec yds · Stevenson anytime TD. One correlated game-script stack, small unit, logged win or lose.</p>
+  </div>
+  <div class="card">
+    <h3>🏈 Touchdown Tax</h3>
+    <p style="margin:6px 0 0">Two model-picked TD parlays per week (Sunday/Monday slate): "the collector" (3 safe legs) and "the spicy one" (4 legs, one flier). Legs chosen by model-vs-price ratio, rookies handled with depth-chart priors. First drop hits your inbox <b>Thursday</b>.</p>
+  </div>
+  <p class="note">Every parlay and missile logged with the price taken. When one hits, that's the receipt.</p>
+</section>
+
+<section id="tools">
+  <h2>The interactive stuff</h2><hr class="rule">
+  <p>Everything the model makes, one tap away. These are the shareable, come-back-to pages.</p>
+  <a class="link" href="https://claude.ai/code/artifact/09673b5b-335f-4539-8bb8-db3989fdff0c"><div><b>20,000 Seasons 🎲</b><br><span>Tap any team — win distribution, playoff odds, game-by-game</span></div><div class="go">OPEN →</div></a>
+  <a class="link" href="https://claude.ai/code/artifact/cdaec25d-2354-48eb-8096-5adabb7afc72"><div><b>The Graveyard ⚰️</b><br><span>Every famous betting angle, tested and buried</span></div><div class="go">OPEN →</div></a>
+  <a class="link" href="https://claude.ai/code/artifact/711de645-853b-4fc1-a3b3-ab328e47973e"><div><b>Run the Table 🏆</b><br><span>Draft 8 legends, see if the model takes you 20-0</span></div><div class="go">OPEN →</div></a>
+  <a class="link" href="https://claude.ai/code/artifact/f7605629-e85e-4cb7-a282-0ab8a17f2b76"><div><b>Model Desk report 📊</b><br><span>The build, the backtest, the full methodology</span></div><div class="go">OPEN →</div></a>
+  <a class="link" href="https://claude.ai/code/artifact/44dd4844-ef86-4776-b76e-a872b32b09a6"><div><b>Growth playbook 🧾</b><br><span>Funnel, monetization, the whole business plan</span></div><div class="go">OPEN →</div></a>
+</section>
+
+<p class="foot">This is your private view — nothing here is public. The model updates weekly; refresh the page after each week's runs. <b>21+ · gamble responsibly.</b> Bookmark this link and it's your daily glance.</p>
+</div>
+
+<script>
+const btns=[...document.querySelectorAll('nav button')], secs=[...document.querySelectorAll('section')];
+function show(t){btns.forEach(b=>b.classList.toggle('on',b.dataset.t===t));secs.forEach(s=>s.classList.toggle('on',s.id===t));window.scrollTo({top:0,behavior:'smooth'});}
+btns.forEach(b=>b.onclick=()=>{show(b.dataset.t);try{localStorage.setItem('desk_tab',b.dataset.t)}catch(e){}});
+try{const t=localStorage.getItem('desk_tab');if(t&&document.getElementById(t))show(t)}catch(e){}
+</script>
