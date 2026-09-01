@@ -1,0 +1,250 @@
+<title>The Desk — QC Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#f5f4f1; --panel:#fffefb; --panel2:#f0eee9; --ink:#181a1d; --muted:#585d66;
+  --dim:#8b909a; --line:#e3e0d9; --line2:#d6d2c8;
+  --accent:#3b6ea5; --accent-soft:#3b6ea520;
+  --good:#2f9e5f; --good-bg:#2f9e5f1a;
+  --warn:#c8891b; --warn-bg:#c8891b1a;
+  --bad:#cf3b41; --bad-bg:#cf3b411a;
+  --shadow:0 1px 2px rgba(20,22,25,.05),0 4px 16px rgba(20,22,25,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --panel:#171a1f; --panel2:#1f232a; --ink:#eceef1; --muted:#a2a8b2;
+    --dim:#6b7280; --line:#282d35; --line2:#333944;
+    --accent:#6ba3de; --accent-soft:#6ba3de1f;
+    --good:#4cc47f; --good-bg:#4cc47f1a;
+    --warn:#e0a339; --warn-bg:#e0a3391a;
+    --bad:#e5686d; --bad-bg:#e5686d1a;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 20px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --panel:#171a1f; --panel2:#1f232a; --ink:#eceef1; --muted:#a2a8b2;
+  --dim:#6b7280; --line:#282d35; --line2:#333944;
+  --accent:#6ba3de; --accent-soft:#6ba3de1f;
+  --good:#4cc47f; --good-bg:#4cc47f1a;
+  --warn:#e0a339; --warn-bg:#e0a3391a;
+  --bad:#e5686d; --bad-bg:#e5686d1a;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 20px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;
+  line-height:1.55;-webkit-font-smoothing:antialiased;margin:0}
+.wrap{max-width:820px;margin:0 auto;padding:40px 22px 80px}
+h1,h2,h3{font-family:"Archivo",system-ui,sans-serif;text-wrap:balance;letter-spacing:-.01em}
+.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent);font-weight:600}
+header h1{font-size:clamp(30px,7vw,46px);font-weight:800;line-height:1.02;margin:.28em 0 .1em}
+.sub{color:var(--muted);font-size:15px;max-width:60ch}
+.stamp{color:var(--dim);font-size:12.5px;margin-top:14px;font-family:"IBM Plex Mono",monospace}
+
+.verdict{margin:30px 0;padding:22px 24px;background:var(--panel);border:1px solid var(--line);
+  border-left:4px solid var(--warn);border-radius:12px;box-shadow:var(--shadow)}
+.verdict .lab{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--warn);font-weight:600;margin-bottom:8px}
+.verdict p{margin:0;font-size:16.5px;line-height:1.5}
+.verdict strong{font-weight:600}
+
+h2{font-size:13px;font-family:"IBM Plex Mono",monospace;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:54px 0 4px;font-weight:600}
+.rule{height:1px;background:var(--line);margin:12px 0 22px}
+
+/* scorecard */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:12px}
+.sc{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:15px 16px;
+  display:flex;flex-direction:column;gap:7px}
+.sc .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sc .nm{font-family:"Archivo";font-weight:700;font-size:15px}
+.sc .dt{font-size:13px;color:var(--muted);line-height:1.45}
+.pill{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.04em;
+  padding:3px 8px;border-radius:20px;white-space:nowrap;text-transform:uppercase}
+.p-good{color:var(--good);background:var(--good-bg)} .p-warn{color:var(--warn);background:var(--warn-bg)}
+.p-bad{color:var(--bad);background:var(--bad-bg)}
+
+/* findings */
+.find{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 18px;
+  margin-bottom:11px;border-left:4px solid var(--line2)}
+.find.crit{border-left-color:var(--bad)} .find.edge{border-left-color:var(--warn)}
+.find.real{border-left-color:var(--accent)}
+.find h3{font-size:15.5px;margin:0 0 6px;font-weight:700;display:flex;gap:9px;align-items:baseline;flex-wrap:wrap}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;
+  letter-spacing:.03em;flex:none}
+.t-bad{color:var(--bad);background:var(--bad-bg)} .t-warn{color:var(--warn);background:var(--warn-bg)}
+.t-real{color:var(--accent);background:var(--accent-soft)}
+.find p{margin:5px 0 0;font-size:14px;color:var(--muted)}
+.find p b{color:var(--ink);font-weight:600}
+.find .fix{margin-top:9px;font-size:13.5px;padding-top:9px;border-top:1px dashed var(--line2)}
+.find .fix b{color:var(--good);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;
+  text-transform:uppercase}
+code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--panel2);padding:1px 5px;
+  border-radius:4px;color:var(--ink)}
+
+/* chart */
+.chart{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 20px 14px;
+  box-shadow:var(--shadow)}
+.chart .ct{font-family:"Archivo";font-weight:700;font-size:16px;margin:0 0 3px}
+.chart .cs{font-size:13px;color:var(--muted);margin:0 0 16px}
+.bars{display:flex;align-items:flex-end;gap:10px;height:190px;position:relative;padding-top:6px}
+.brk{position:absolute;left:0;right:0;border-top:2px dashed var(--bad);z-index:2}
+.brk span{position:absolute;right:0;top:-18px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  color:var(--bad);font-weight:600}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;position:relative;z-index:1}
+.bcol .bar{width:100%;max-width:46px;border-radius:5px 5px 0 0;background:var(--accent);position:relative;transition:none}
+.bcol .val{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;color:var(--ink)}
+.bcol .lb{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--dim);text-align:center}
+.cnote{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.5}
+
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:8px 0 0}
+ol.steps li{position:relative;padding:13px 16px 13px 52px;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;margin-bottom:9px;font-size:14.5px}
+ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:12px;
+  width:24px;height:24px;border-radius:6px;background:var(--accent-soft);color:var(--accent);
+  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center}
+ol.steps li b{font-weight:600}
+ol.steps li .why{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:2px 0 18px;font-size:12px;color:var(--muted);
+  font-family:"IBM Plex Mono",monospace}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Full QC Review · Back to basics</div>
+  <h1>Does the model actually work?</h1>
+  <p class="sub">A cold, honest audit of The Desk — the game model, the props, the "beat-the-close" thesis, the autonomous layer, and the picks being published right now. Three independent reviews, every claim checked against data.</p>
+  <div class="stamp">Reviewed 2026-09-01 · preseason, 0 of 272 games played · commit f494367</div>
+</header>
+
+<div class="verdict">
+  <div class="lab">◆ Bottom line</div>
+  <p>The <strong>foundation is real</strong> — a legitimate EPA engine, clean walk-forward backtests, calibrated projections, a working live-odds pipeline. But there is <strong>no demonstrated, monetizable edge yet</strong>: the game model doesn't beat the closing spread, the one true signal (closing-line value) is too small to clear the vig, and the prop edge has <strong>never been tested against real book lines</strong>. Meanwhile the published board is shipping <strong>four logic bugs</strong>, and the "self-updating, autonomous, publicly-graded business" is largely scaffold. None of this is fatal — we found it preseason, before a dollar is bet. This is the punch-list.</p>
+</div>
+
+<h2>The scorecard</h2>
+<div class="rule"></div>
+<div class="legend">
+  <span><i class="dot" style="background:var(--good)"></i>Real / works</span>
+  <span><i class="dot" style="background:var(--warn)"></i>Partial / unproven</span>
+  <span><i class="dot" style="background:var(--bad)"></i>Broken / not built</span>
+</div>
+<div class="grid">
+  <div class="sc"><div class="top"><span class="nm">EPA game model</span><span class="pill p-good">Real</span></div>
+    <div class="dt">Opponent-adjusted, walk-forward, no leakage. Solid spine — but it does <b>not</b> beat the close (that's expected; nobody does).</div></div>
+  <div class="sc"><div class="top"><span class="nm">Closing-line value</span><span class="pill p-warn">Real · sub-vig</span></div>
+    <div class="dt">The market genuinely drifts toward our side (+0.46 pt, p&lt;1e-22). But it's too small to beat −110 juice on spreads.</div></div>
+  <div class="sc"><div class="top"><span class="nm">Prop edge</span><span class="pill p-warn">Unproven</span></div>
+    <div class="dt">Projections are calibrated, but never once backtested against posted book lines + results. The "Brier 0.051" headline is mathematically impossible.</div></div>
+  <div class="sc"><div class="top"><span class="nm">Published board</span><span class="pill p-bad">4 bugs live</span></div>
+    <div class="dt">Game-script backwards, sides that contradict the model, thin-data picks topping the board, "calibrated" TD model shipping raw numbers.</div></div>
+  <div class="sc"><div class="top"><span class="nm">Self-update + research bot</span><span class="pill p-bad">Scaffold</span></div>
+    <div class="dt">Narrated as autonomous. Reality: re-tests one parameter; research "30-day sprint" was a relabeled one-shot simulation.</div></div>
+  <div class="sc"><div class="top"><span class="nm">Automation + public record</span><span class="pill p-bad">Not built</span></div>
+    <div class="dt">Zero X/Discord/Whop code. No graded-in-public record page — the brand's entire trust premise.</div></div>
+</div>
+
+<h2>The edge reality — what the numbers say</h2>
+<div class="rule"></div>
+<div class="chart">
+  <p class="ct">Against the closing spread, the model loses money at every threshold</p>
+  <p class="cs">ATS win rate by model edge · 2,277 games, 2017–2025 · break-even at −110 is 52.4%</p>
+  <div class="bars" id="bars">
+    <div class="brk" style="bottom:calc(6px + (52.4 - 46) / (54 - 46) * 178px)"><span>52.4% break-even</span></div>
+  </div>
+  <p class="cnote">Not only does it never clear the bar — it trends <b>down</b> as the model's claimed edge grows (48.6% at 3+ points). A big model-vs-market gap is the model being <b>wrong</b>, not finding value. This is the single most important truth in the whole system, and it's why the honest thesis was never "beat the spread."</p>
+</div>
+
+<div class="find edge" style="margin-top:20px">
+  <h3><span class="tag t-warn">CLV</span>The one real signal — closing-line value — is genuine but sub-vig</h3>
+  <p>The market <b>does</b> move toward our side after we'd have bet: <b>+0.46 pts on spreads, +0.43 on totals</b>, both wildly significant (p&lt;1e-22), and it scales with edge. That's a real anticipatory signal. But graded at the opening price you'd actually get, spreads still win only <b>51.2–51.6%</b> — below the 52.4% you need. Half a point of CLV isn't enough to overcome the juice.</p>
+  <p style="margin-top:7px">The lone flicker: <b>totals bet at the opener</b> hit 54.5% at edge ≥3 — but that's <b>not</b> statistically above break-even (p=0.12), it's unstable across seasons, and it vanishes entirely by close (50%). Plausible, unproven, and it depends on actually getting the opening number.</p>
+</div>
+<div class="find edge">
+  <h3><span class="tag t-warn">Props</span>The prop program has no proven edge — and a fabricated headline stat</h3>
+  <p>There is <b>no historical prop backtest anywhere</b> — no posted book lines in the data, no hit-rate or ROI against the market. Props are only validated on "beats a naive baseline" (MAE), which says nothing about beating the book. The advertised <code>prop_brier = 0.051</code> is <b>mathematically impossible</b>: the floor implied by its own calibration table is 0.227. The projections look well-calibrated, but good calibration is not edge — treat the whole <code>calibration.json</code> headline as untrustworthy until rebuilt.</p>
+</div>
+
+<h2>Critical — bugs in the picks being published now</h2>
+<div class="rule"></div>
+<div class="find crit">
+  <h3><span class="tag t-bad">C1</span>Game-script is backwards on every published pick</h3>
+  <p>A sign error reads <code>spread_line</code> with the wrong convention, so <b>favorites are scored as underdogs</b> and vice-versa. On the live board a favorite's WR gets "pass-heavy script helps" and a road dog's RB gets "game script helps the run" — both inverted. It corrupts the Game Flow slider (fires on 10/10 picks) and the implied-points feeding anytime-TD.</p>
+  <p class="fix"><b>Fix</b> Flip the team-spread assignment in <code>board_factors._game_ctx</code> (dog = positive). One line.</p>
+</div>
+<div class="find crit">
+  <h3><span class="tag t-bad">C2</span>The board can publish "Under" when the model itself says "Over"</h3>
+  <p>The "skew-neutralization" step subtracts the median model-vs-market edge per market, which forces a ~50/50 over/under split by construction and re-anchors the model to the market. Players the model likes for the over at 56–58% get flipped and <b>published as unders</b>. It's erasing the genuine directional edges, not cleaning skew.</p>
+  <p class="fix"><b>Fix</b> Drop the re-centering, or at minimum never let it publish a side that contradicts the raw model probability.</p>
+</div>
+<div class="find crit">
+  <h3><span class="tag t-bad">C3</span>The thinnest-data picks are topping the board</h3>
+  <p>The Desk Score is documented to "peak at 8% edge and penalize beyond 11%" — but the code is a straight line that rewards ever-bigger edges up to the cap. So the #1 and #3 picks are a thin-data WR (not even in the fantasy ADP file) with 16–17% "edges" — exactly the stale-model blowups the design says to suppress. The per-play investigation verdict is computed but then <b>ignored</b> by the ranker.</p>
+  <p class="fix"><b>Fix</b> Implement the documented hump curve, and actually consume the investigate multiplier instead of a dead hard-coded penalty.</p>
+</div>
+<div class="find crit">
+  <h3><span class="tag t-bad">C4</span>The "calibrated" TD model ships raw, uncalibrated numbers</h3>
+  <p>A calibration function is defined and then <b>never called</b> — the anytime-TD board publishes the raw Poisson probability while the docstring calls it "the calibrated model." Every TD <code>p_model</code>, implied prob, and edge is off.</p>
+  <p class="fix"><b>Fix</b> Call <code>p_calibrated()</code> in the TD pricing (one line), or drop the "calibrated" claim.</p>
+</div>
+<div class="find crit">
+  <h3><span class="tag t-bad">+</span>Two more that mislead the board</h3>
+  <p><b>Missing fantasy ADP is treated as proof of a "small role,"</b> which auto-confirms unders and auto-suspects overs on exactly the thin-data players we should distrust. And <b>three different name-matchers</b> across files mean stars (James Cook, Kenneth Walker, Travis Etienne) silently miss their ADP/role joins — so their factor sliders run on defaults.</p>
+  <p class="fix"><b>Fix</b> One shared name normalizer; treat "no ADP" as unknown, not as a small role.</p>
+</div>
+
+<h2>Real vs. narrated — the autonomous layer</h2>
+<div class="rule"></div>
+<div class="find real">
+  <h3><span class="tag t-real">Reproducibility</span>The board can't be regenerated for Week 2</h3>
+  <p>The published <code>ranked_board.json</code> was assembled by an <b>inline one-off script that was never committed</b>. The ranker's only committed caller runs on synthetic test data; the other scripts only re-read the existing file. There is no single committed weekly pick-run (odds → build → publish → grade). This is the most consequential gap: <b>the product cannot be reproduced.</b></p>
+</div>
+<div class="find real">
+  <h3><span class="tag t-real">"Gets smarter weekly"</span>The self-update engine re-tests one parameter</h3>
+  <p>It checks a single variable (road-dog), bumps a version number, and isn't even wired to the real 74-parameter registry. The impressive changelog (v1/v2/v3, "67 params") was <b>hand-authored</b>, not produced by the engine. The "add / cut / reweight by significance" promise doesn't exist yet.</p>
+</div>
+<div class="find real">
+  <h3><span class="tag t-real">"Daily research bot"</span>A 3-example harness plus a relabeled simulation</h3>
+  <p>The tests themselves are real (real data, real p-values), but there is no scheduler and no agent inventing hypotheses. The "30-day sprint" was one simulation run with a faked calendar. Genuine analysis, mis-narrated as an autonomous system.</p>
+</div>
+<div class="find real">
+  <h3><span class="tag t-real">Automation</span>X / Discord / Whop / public record — zero code</h3>
+  <p>No integration anywhere, no scheduler, no public graded-record page. The "graded in public vs the close" trust premise — the whole reason a picks brand earns followers — does not exist yet.</p>
+</div>
+
+<h2>What I'd do next — in order</h2>
+<div class="rule"></div>
+<ol class="steps">
+  <li><b>Fix the four published bugs first.</b><span class="why">C1–C4 are cheap (mostly one line each) and they're wrong on the live board right now. Nothing else matters if the picks are visibly broken.</span></li>
+  <li><b>Commit one real, repeatable weekly pick-run.</b><span class="why">Odds pull → board build → publish → grade, as a single committed entry point. Without this the product literally can't run next week.</span></li>
+  <li><b>Build the honest edge test before claiming any edge.</b><span class="why">Backtest props against real posted lines with hit-rate + ROI, and rebuild the calibration numbers. Decide what we can actually stand behind.</span></li>
+  <li><b>Stand up the public graded-record page.</b><span class="why">Grade every pick vs the closing line, in public. For a picks brand this is the product — more than any single model tweak.</span></li>
+  <li><b>Then decide the real thesis.</b><span class="why">If CLV is the only real signal, the honest brand is "we beat the number you'd get later," not "we beat the market." That's a legitimate, defensible pitch — but it changes what we build and how we sell it.</span></li>
+</ol>
+
+<footer>
+  The good news: the hard, real parts (the engine, the data, the projections, the live pipeline, the board UI) are built and genuine. The gaps are known, mostly mechanical, and caught before launch. This is a strong place to fix from — not a place to start over.
+</footer>
+</div>
+
+<script>
+// honest ATS-by-edge chart — real numbers from the backtest
+const data=[["all",50.7],["≥0.5",50.4],["≥1.0",49.5],["≥1.5",50.0],["≥2.0",49.5],["≥3.0",48.6]];
+const MIN=46,MAX=54,H=178;
+const bars=document.getElementById("bars");
+data.forEach(([lb,v])=>{
+  const h=Math.max(2,(v-MIN)/(MAX-MIN)*H);
+  const col=document.createElement("div");col.className="bcol";
+  const under=v<52.4;
+  col.innerHTML=`<span class="val">${v.toFixed(1)}%</span>`+
+    `<div class="bar" style="height:${h}px;background:${under?'var(--accent)':'var(--good)'}"></div>`+
+    `<span class="lb">${lb}</span>`;
+  bars.appendChild(col);
+});
+</script>
