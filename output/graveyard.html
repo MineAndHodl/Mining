@@ -1,0 +1,85 @@
+<title>The Graveyard</title>
+<style>
+:root{--bg:#0c120e;--surface:#131a15;--card:#182019;--ink:#eef2ee;--muted:#93a096;
+--line:#263028;--accent:#4cc492;--gold:#e8c15a;--neg:#e07b6f}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,'Segoe UI',system-ui,sans-serif;padding:0 0 70px}
+.wrap{max-width:700px;margin:0 auto;padding:0 18px}
+header{padding:36px 0 10px}
+.brand{color:var(--accent);font-weight:700;letter-spacing:.09em;font-size:12px;text-transform:uppercase}
+h1{font-size:42px;letter-spacing:-.02em;margin:6px 0 8px}
+.sub{color:var(--muted);max-width:52ch}
+h2{font-size:15px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin:30px 0 10px}
+.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.dead{color:var(--neg);font-weight:600}
+.alive{color:var(--accent);font-weight:600}
+.faded{color:var(--gold);font-weight:600}
+.note{color:var(--muted);font-size:13.5px;margin:10px 0 0;max-width:60ch}
+.method{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:26px 0;font-size:14.5px;color:var(--muted)}
+.method b{color:var(--ink)}
+.foot{color:var(--muted);font-size:12.5px;margin-top:34px;line-height:1.6}
+.foot b{color:var(--accent)}
+</style>
+<div class="wrap">
+<header>
+<div class="brand">Beat the Close</div>
+<h1>The Graveyard ⚰️</h1>
+<p class="sub">Every famous betting angle, tested against 11 seasons of real closing lines. We ran the numbers so you don't have to. Spoiler: the market already ate almost all of it.</p>
+</header>
+
+<h2>Spread & situational angles · 2015–2025 · vs the closing line</h2>
+<div class="tablebox"><table>
+<thead><tr><th>The angle</th><th>Games</th><th>Win %</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Home dogs cover</td><td>1,089</td><td>50.3%</td><td class="dead">DEAD — inside the vig</td></tr>
+<tr><td>Big road favorites (-7+)</td><td>232</td><td>45.7%</td><td class="dead">DEAD — noise</td></tr>
+<tr><td>Teams off a bye (home)</td><td>241</td><td>47.3%</td><td class="dead">DEAD</td></tr>
+<tr><td>Teams off a bye (road)</td><td>289</td><td>54.0%</td><td class="dead">DEAD — p=0.20, noise</td></tr>
+<tr><td>Fade short-rest road teams</td><td>177</td><td>49.7%</td><td class="dead">DEAD</td></tr>
+<tr><td>Division home dogs</td><td>411</td><td>49.9%</td><td class="dead">DEAD</td></tr>
+<tr><td>Late-season home dogs</td><td>297</td><td>50.2%</td><td class="dead">DEAD</td></tr>
+<tr><td>Late division-rematch dogs</td><td>242</td><td>47.5%</td><td class="dead">DEAD</td></tr>
+<tr><td>Fade west-coast teams at 1pm ET</td><td>158</td><td>45.6%</td><td class="dead">DEAD — backwards, even</td></tr>
+<tr><td>Fade dome teams outdoors in Dec</td><td>173</td><td>49.7%</td><td class="dead">DEAD</td></tr>
+<tr><td>Bounce-back after a 20-pt loss</td><td>487</td><td>52.6%</td><td class="dead">DEAD — p=0.28</td></tr>
+</tbody></table></div>
+
+<h2>Totals angles</h2>
+<div class="tablebox"><table>
+<thead><tr><th>The angle</th><th>Games</th><th>Win %</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Primetime unders</td><td>618</td><td>54.4%</td><td class="dead">DEAD — p=0.03, fails the 15-test bar</td></tr>
+<tr><td>Unders on 50+ totals</td><td>394</td><td>51.8%</td><td class="dead">DEAD — inside the vig</td></tr>
+<tr><td>Overs on low totals (≤38)</td><td>146</td><td>43.2%</td><td class="dead">DEAD — backwards</td></tr>
+<tr><td>Unders on 10+ point spreads</td><td>352</td><td>53.7%</td><td class="dead">DEAD — p=0.18</td></tr>
+<tr><td>Wind 10mph+ unders</td><td>491</td><td>57.6%*</td><td class="faded">FADED — real until 2023, then the market patched it (45.5% in 2024)</td></tr>
+</tbody></table></div>
+
+<h2>The exotic stuff</h2>
+<div class="tablebox"><table>
+<thead><tr><th>The angle</th><th>Test</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Referee over/under tendencies</td><td>12 crew-trait × market tests, out-of-sample</td><td class="dead">DEAD — zero persistence (r = -0.08). Crews really do differ in flags/game (r=0.43) — the market just prices it.</td></tr>
+<tr><td>Fumble "doghouse" (RB benched after fumbling)</td><td>121 lost-fumble event studies</td><td class="dead">DEAD — next-game touch share drops just 1.1%, p=0.20. Mostly a narrative.</td></tr>
+<tr><td>Coach goal-line tendencies</td><td>3 seasons of goal-line concentration by coach</td><td class="faded">WEAK — real spread (0.30 committee to 0.81 feed-one-guy) but year-to-year r=0.17: it's the roster, not the coach. Used as a small prior only.</td></tr>
+</tbody></table></div>
+
+<h2>What actually survived testing</h2>
+<div class="tablebox"><table>
+<thead><tr><th>The edge</th><th>Evidence</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>Off-market prices vs the sharp anchor</td><td>Positive expected CLV by construction; live-tracked all season</td><td class="alive">IN THE MODEL</td></tr>
+<tr><td>Key-number capture (3 and 7)</td><td>~2% win prob per crossing, well-documented</td><td class="alive">IN THE MODEL</td></tr>
+<tr><td>Wong teasers (6pt through 3 & 7)</td><td>The one parlay-family bet with documented +EV history</td><td class="alive">FLAGGED WEEKLY</td></tr>
+<tr><td>Calibrated TD probabilities vs one-way prop vig</td><td>Out-of-sample calibrated (predicted 25% → hit 26%); finds mispriced legs both directions</td><td class="alive">IN THE MODEL</td></tr>
+<tr><td>Line-shopping the best number</td><td>~1 point of ROI, mechanical</td><td class="alive">EVERY CARD</td></tr>
+</tbody></table></div>
+
+<div class="method"><b>Method, because receipts:</b> every test runs against real closing lines (nflverse, 2015–2025), walk-forward where models are involved, with a Bonferroni-corrected significance bar for the number of angles tested (15 simultaneous tests = p &lt; 0.0033 to survive). An angle that "hits 54%" on a cherry-picked sample is how touts are born; an angle that clears a corrected bar out-of-sample is how bets are made. Almost nothing clears the bar. That is the single most important fact in sports betting.</div>
+
+<p class="foot">Living document — new angles get tested and buried (or promoted) all season. Have an angle you swear by? Send it. The model loves fresh graves. · <b>Beat the Close</b> — every pick graded in public, wins and losses. 21+ · gamble responsibly.</p>
+</div>
