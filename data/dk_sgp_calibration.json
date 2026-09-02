@@ -1,0 +1,25 @@
+{
+ "note": "Real DraftKings SGP quotes captured from screen recordings, used to calibrate correlation_lab. Each slip: legs with individual odds + DK's combined SGP price. Add more to refine.",
+ "slips": [
+  {"game": "NE@SEA", "dk_combined": 340,
+   "legs": [
+    {"sel": "Drake Maye 220+ pass yds", "odds": -133},
+    {"sel": "A.J. Brown 62+ rec yds", "odds": -111},
+    {"sel": "Sam Darnold 230+ pass yds", "odds": -107}],
+   "our_fair": 343, "result": "matched DK to ~1%"},
+  {"game": "NE@SEA", "dk_combined": 10000,
+   "legs": [
+    {"sel": "Drake Maye 220+ pass yds", "odds": -133},
+    {"sel": "Drake Maye 40+ rush yds", "odds": 298},
+    {"sel": "Rhamondre Stevenson 40+ rush yds", "odds": -137},
+    {"sel": "Romeo Doubs 4+ receptions", "odds": 111},
+    {"sel": "Cooper Kupp 50+ rec yds", "odds": 229},
+    {"sel": "Rashid Shaheed 31+ rec yds", "odds": -111}],
+   "our_fair": 9005, "result": "converged to +9005 after fixing same-player cross-skill corr + de-vig"}
+ ],
+ "learnings": [
+  "same-player pass+rush are ~independent (0.10), not 0.80 like rec_yds+receptions",
+  "single-sided implied marginals must be de-vigged (~0.96/leg) or error compounds over many legs",
+  "DK haircut on a mixed 6-leg slip ~0.63 of the naive product"
+ ]
+}

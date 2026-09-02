@@ -224,9 +224,15 @@ def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_le
     dec = float(np.prod([american_to_dec(l["price"]) for l in legs]))
 
     # --- true joint probability + FAIR odds (the benchmark to beat DK's SGP quote) ----------
+    SKILL_GROUP = {"pass_yds": "P", "pass_tds": "P", "rush_yds": "R", "rush_att": "R",
+                   "rec_yds": "C", "receptions": "C", "anytime_td": "T"}
+
     def relation(a, b):
         if a["player"] == b["player"]:
-            return "same_player"
+            # same skill group (rec yds + catches) hit together tightly; cross-skill (QB pass +
+            # QB rush) are nearly independent — calibrated against real DK SGP quotes.
+            same_grp = SKILL_GROUP.get(a["mkt"]) == SKILL_GROUP.get(b["mkt"])
+            return "same_player" if same_grp else "same_player_diff_skill"
         same = a["team"] is not None and a["team"] == b["team"]
         aqb, bqb = a["mkt"] == "pass_yds", b["mkt"] == "pass_yds"
         arec = a["mkt"] in ("rec_yds", "receptions") or (a["mkt"] == "anytime_td" and a["pos"] in ("WR", "TE", "RB"))

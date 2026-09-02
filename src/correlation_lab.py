@@ -70,7 +70,8 @@ def measure_correlations(pg=None):
 # raw Pearson of counting stats slightly overstates the copula correlation via the shared game
 # total. Same player across markets (yards+catches) is strongly correlated (~0.8).
 _SHRINK = 0.85
-REL_CORR = {"same_player": 0.80,
+REL_CORR = {"same_player": 0.80,                        # same skill (rec yds + catches)
+            "same_player_diff_skill": 0.10,             # QB pass + QB rush etc. — nearly independent
             "qb_wr_same": round(0.696 * _SHRINK, 2),    # 0.59  (was mis-measured at 0.16)
             "qb_wr2_same": round(0.753 * _SHRINK, 2),   # 0.64
             "wr_wr_same": round(0.507 * _SHRINK, 2),    # 0.43  (NOT independent)
@@ -78,6 +79,10 @@ REL_CORR = {"same_player": 0.80,
             "opp_qbs": round(0.164 * _SHRINK, 2),       # 0.14
             "qb_opp_wr": round(0.125 * _SHRINK, 2),     # 0.11
             "unrelated": 0.0}
+# calibrated against real DraftKings SGP quotes (Sep 2026): a 3-leg simple stack matched DK to
+# ~1% (+343 vs +340); a 6-leg mixed slip converged to +9005 vs DK +10000 once (a) same-player
+# cross-skill legs were separated from same-skill and (b) single-sided marginals were de-vigged.
+DEVIG_PER_LEG = 0.96   # strip ~half of a typical prop two-way hold from a one-sided implied prob
 
 
 def joint_hit_prob(marg_ps, corr_matrix, n=60000):
@@ -100,10 +105,12 @@ def joint_hit_prob(marg_ps, corr_matrix, n=60000):
     return float(np.mean(np.all(Z > thr, axis=1)))
 
 
-def fair_sgp(legs):
+def fair_sgp(legs, devig=True):
     """legs: list of {p, price, rel_to[i]=relation-labels vs earlier legs}. Returns naive vs
-    true joint prob, correlation lift, and fair American odds to compare DK's SGP quote to."""
-    ps = [l["p"] for l in legs]
+    true joint prob, correlation lift, and fair American odds to compare DK's SGP quote to.
+    devig: strip ~half the per-leg prop hold from single-sided implied marginals (they overstate
+    the true probability, and the error compounds across many legs — calibrated vs real DK slips)."""
+    ps = [l["p"] * (DEVIG_PER_LEG if devig else 1.0) for l in legs]
     k = len(legs)
     R = np.eye(k)
     for i in range(k):
