@@ -244,28 +244,26 @@ def test_factor_scorecard():
 
 
 def test_whale_missile_discipline():
-    """Missile locks must be minus-money (market-agreed), and mostly near-locks."""
-    import whale_missile as wm
+    """The Sunday Stack (replaces the whale missile): 4-6 of OUR recommended bets, one per game,
+    6-12:1, +EV on our numbers; the Primetime SGPs land at a 30-100:1 fair price (lotto lane)."""
     import json as _j
     d = _j.load(open(os.path.join(os.path.dirname(__file__), "..", "data", "ranked_board.json")))
-    m = d.get("whale_missile")
-    if not m:
-        check("missile present in board", False, "no whale_missile key"); return
-    legs = m["legs"]
-    check("missile has 5-10 legs (odds-band tuned)", 5 <= len(legs) <= 10, f"n={len(legs)}")
-    # payout targets 60-120:1 but is capped by how many genuine near-locks the slate offers
-    check("missile payout positive & within target ceiling", 300 <= m["combined_american"] <= 14000,
-          f"{m['combined_american']:+d}")
-    # expected hits must be the HONEST (market-based) number, never above the leg count
-    check("missile expected_hits is market-based (<= legs)", m["expected_hits"] <= len(legs),
-          f"{m['expected_hits']} vs {len(legs)}")
-    # honest contract: every leg is a market FAVORITE (de-vigged prob >= 0.53) — true 60%+
-    # near-locks are too scarce on an efficient slate to fill a 30-100:1 slip, so we use solid
-    # favorites and report honest expected-hits (~half), rather than force a contradiction.
-    favs_ok = all((l.get("p_mkt") or 0) >= 0.53 for l in legs)
-    check("every leg is a market favorite (de-vigged >= 0.53)", favs_ok)
-    players = [l["name"] for l in legs]
-    check("no duplicate players in missile", len(players) == len(set(players)))
+    m = d.get("sunday_stack")
+    check("Sunday Stack present (no whale missile)", bool(m) and "whale_missile" not in d)
+    if m:
+        legs = m["legs"]
+        check("stack has 4-6 legs", 4 <= len(legs) <= 6, f"n={len(legs)}")
+        check("stack pays 6-12:1", 600 <= m["combined_american"] <= 1300, f"{m['combined_american']:+d}")
+        check("one leg per game (independent legs)", len({l["game"] for l in legs}) == len(legs))
+        check("every leg is a RECOMMENDED bet (grade B+ or better)", all(l.get("grade") in ("A+", "A", "A-", "B+") for l in legs))
+        check("no micro-prop legs", all(float(l["line"]) >= {"rush_yds": 15, "rec_yds": 10, "receptions": 2.5, "pass_yds": 150}.get(l["cat"], 0) for l in legs))
+        sides = [l["side"] for l in legs]
+        check("not a single-side regime stack (<=3 of one side)", max(sides.count(s) for s in set(sides)) <= 3)
+        check("stack is +EV on our numbers and reports true prob + fair", m["ev"] > 0 and 0 < m["true_prob"] < 0.5 and m["fair_american"] > 0)
+    for s in d.get("primetime_sgps", []):
+        fa = s.get("fair_american") or 0
+        check(f"SGP fair in the 30-100:1 lotto band ({s['game'][:22]})", 2500 <= fa <= 10500, f"fair {fa:+d}")
+        check("SGP is a correlated stack (lift > 3x)", (s.get("correlation_lift") or 0) > 3)
 
 
 def test_qc_fixes():

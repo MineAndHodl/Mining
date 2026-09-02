@@ -95,15 +95,14 @@ def run(key=None, days=14, rebuild_games=False, cached=False):
     print(f"grades: {gs.get('grade_counts')} | recommended {gs.get('n_recommended')} "
           f"({gs.get('units_recommended')}u) | season cap {gs.get('season_cap')}")
 
-    # 6) two parlay lanes (in cached mode, reuse the prior parlays — offline re-rank)
+    # 6) parlay lanes. The Sunday Stack is built from the graded slate (offline, every run);
+    #    the primetime SGPs need odds (reused in cached mode).
+    import sunday_stack as ss
+    ranked["sunday_stack"] = ss.build_stack(ranked)
+    ranked.pop("whale_missile", None)
     if cached:
-        ranked["whale_missile"] = prev.get("whale_missile")
         ranked["primetime_sgps"] = prev.get("primetime_sgps", [])
     else:
-        try:
-            ranked["whale_missile"] = wm.build_missile(key=key, days=days, prop=board)  # reuse board (no 2nd API fetch)
-        except Exception as e:
-            print("whale missile skipped:", e)
         try:
             ranked["primetime_sgps"] = ps.build_all(key=key, days=days, projections=proj)  # correlated
             print(f"primetime SGPs: {len(ranked['primetime_sgps'])}")
@@ -123,7 +122,7 @@ def run(key=None, days=14, rebuild_games=False, cached=False):
     bbp.build()
     print(f"board rebuilt: {len(ranked.get('best_props', []))} best props, "
           f"{len(ranked.get('best_games', []))} games, "
-          f"{'missile' if ranked.get('whale_missile') else 'no missile'}, "
+          f"{'stack ' + str(ranked['sunday_stack']['combined_american']) if ranked.get('sunday_stack') else 'no stack'}, "
           f"{len(ranked.get('primetime_sgps', []))} SGPs")
     return ranked
 

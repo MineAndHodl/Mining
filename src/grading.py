@@ -134,7 +134,7 @@ def apply(rows, weeks_played=0):
 
 RECORD_RULE = ("Only RECOMMENDED straight bets (grade B+ or better after rails) count toward the record, at "
                "their unit size, from the moment they're published. Leans (B) and reference plays (C) never "
-               "count. The Whale Missile and Primetime SGPs are a separate lotto lane with its own record.")
+               "count. The Sunday Stack (our recommended bets compounded) and the Primetime SGPs (the lotto lane) are each tracked as their own parlay record, never mixed into the straight-bet record.")
 
 
 # --------------------------------------------------------------------------- board pass

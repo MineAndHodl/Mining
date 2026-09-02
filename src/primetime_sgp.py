@@ -121,7 +121,7 @@ def _best_over(rows):
 
 
 def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_legs=10,
-                       alt_ladders=None):
+                       alt_ladders=None, target_p=0.62):
     """Construct one correlated shootout SGP from a single game's props (one book).
     alt_ladders: {(norm_name, mkt): [(line, price)]} — when present, each leg's line is chosen
     EV-optimally (juiced down toward a more likely line without crushing EV)."""
@@ -152,7 +152,7 @@ def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_le
         lad = alt_ladders.get((norm_name(nm), mkt))
         mean = _mean(nm, mkt)
         if lad and mean > 0:
-            opt = opt_alt_line(mkt, mean, lad)
+            opt = opt_alt_line(mkt, mean, lad, target_p=target_p, band=(max(0.40, target_p - 0.08), min(0.80, target_p + 0.10)))
             if opt:
                 return opt[0], opt[1], opt[2]        # line, price, hit-prob
         bo = _best_over(df[(df.name == nm) & (df.mkt == mkt)].to_dict("records"))
@@ -285,10 +285,36 @@ def build_all(key=None, days=14, projections=None, max_games=3):
         except Exception:
             pass
         alt = fetch_alt_ladders(key, e["id"])          # EV-optimal alternate-line selection
-        sgp = build_sgp_for_game(props, td_rows, proj, gl, alt_ladders=alt)
+        sgp = tune_to_band(props, td_rows, proj, gl, alt)
         if sgp:
             out.append(sgp)
     return out
+
+
+# The lotto lane (Alex): every primetime SGP should land at 30-100:1. We tune leg count and the
+# alt-line hit-prob target until the FAIR price (our copula, not the book's quote) sits in the
+# band, and among in-band builds prefer the one with the largest correlation lift — that is
+# exactly where DK's engine has under-priced the stack (our calibration: DK quoted +10000 on a
+# 6-leg we made fair at +9005). Bet only when DK's quote is longer than our fair.
+SGP_BAND = (2800, 9000)   # FAIR band; DK quotes ~1.0-1.2x our fair (calibration), so this lands the ticket at ~30-100:1
+
+def tune_to_band(props, td_rows, proj, gl, alt):
+    tried = []
+    for max_legs in (8, 9, 10):
+        for tp in (0.62, 0.58, 0.55, 0.52, 0.50, 0.47, 0.44, 0.41, 0.38):
+            sgp = build_sgp_for_game(props, td_rows, proj, gl, min_legs=min(8, max_legs), max_legs=max_legs,
+                                     alt_ladders=alt, target_p=tp)
+            if not sgp: continue
+            fa = sgp.get("fair_american") or sgp.get("combined_american")
+            sgp["tuning"] = {"max_legs": max_legs, "target_p": tp}
+            tried.append((fa, sgp))
+    if not tried:
+        return None
+    inband = [t for t in tried if SGP_BAND[0] <= t[0] <= SGP_BAND[1]]
+    if inband:
+        return max(inband, key=lambda t: (t[1].get("correlation_lift") or 0, t[0]))[1]
+    # nothing in band: take the closest to the band's edge
+    return min(tried, key=lambda t: min(abs(t[0] - SGP_BAND[0]), abs(t[0] - SGP_BAND[1])))[1]
 
 
 if __name__ == "__main__":

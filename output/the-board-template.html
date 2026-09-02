@@ -106,14 +106,14 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
   <div class="tabhint" id="hint"></div>
   <div id="list"></div>
 
-  <div class="note">Desk Score blends edge, expected value, and role certainty — a <b>moderate</b> edge on a locked-in role outranks a huge edge on an unknown (a blowout gap usually means our number's stale, not that we found free money). Best-across shows the top plays regardless of category, so a weak category can contribute nothing. Two parlay lanes: the <b>Whale Missile</b> is 8-10 near-locks across <i>different</i> games (independent, so a lot of them hit), while each <b>Primetime SGP</b> is a same-game correlated stack (we show the fair price; bet DK only if its quote is longer).</div>
+  <div class="note">Desk Score blends edge, expected value, and role certainty — a <b>moderate</b> edge on a locked-in role outranks a huge edge on an unknown (a blowout gap usually means our number's stale, not that we found free money). Best-across shows the top plays regardless of category, so a weak category can contribute nothing. Two parlay lanes: the <b>Sunday Stack</b> is 4-6 of our own recommended bets, one per game, compounded to a sensible 6-12:1 (a parlay multiplies real edge), while each <b>Primetime SGP</b> is the lotto — a same-game correlated stack tuned to 30-100:1, priced by our copula; bet DK only if its quote is longer than our fair.</div>
   <div class="rgfoot">21+ · Gamble responsibly · Call 1-800-GAMBLER · Picks are opinions and analysis, not guarantees — for entertainment. Not affiliated with any sportsbook. Lines and availability change; always confirm the current number at your book.</div>
 </div>
 
 <script>
 const D = /*DATA*/{};
 const CATLABEL={rec_yds:"Receiving Yds",rush_yds:"Rushing Yds",receptions:"Receptions",anytime_td:"Anytime TD",pass_yds:"Passing Yds",rush_att:"Rush Att"};
-const VIEWS=[["best","🔥 Best Bets"],["games","🏈 Games"],["missile","🐋 Whale Missile"]];
+const VIEWS=[["best","🔥 Best Bets"],["games","🏈 Games"],["stack","🧱 Sunday Stack"]];
 if((D.primetime_sgps||[]).length) VIEWS.push(["sgp","🏟️ Primetime SGP"]);
 Object.keys(D.by_category||{}).forEach(c=>VIEWS.push([c,CATLABEL[c]||c]));
 const HINTS={best:"Top plays across every category, ranked by conviction.",games:"Spreads, totals & moneylines — best value on the slate."};
@@ -208,20 +208,20 @@ function render(){
   document.getElementById("tabs").innerHTML=VIEWS.map(v=>`<div class="tab ${v[0]===active?'on':''}" onclick="setView('${v[0]}')">${v[1]}</div>`).join("");
   const hint=document.getElementById("hint");
   const L=document.getElementById("list");
-  if(active==="missile"){
-    hint.textContent="LOTTO LANE — a separate record from the straight bets. 8-10 market favorites across different games, honest hit math; a fun swing, never counted in the slate.";
-    const m=D.whale_missile;
-    if(!m){L.innerHTML='<div class="empty">No near-lock slate yet (props not posted).</div>';return;}
+  if(active==="stack"){
+    hint.textContent="THE SUNDAY STACK — 4-6 of our own recommended bets, one per game, compounded to 6-12:1. A parlay multiplies real edge; tracked as its own record, separate from the straight-bet slate.";
+    const m=D.sunday_stack;
+    if(!m){L.innerHTML='<div class="empty">No stack this slate (needs 4+ recommended bets across different games).</div>';return;}
     const ng=(m.games&&m.games.length)||1;
-    L.innerHTML=`<div class="play top" style="cursor:default"><div class="rank">🐋</div>
-      <div class="pmain"><div class="nm">Whale Missile</div><div class="meta"><span class="chip mk">${m.n_legs} legs · ${ng} games</span><span class="num">$100 → <b>$${Math.round(100*(m.combined_decimal||0)).toLocaleString()}</b></span>${m.expected_hits!=null?`<span class="num" style="color:var(--muted)">~${m.expected_hits} expected to hit</span>`:''}</div></div>
+    L.innerHTML=`<div class="play top" style="cursor:default"><div class="rank">🧱</div>
+      <div class="pmain"><div class="nm">Sunday Stack</div><div class="meta"><span class="chip mk">${m.n_legs} legs · ${ng} games</span><span class="num">$100 → <b>$${Math.round(100*(m.combined_decimal||0)).toLocaleString()}</b></span><span class="num" style="color:var(--muted)">cashes ~${Math.round((m.true_prob||0)*100)}% on our numbers · fair ${m.fair_american>0?'+':''}${m.fair_american}</span><span class="edge">${m.ev!=null?((m.ev>=0?'+':'')+Math.round(m.ev*100)+'% EV'):''}</span></div></div>
       <div class="pscore"><div class="v" style="color:var(--gold)">${(m.combined_american>0?'+':'')+m.combined_american}</div><div class="l">Payout</div></div></div>`+
-      m.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta">${l.lock?'<span class="vbadge v-confirmed">🔒 lock</span>':'<span class="chip mk">spice</span>'}<span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">model ${Math.round((l.p_model||0)*100)}%</span></div></div><div class="pscore"></div></div>`).join('')+
+      m.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta"><span class="grade" style="font-size:14px;color:${GCOL[l.grade]||'var(--dim)'}">${l.grade||''}</span><span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">model ${Math.round((l.model_p||0)*100)}%</span> <span class="num" style="color:var(--dim)">${l.game||''}</span></div></div><div class="pscore"></div></div>`).join('')+
       `<div class="note" style="margin-top:12px">${m.note||''}</div>`;
     return;
   }
   if(active==="sgp"){
-    hint.textContent="LOTTO LANE — a separate record from the straight bets. One correlated same-game parlay per primetime game; we show the fair price — bet only if DK quotes longer.";
+    hint.textContent="THE LOTTO LANE — one correlated same-game stack per primetime game, tuned to 30-100:1 and priced by our correlation model. Bet it at DK only if their quote is LONGER than our fair price (the book under-pricing the correlation). Its own record.";
     const list=D.primetime_sgps||[];
     if(!list.length){L.innerHTML='<div class="empty">No primetime props posted yet (they land Thu–Sat).</div>';return;}
     L.innerHTML=list.map(s=>`<div style="margin-bottom:22px">

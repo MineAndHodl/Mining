@@ -161,9 +161,11 @@ unit size, from publication. Leans and reference never count. The Whale Missile 
 SGPs are a separate lotto lane with its own record.
 
 **The board**: Best Bets = the slate (what we send). Category tabs = 10 each for breadth,
-graded, leans/reference labeled. Games on the same scale (~1 pt ≈ 3%). Missile = 8-10 market
-favorites across different games, honest expected-hits. Primetime SGP = correlated same-game
-stack, show our fair price, bet only if DK quotes longer.
+graded, leans/reference labeled. Games on the same scale (~1 pt ≈ 3%). Sunday Stack = 4-6 of our
+own recommended bets, one per game, ≤3 per side, 6-12:1, max-EV (a parlay compounds real
+edge; own record). Primetime SGP = the lotto lane: correlated same-game stack whose FAIR
+price lands +2800..+9000 (~30-100:1 at DK), max correlation lift, bet only if DK quotes
+longer than our fair.
 
 ## 5. The variable inventory (principle 5, the living list)
 
@@ -230,7 +232,7 @@ Do these in order. Each one is done only when it meets §8.
    This is what turns backtest calibration into our own track record.
 3. **EARN features, one at a time**, each walk-forward-proven before it ships: pace, PROE,
    opponent EPA, target share/aDOT, opponent red-zone defense, officials, line movement.
-4. **SGP lane tuning** — 30-100:1 payout band with EV balance; stronger selling copy.
+4. ~~SGP lane tuning~~ DONE — lanes flipped: Sunday Stack 6-12:1 from the slate; SGP lotto at 30-100:1 fair.
 5. **Publishing** — X/Discord/Whop keys (blocked on Alex); DK SGP quotes for calibration.
 
 ## 8. Definition of done — for any change

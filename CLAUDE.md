@@ -124,6 +124,9 @@ The board is the product: every pick on it must be something a sharp would nod a
   staff changes surfaced (BAL Minter/Doyle, CLE Monken, ATL Stefanski, DET OC Petzing, LAC
   McDaniel) — the coach-change flip matters this year. Automation blocked: Google News RSS
   and ESPN RSS not reachable from the session; needs a news API key or the weekly in-session pass.
+- **Parlay lanes flipped (Alex):** Sunday Stack = 4-6 recommended bets, one per game, 6-12:1, max-EV
+  (compounds real edge; own record). Primetime SGP = the lotto, fair +2800..+9000 (~30-100:1 at DK),
+  max correlation lift, bet only if DK quotes longer than our fair. `sunday_stack.py`, `primetime_sgp.tune_to_band`.
 - **Structural truths:** near-locks are minus-money and scarce (books balance ~50/50), so
   "8-10 near-locks at 100:1" is self-contradictory — the missile is an honest lotto of
   53-60% favorites. Week 1 is the weakest week (recency needs games across the offseason
