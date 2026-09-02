@@ -177,7 +177,7 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
         for r in recs:
             rows.append({"cat": r["mkt"], "score": prop_score(r), "name": r["name"],
                          "game": r.get("game"), "line": r.get("line"), "side": r.get("side"),
-                         "our_num": r.get("desk_proj"), "edge": r.get("edge"), "ev": r.get("ev"),
+                         "our_num": r.get("desk_proj"), "market_num": r.get("market_num"), "edge": r.get("edge"), "ev": r.get("ev"),
                          "model_p": r.get("model_p"), "price": r.get("price"), "book": r.get("book"),
                          "n_books": r.get("n_books"), "shop_adv": r.get("shop_adv"),
                          "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),

@@ -113,14 +113,14 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 <script>
 const D = /*DATA*/{};
 const CATLABEL={rec_yds:"Receiving Yds",rush_yds:"Rushing Yds",receptions:"Receptions",anytime_td:"Anytime TD",pass_yds:"Passing Yds",rush_att:"Rush Att"};
-const VIEWS=[["best","🔥 Best Bets"],["games","🏈 Games"],["stack","🧱 Sunday Stack"]];
+const VIEWS=[["best","🎫 The Card"],["games","🏈 Games"],["stack","🧱 Sunday Stack"]];
 if((D.primetime_sgps||[]).length) VIEWS.push(["sgp","🏟️ Primetime SGP"]);
 Object.keys(D.by_category||{}).forEach(c=>VIEWS.push([c,CATLABEL[c]||c]));
 const HINTS={best:"Top plays across every category, ranked by conviction.",games:"Spreads, totals & moneylines — best value on the slate."};
 let active="best";
 
 function scoreColor(s){return s>=85?"var(--gold)":s>=70?"var(--green)":s>=55?"var(--blue)":"var(--muted)";}
-function fmtEdge(e){if(e==null)return"";if(typeof e==="string")return e;const p=Math.round(e*100);return (p>=0?"+":"")+p+"% edge";}
+function fmtEdge(e){if(e==null)return"";if(typeof e==="string")return e;const p=Math.round(e*100);return (p>=0?"+":"")+p+" pts edge";}
 
 
 function renderCard(sc, side){
@@ -166,7 +166,7 @@ function gradeBlock(p){
 }
 function statusTags(p){
   let t="";
-  if(p.recommended) t+=`<span class="gtag rec">✓ recommended</span>`;
+  if(p.recommended) t+=`<span class="gtag rec">✓ on the card</span>`;
   else if(p.rail) t+=`<span class="gtag rail" title="${p.rail}">railed · ${p.rail.split(' (')[0]}</span>`;
   else if(p.grade==="B") t+=`<span class="gtag">lean · not counted</span>`;
   else if(p.grade==="C") t+=`<span class="gtag">reference</span>`;
@@ -178,7 +178,7 @@ function propRow(p,i){
   const mk=CATLABEL[p.cat]||p.cat;
   const price=p.price!=null?((p.price>0?"+":"")+p.price):"";
   const num=(p.cat==="anytime_td")?`model ${Math.round((p.our_num||0)*100)}% to score`
-       :`line <b>${p.line}</b> · our # ${p.our_num}`;
+       :`line <b>${p.line}</b> · our # ${p.our_num}${p.market_num!=null?` vs mkt ≈ ${p.market_num}`:''}${p.model_p!=null?` · <b>${Math.round(p.model_p*100)}%</b> to hit`:''}`;
   return `<div class="play ${top?'top':''} ${p.recommended?'':'lean'}" onclick="this.querySelector('.why').classList.toggle('hide')">
     <div class="rank">${i+1}</div>
     <div class="pmain"><div class="nm">${top?'🔥 ':''}${p.name} <span style="color:var(--muted);font-weight:600">${p.side||''}</span></div>
@@ -202,7 +202,7 @@ function gradeKey(){
   const rows=k.map(r=>`<div class="keyrow"><b style="color:${GCOL[r.grade]}">${r.grade}</b><span>${r.units>0?r.units+'u':'—'}</span><span>${r.meaning}${r.n?` · <i>this week: ${r.n}${r.avg_model_p?`, avg ${r.avg_model_p}% to hit, avg edge +${r.avg_edge_pct}%`:''}</i>`:''}</span></div>`).join('');
   const cap=gs.season_cap?`<div style="margin-top:8px"><b>Week-${gs.weeks_played||0} rail:</b> every bet is sized at most ${gs.season_cap} (${gs.season_cap==='A-'?'1u':'1.5u'}) until current-season games confirm the reads — the grade is the quality, the cap is the discipline.</div>`:'';
   const rails=gs.rails?`<div style="margin-top:6px"><b>Rails:</b> max ${gs.rails.thesis_cap} bets per thesis (same market &amp; side) · max ${gs.rails.game_cap} per game · ${gs.rails.weekly_unit_cap}u per week. A railed pick is shown as a lean with the rail named.</div>`:'';
-  return `<div class="keybox"><div style="margin-bottom:6px"><b>How to read a grade.</b> The Desk Score is a conviction rank (edge × how hittable × how trusted) — <b>not</b> a win probability; the "model %" on the card is the win probability. The grade is what the score means:</div>${rows}${cap}${rails}<div style="margin-top:8px"><b>What counts for the record:</b> ${D.record_rule||''}</div></div>`;
+  return `<div class="keybox"><div style="margin-bottom:6px"><b>How to read a grade.</b> The Desk Score is a conviction rank (edge × how hittable × how trusted) — <b>not</b> a win probability; the "% to hit" on the card is the win probability. <b>Edge is in probability points</b> — how much likelier we make the play than the vig-free market — not the size of the yardage gap: a back we project at 52 on a 39.5 line is only ~59% to clear it (single-game rushing swings that much), so that's a +9-point edge, and the market's own number is a mean of ~46, not 39.5 (the line is the median). The grade is what the score means:</div>${rows}${cap}${rails}<div style="margin-top:8px"><b>What counts for the record:</b> ${D.record_rule||''}</div></div>`;
 }
 function render(){
   document.getElementById("tabs").innerHTML=VIEWS.map(v=>`<div class="tab ${v[0]===active?'on':''}" onclick="setView('${v[0]}')">${v[1]}</div>`).join("");
@@ -237,9 +237,9 @@ function render(){
     hint.textContent=`Game lines are the most efficient market — ${ng} recommended this slate; the rest are leans (not counted). Games grade on the same scale as props (~1 pt of spread value ≈ 3% win probability).`;
     L.innerHTML=g.length?g.map(gameRow).join(""):'<div class="empty">No game edges clear the bar this slate.</div>';
   }else if(active==="best"){
-    hint.textContent="The official slate — only the bets we recommend. These are what we send, and these are what count.";
+    hint.textContent="THE CARD — the bets we\u2019re actually sending this week. Fewer, higher conviction, every one graded; these are the ones that count toward the record.";
     const rec=D.recommended||[], gs=D.grading||{};
-    const head=`<div class="slatehead"><div class="t">This week's slate</div><div class="s">${rec.length} bets · ${gs.units_recommended||0}u · every one graded B+ or better after rails</div></div>`;
+    const head=`<div class="slatehead"><div class="t">This week's Card</div><div class="s">${rec.length} bets · ${gs.units_recommended||0}u · every one ${gs.floor||"B+"} or better after rails${gs.slate_max?` · capped at ${gs.slate_max} while the record is young`:""}</div></div>`;
     const rows=rec.map((p,i)=>p.kind?gameRow(p,i):propRow(p,i)).join("");
     L.innerHTML=(rec.length?head+rows:'<div class="empty">Nothing clears the bar for a recommendation this slate.</div>')+gradeKey();
   }else{

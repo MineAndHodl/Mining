@@ -41,6 +41,16 @@ REC_FLOOR = "B+"
 THESIS_CAP = 3
 GAME_CAP = 2
 WEEKLY_UNIT_CAP = 15.0
+# TRACK-RECORD RAIL (Alex): start with fewer, higher-conviction picks so the public record is
+# built on our best. Early season (weeks 0-3) the Card takes at most SLATE_MAX picks and only
+# A- or better; B+ becomes a lean. Loosens to the B+ floor and a bigger card once the
+# grading loop shows the grades are calibrated — a rail, not a belief.
+SLATE_MAX_EARLY = 8
+SLATE_MAX = 12
+EARLY_FLOOR = "A-"
+# Micro-prop lines are not Card material: thin markets, often limited, and a public record built
+# on "QB under 5.5 rushing yards" reads like noise. Shown as leans; never on the Card.
+MIN_CARD_LINE = {"rush_yds": 15.0, "rec_yds": 10.0, "receptions": 2.5, "pass_yds": 150.0}
 # validated macro theses -> cap override. Empty until a thesis has a walk-forward backtest.
 # e.g. {"pass_yds:Under": 5}
 MACRO_THESES = {}
@@ -98,12 +108,17 @@ def apply(rows, weeks_played=0):
     """rows: straight-bet dicts (props + games) with 'score'. Mutates each with grade, units,
     recommended, rail, thesis. Returns (recommended_list, summary)."""
     cap = season_cap(weeks_played)
+    early = int(weeks_played or 0) <= 3
+    floor = EARLY_FLOOR if early else REC_FLOOR
+    slate_max = SLATE_MAX_EARLY if early else SLATE_MAX
     for r in rows:
         g = grade_for(r.get("score"))                      # the QUALITY grade — always shown
         gc = cap_grade(g, cap)                             # the SIZING grade under the season cap
         r["grade"] = g; r["grade_sized"] = gc; r["units"] = UNITS[gc]; r["thesis"] = thesis_of(r)
-        r["recommended"] = ORDER.index(g) >= ORDER.index(REC_FLOOR)
+        r["recommended"] = ORDER.index(g) >= ORDER.index(floor)
         r["rail"] = None
+        if not r["recommended"] and ORDER.index(g) >= ORDER.index(REC_FLOOR):
+            r["rail"] = f"early-season floor ({floor}+ only while the record is young)"
         r["cap_note"] = (f"early-season cap: sized as {gc} ({UNITS[gc]:g}u) until current-season games confirm"
                          if cap and gc != g else None)
     # rails claim slots in score order
@@ -112,6 +127,10 @@ def apply(rows, weeks_played=0):
     for r in sorted(rows, key=lambda x: float(x.get("score") or 0), reverse=True):
         if not r["recommended"]:
             continue
+        if not r.get("kind") and float(r.get("line") or 0) < MIN_CARD_LINE.get(r.get("cat"), 0):
+            r["recommended"] = False; r["rail"] = "micro-prop line (not card material)"; r["units"] = 0.0; continue
+        if len(rec) >= slate_max:
+            r["recommended"] = False; r["rail"] = f"card cap ({slate_max} picks while the record is young)"; r["units"] = 0.0; continue
         t = r["thesis"]; gm = r.get("game") or r.get("pick", "")
         tcap = MACRO_THESES.get(t, THESIS_CAP)
         if per_thesis.get(t, 0) >= tcap:
@@ -125,7 +144,8 @@ def apply(rows, weeks_played=0):
     counts = {}
     for r in rows:
         counts[r["grade"]] = counts.get(r["grade"], 0) + 1
-    summary = {"weeks_played": int(weeks_played or 0), "season_cap": cap, "units_recommended": round(units_used, 1),
+    summary = {"weeks_played": int(weeks_played or 0), "season_cap": cap, "floor": floor, "slate_max": slate_max,
+               "units_recommended": round(units_used, 1),
                "n_recommended": len(rec), "grade_counts": counts,
                "rails": {"thesis_cap": THESIS_CAP, "game_cap": GAME_CAP, "weekly_unit_cap": WEEKLY_UNIT_CAP,
                          "macro_theses": MACRO_THESES}}
