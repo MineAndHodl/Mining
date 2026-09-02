@@ -204,21 +204,17 @@ def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_le
             if ln:
                 add(nm, "rec_yds", ln, pr, f"stacks with his QB (corr +0.59) — they rise together in a passing script ({int((hp or 0)*100)}%)")
 
-    # anytime-TD legs: pick by VALUE, not by always grabbing the chalkiest favorite. A heavy
-    # favorite is fine IF the model still sees value at its price; otherwise take the +edge dog.
+    # anytime-TD: ONLY a genuine likely scorer belongs in a correlated SGP — never a +600-2000
+    # backup longshot that carries the whole payout and tanks the hit rate. Require model_p>=0.45
+    # (a real red-zone threat, roughly -120 or shorter) and add at most ONE.
     if td_rows is not None and len(td_rows):
         td = td_rows.copy()
-        if "edge" in td.columns:
-            td = td[td["edge"].fillna(-1) >= 0]                 # only TDs where we see value
-        # among value TDs, prefer the more likely (correlates better with the shootout)
-        td = td.sort_values(["edge", "p_model"], ascending=False) if "edge" in td.columns else td.sort_values("p_model", ascending=False)
-        for _, r in td.head(2).iterrows():
+        td = td[td["p_model"].fillna(0) >= 0.45].sort_values("p_model", ascending=False)
+        for _, r in td.head(1).iterrows():
             if len(legs) >= max_legs:
                 break
-            fav = float(r.get("p_model", 0)) >= 0.5
             add(r["name"], "anytime_td", 0.5, int(r["price"]),
-                ("near-lock scorer, and still +value at the price — anchors the shootout" if fav
-                 else "value TD dog that pops in a high-scoring script"))
+                f"a real red-zone threat ({int(float(r['p_model'])*100)}% to score) — correlates with the passing legs in a scoring script")
 
     legs = legs[:max_legs]
     if len(legs) < min_legs:

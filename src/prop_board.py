@@ -127,8 +127,10 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
     proj = projections.copy()
     proj["_k"] = proj["name"].map(_norm)
     pj = proj.set_index("_k")
-    # THE EDGE: recency-weighted form (keyed by player_id) mapped to names via the projection.
-    import recency as rc
+    # THE MODEL: a MULTI-FACTOR projection = baseline + weighted(recency, mean-reversion, opponent
+    # defense, game total, home). Weights are earned out-of-sample (multifactor.py) — the alpha is
+    # the ensemble, not any single factor. Recency is keyed by player_id -> mapped to names.
+    import recency as rc, multifactor as mf, board_factors as bf, json as _json
     rec = rc.build_recency(through_season=recency_season, through_week=recency_week)
     id2name = dict(zip(proj["player_id"], proj["name"])) if "player_id" in proj.columns else {}
     recmap = {}
@@ -136,6 +138,11 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         nm = id2name.get(r["pid"])
         if nm:
             recmap[(_norm(nm), r["mkt"])] = r
+    try:
+        model = _json.load(open(os.path.join(os.path.dirname(__file__), "..", "data", "multifactor_weights.json")))
+    except Exception:
+        model = {"features": [], "base_med": {}, "weights": {}}
+    _pmap, sched_rows, code2full, _adp, def_vs = bf._load_context()
     out = []
     for _, b in board.iterrows():
         k = _norm(b["name"]); mkt = b["mkt"]
@@ -143,14 +150,33 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         if pr is not None and isinstance(pr, pd.DataFrame):
             pr = pr.iloc[0]
         if mkt == "anytime_td":
-            continue  # TD handled by td_model elsewhere; kept out of the yards board
+            continue
         rr = recmap.get((k, mkt))
-        if rr is not None:              # recency signal available -> this is where our edge lives
-            our_mu = float(rr["form"]); trend = float(rr["trend"]); trend_pct = float(rr["trend_pct"])
-            baseline = float(rr["baseline"]); log = rr["log"]; src = "recency"
+        pos = pr["position"] if pr is not None else "?"
+        team = pr["team"] if pr is not None else None
+        contrib = {}
+        if rr is not None:              # we have a recent log -> full multi-factor projection
+            baseline = float(rr["baseline"]); log = rr["log"]; src = "multifactor"
+            # game context for the non-recency factors
+            g, opp_team = bf._game_ctx(b["game"], bf.TEAM_FIX.get(team, team), sched_rows, code2full)
+            total = (g.get("implied_team_pts", 22) * 2) if g else 44.0    # game total ~ 2x team implied
+            home = 1.0 if (g and team and bf.TEAM_FIX.get(team, team) == b["game"].split(" @ ")[-1][-3:]) else 0.0
+            ddelta = 0.0
+            if g and opp_team:
+                if mkt in ("rush_yds", "rush_att"): ddelta = def_vs.get("RB", {}).get(opp_team, 0.0)
+                elif mkt in ("rec_yds", "receptions"): ddelta = def_vs.get("WR", {}).get(opp_team, 0.0)
+            feats = {"form3": float(rr["last3"]) - baseline, "form1": float(rr["last1"]) - baseline,
+                     "def_delta": ddelta, "total_c": total - 44.0, "home": home,
+                     "base_c": baseline - model.get("base_med", {}).get(mkt, baseline)}
+            resid = mf.predict_residual(mkt, feats, model)
+            our_mu = max(baseline + resid, 0.1)
+            trend = round(float(rr["last3"]) - baseline, 1)
+            # per-factor contribution (weight x feature) for the honest scorecard/rationale
+            w = model.get("weights", {}).get(mkt, {})
+            contrib = {f: round(w.get(f, 0.0) * feats[f], 2) for f in feats} if w else {}
         else:                          # no recent games (rookie / new role) -> role-model projection
             our_mu = float(pr[mkt]) if (pr is not None and mkt in pr and pd.notna(pr[mkt])) else None
-            trend = 0.0; trend_pct = 0.0; baseline = our_mu; log = None; src = "role"
+            trend = 0.0; baseline = our_mu; log = None; src = "role"
         if our_mu is None or our_mu <= 0:
             continue
         wg = (weather_by_game or {}).get(b["game"])
@@ -161,14 +187,13 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
         out.append({"name": b["name"], "game": b["game"], "book": b["book"], "mkt": mkt,
                     "line": b["line"], "desk_proj": round(our_mu, 1),
-                    "position": pr["position"] if pr is not None else "?",
-                    "team": pr["team"] if pr is not None else "?",
+                    "position": pos, "team": team if team else "?",
                     "moved": bool(pr["moved"]) if pr is not None and "moved" in pr else False,
                     "rookie": bool(pr["rookie"]) if pr is not None and "rookie" in pr else False,
                     "confidence": conf, "edge_src": src, "trend": round(trend, 1),
-                    "trend_pct": round(trend_pct, 2),
                     "baseline": (round(baseline, 1) if baseline else None), "recent_log": log,
-                    "offseason": (recency_week is None),
+                    "contrib": contrib, "offseason": (recency_week is None),
+                    "market_num": round(pm.market_mean(mkt, b["line"], p["fair_over"]), 1),
                     "side": p["side"], "edge": p["edge"], "model_p": p["model_p"], "fair": p["fair"],
                     "price": p["price"], "ev": p["ev"],
                     "over_price_kept": b["over_price"], "under_price_kept": b["under_price"]})
@@ -203,24 +228,16 @@ TRUST_LO, TRUST_HI = 0.62, 1.6
 
 FLAT_PRIOR_MARKETS = {"kicking_points", "field_goals"}   # league-prior projections, not per-player
 
-TREND_PICK_PCT = 0.60      # only the top ~40% of recency trends cleared +EV out-of-sample
-
 def classify(row):
-    """A PICK requires the VALIDATED edge: a strong recency trend, our side agreeing with that
-    trend, and a real edge vs the line. Everything else is REVIEW (context) or PASS."""
+    """A PICK requires the multi-factor edge: a real recent-data-backed projection that diverges
+    from the line by more than the market-trust threshold. Rookies/no-recent-data -> REVIEW."""
     if row.get("mkt") in FLAT_PRIOR_MARKETS:
         return "REVIEW"                                   # kicker flat prior — never a pick
-    if row.get("edge_src") != "recency":
-        return "REVIEW"                                   # no recent form (rookie/new role) — untrusted
+    if row.get("edge_src") != "multifactor":
+        return "REVIEW"                                   # no recent data to model — untrusted
     ratio = row["desk_proj"] / row["line"] if row["line"] else 1.0
     if not (TRUST_LO <= ratio <= TRUST_HI):
         return "REVIEW"
-    trend = row.get("trend", 0); side = row.get("side")
-    # the edge only held where the trend was STRONG and our side rode the trend's direction
-    if row.get("trend_pct", 0) < TREND_PICK_PCT:
-        return "PASS"
-    if (side == "Over" and trend <= 0) or (side == "Under" and trend >= 0):
-        return "PASS"                                     # our side fights the recency signal — skip
     need = EDGE_MIN / wx.MARKET_TRUST.get(row.get("mkt", ""), 0.7)
     if row["edge"] < need:
         return "PASS"
@@ -287,7 +304,7 @@ def reason(row, news=None):
 
     status = row.get("status", classify(row))
     if status == "REVIEW":
-        if row.get("edge_src") != "recency":
+        if row.get("edge_src") != "multifactor":
             return (f"{name}'s {line} {mkt_lbl} — we're holding. No stable recent game log to lean on "
                     f"(new role or rookie), and our edge is a recency read, so we won't bet into the "
                     f"market's number blind. Revisit once he's banked a few games."
@@ -295,31 +312,41 @@ def reason(row, news=None):
         return (f"{name}'s {line} {mkt_lbl} is close to our number — no strong recent trend to attack "
                 f"the line with, so we pass rather than force it." + (f" Latest: {news}" if news else ""))
 
-    # the real case: the recent game log vs the line's season anchor
+    # the case: the recent log PLUS the multi-factor drivers (recency, matchup, environment,
+    # mean-reversion) that actually moved our number — the ensemble is the alpha.
     loglist = ", ".join(f"{v:g}" for v in log) if log else None
     offseason = row.get("offseason")
     when = "closed last season" if offseason else "over his last four"
     open_lines = {"Over": f"We're on {name} over {line} {mkt_lbl}. ",
                   "Under": f"Give us {name} under {line} {mkt_lbl}. "}
     lead = open_lines.get(side, f"We like {name} {s} {line} {mkt_lbl}. ")
+    case = ""
     if loglist and baseline:
-        direction = "trending up toward" if trend > 0 else "sliding to"
-        against = "clear of" if (side == "Over") else "under"
-        case = (f"He {when} with games of {loglist} {unit} — form {direction} ~{form:g}, "
-                f"{against} a {line} line the book still has near his season number ({baseline:g}). "
-                f"The market is slow to move a prop off the season average; that's the gap we're taking. ")
-    else:
-        case = f"Recent usage points our way and the {line} hasn't moved with it. "
+        case = f"He {when} with games of {loglist} {unit} (season line ~{baseline:g}). "
+    # name the factors doing the work, from their actual signed contributions to our number
+    contrib = row.get("contrib") or {}
+    LABEL = {"form3": "recent form", "form1": "last game", "def_delta": "the matchup",
+             "total_c": "the game total", "home": "the venue", "base_c": "mean-reversion"}
+    drivers = sorted([(f, v) for f, v in contrib.items() if abs(v) >= 0.4], key=lambda x: -abs(x[1]))[:3]
+    mkt_num = row.get("market_num")
+    if drivers:
+        parts = []
+        for f, v in drivers:
+            d = ("pushes down" if v < 0 else "pushes up")
+            parts.append(f"{LABEL.get(f, f)} {d}")
+        # compare our expected number to the MARKET's implied number (both means) — the honest,
+        # non-contradictory read (comparing our mean to the line itself misleads on skewed stats).
+        vs = (f"we land at {form:g} where the market's number implies about {mkt_num:g}"
+              if mkt_num else f"our number sits at {form:g}")
+        case += "Our model weighs it out (" + ", ".join(parts) + f") and {vs} — that gap is the {s}. "
+    elif mkt_num:
+        case += f"We project {form:g}; the market's line implies about {mkt_num:g} — the gap is the {s}. "
     money = (f"Strip the {vig:.0f}% juice and the fair {s} is {int(row['fair']*100)}%; we make it "
              f"{int(row['model_p']*100)}% — {ev:+.0f} cents on the dollar at {price:+d}"
              + (f" ({row.get('book')})" if row.get("book") else "")
              + (f", best of {int(row['n_books'])} books" if row.get("n_books", 0) and row['n_books'] > 1 else "") + ". ")
-    if offseason:
-        conf_note = ("Honest caveat: this leans on late-2025 form across the offseason, so it's an "
-                     "early-season read, not our peak-signal in-season number — sized as a lean.")
-    else:
-        conf_note = ("Strong, stable recent sample — our sharpest tier." if row.get("trend_pct", 0) >= 0.8
-                     else "Clear recent trend, sized as a solid lean.")
+    conf_note = ("Honest caveat: this leans on late-2025 form across the offseason — an early-season "
+                 "read, sized as a lean." if offseason else "Multi-factor signal, sized to conviction.")
     tail = f" Beat note: {news}" if news else ""
     return lead + case + money + conf_note + tail
 

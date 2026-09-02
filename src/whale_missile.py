@@ -45,7 +45,7 @@ def build_missile(key=None, days=8, target=10, target_low=3000, target_high=1000
     # a near-lock parlay is about MARKET-likely legs on players with a real track record — never
     # a rookie the model overrates (no recent games). Keep only players who HAVE a recent log.
     if prop is not None and len(prop) and "edge_src" in prop.columns:
-        prop = prop[prop["edge_src"] == "recency"].copy()
+        prop = prop[prop["edge_src"] == "multifactor"].copy()
     if prop is None or not len(prop):
         return None
     # credibility: prefer ESTABLISHED, recognizable players (real ADP / real NFL sample) over
