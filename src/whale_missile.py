@@ -114,11 +114,14 @@ def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000
         legs.append(c); seen_player.add(c["name"]); per_game[c["game"]] = per_game.get(c["game"], 0) + 1
         if is_spice: spice_used += 1
 
-    # ordered pool: recognizable near-locks first, then any near-lock, then spice
+    # ordered pool: to MAXIMIZE how many legs are expected to hit, add the highest-probability
+    # near-locks first (recognizable names get a small tiebreak so the slip stays marketable),
+    # then lower-prob locks, then spice. Higher-p legs are more juiced, so more of them are
+    # needed to reach the payout band — which is exactly what lifts the expected-hits count.
     credible_locks = sorted([c for c in cand if c["lock"] and c["cred"] >= 0.30],
-                            key=lambda x: (x["cred"], x["p_model"]), reverse=True)
+                            key=lambda x: (x["p_model"], x["cred"]), reverse=True)
     other_locks = sorted([c for c in cand if c["lock"] and c["cred"] < 0.30],
-                         key=lambda x: x["_sort"], reverse=True)
+                         key=lambda x: x["p_model"], reverse=True)
     spice = sorted([c for c in cand if not c["lock"]], key=lambda x: x["_sort"], reverse=True)
     pool = credible_locks + other_locks + spice
 

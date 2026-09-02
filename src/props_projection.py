@@ -26,7 +26,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "..", "data")
 
-SKILL = {"WR", "TE", "RB", "FB", "QB"}
+SKILL = {"WR", "TE", "RB", "FB", "QB", "K"}
 REC_POS = {"WR", "TE", "RB", "FB"}
 # how much to trust own history vs role prior, by games of history
 def w_own(games, moved):
@@ -296,10 +296,26 @@ def project(season, team_vol_season=None):
         rookie = pid in rookies
         w = w_own(hg, moved)
         py = w * (own if pd.notna(own) else league_qb) + (1 - w) * league_qb
+        # QB rushing (mobile QBs): own recency-weighted rush yards/carries, else ~0
+        qrush = float(heff.at[pid, "rushyd_pg"]) if (pid in heff.index and pd.notna(heff.at[pid, "rushyd_pg"])) else 0.0
+        qcar = float(heff.at[pid, "car_pg"]) if (pid in heff.index and pd.notna(heff.at[pid, "car_pg"])) else 0.0
         qrows.append({"player_id": pid, "name": r["name"], "position": "QB", "team": r["team"],
                       "moved": moved, "hist_games": hg, "rookie": rookie,
-                      "proj_targets_pg": 0.0, "proj_carries_pg": 0.0, "pass_yds": max(py, 0.0),
-                      "rec_yds": 0.0, "receptions": 0.0, "rush_yds": 0.0, "rush_att": 0.0})
+                      "proj_targets_pg": 0.0, "proj_carries_pg": qcar, "pass_yds": max(py, 0.0),
+                      "rec_yds": 0.0, "receptions": 0.0, "rush_yds": max(qrush, 0.0),
+                      "rush_att": qcar})
+    # ---- Kickers: league-prior projection (scales with team scoring at board time) ----------
+    # DK posts kicker props closer to game; this makes them price the moment they appear.
+    # League baselines: ~7.8 kicking points/gm, ~1.6 made FGs/gm. Team-1 kicker only.
+    krows = []
+    for _, r in ros[ros["position"] == "K"].drop_duplicates("team").iterrows():
+        krows.append({"player_id": r["player_id"], "name": r["name"], "position": "K",
+                      "team": r["team"], "moved": False, "hist_games": 0.0, "rookie": False,
+                      "proj_targets_pg": 0.0, "proj_carries_pg": 0.0, "pass_yds": 0.0,
+                      "rec_yds": 0.0, "receptions": 0.0, "rush_yds": 0.0, "rush_att": 0.0,
+                      "kicking_points": 7.8, "field_goals": 1.6, "confidence": 0.45,
+                      "tier": "medium"})
+
     qdf = pd.DataFrame(qrows)
     # keep only each team's QB1 (highest projected passing) — backups have ~no props
     if len(qdf):
@@ -309,6 +325,13 @@ def project(season, team_vol_season=None):
         qdf["tier"] = pd.cut(qdf["confidence"], [-1, 0.34, 0.66, 1.01],
                              labels=["role-est (high var)", "medium", "stable"])
         out = pd.concat([out, qdf], ignore_index=True)
+    kdf = pd.DataFrame(krows)
+    if len(kdf):
+        out = pd.concat([out, kdf], ignore_index=True)
+    for col in ("kicking_points", "field_goals"):     # ensure columns exist for non-kickers
+        if col not in out.columns:
+            out[col] = 0.0
+        out[col] = out[col].fillna(0.0)
     return out.sort_values("rec_yds", ascending=False)
 
 

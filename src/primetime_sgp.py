@@ -22,12 +22,61 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import prop_board as pb
 import td_board as tb
+import props_model as pm
 import correlation_lab as cl
 from names import norm_name
+
+ALT_MARKETS = ("player_reception_yds_alternate,player_rush_yds_alternate,"
+               "player_pass_yds_alternate,player_receptions_alternate")
+_ALT_MAP = {"player_reception_yds_alternate": "rec_yds", "player_rush_yds_alternate": "rush_yds",
+            "player_pass_yds_alternate": "pass_yds", "player_receptions_alternate": "receptions"}
 
 
 def implied(o):
     return 100 / (o + 100) if o > 0 else abs(o) / (abs(o) + 100)
+
+
+def _profit(o):
+    return o / 100 if o > 0 else 100 / abs(o)
+
+
+def fetch_alt_ladders(key, event_id, book=None):
+    """{(norm_name, mkt): [(line, over_price), ...]} of DK's alternate lines for a game."""
+    book = book or SGP_BOOK
+    import urllib.request
+    url = (f"{pb.API}/events/{event_id}/odds?apiKey={key}&regions=us&markets={ALT_MARKETS}"
+           f"&oddsFormat=american&bookmakers={book}")
+    try:
+        d = json.load(urllib.request.urlopen(url, timeout=30))
+    except Exception:
+        return {}
+    out = {}
+    for bk in d.get("bookmakers", []):
+        for m in bk.get("markets", []):
+            mk = _ALT_MAP.get(m["key"])
+            if not mk:
+                continue
+            for o in m.get("outcomes", []):
+                if o.get("name") == "Over" and o.get("point") is not None:
+                    out.setdefault((norm_name(o.get("description", "")), mk), []).append(
+                        (float(o["point"]), int(o["price"])))
+    return out
+
+
+def opt_alt_line(mkt, mean, ladder, target_p=0.62, band=(0.54, 0.72)):
+    """Pick an alternate OVER line that makes the leg MORE LIKELY (Alex's 'juice it down'),
+    targeting a hit-probability band rather than raw EV. We deliberately do NOT maximize model
+    EV here: our distribution's tail is fatter than the book's, so an EV-max would chase the
+    longest line as a fake tail edge. Instead we take the line whose hit-prob is closest to the
+    target within the band (best price as the tiebreak) — a safer, likelier leg without over-
+    juicing the payout. Returns (line, price, p, ev)."""
+    scored = [(ln, price, pm.p_over(mkt, mean, ln)) for ln, price in sorted(ladder)]
+    if not scored:
+        return None
+    inband = [s for s in scored if band[0] <= s[2] <= band[1]]
+    pool = inband or scored
+    ln, price, p = min(pool, key=lambda s: (abs(s[2] - target_p), -_profit(s[1])))
+    return (ln, price, p, p * _profit(price) - (1 - p))
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
 PRIMETIME_HOURS_UTC = set(range(0, 5))    # ~7-11pm ET kickoffs land 00:00-05:00 UTC
@@ -71,13 +120,17 @@ def _best_over(rows):
     return rows[0]["line"], int(rows[0]["over_price"])
 
 
-def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_legs=10):
-    """Construct one correlated shootout SGP from a single game's props (one book)."""
+def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_legs=10,
+                       alt_ladders=None):
+    """Construct one correlated shootout SGP from a single game's props (one book).
+    alt_ladders: {(norm_name, mkt): [(line, price)]} — when present, each leg's line is chosen
+    EV-optimally (juiced down toward a more likely line without crushing EV)."""
     df = game_props[game_props["book"] == SGP_BOOK]
     if not len(df):
         df = game_props  # some books missing; fall back to whatever we have
     proj = proj.copy(); proj["_k"] = proj["name"].map(norm_name)
     pj = proj.set_index("_k")
+    alt_ladders = alt_ladders or {}
 
     def role(nm):
         k = norm_name(nm)
@@ -85,6 +138,27 @@ def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_le
             r = pj.loc[k]; r = r.iloc[0] if isinstance(r, pd.DataFrame) else r
             return r.get("position"), r.get("team"), float(r.get("rec_yds", 0) or 0)
         return None, None, 0.0
+
+    def _mean(nm, mkt):
+        k = norm_name(nm)
+        if k in pj.index:
+            r = pj.loc[k]; r = r.iloc[0] if isinstance(r, pd.DataFrame) else r
+            return float(r.get(mkt, 0) or 0)
+        return 0.0
+
+    def pick_line(nm, mkt):
+        """EV-optimal alternate line (juiced toward a likelier number) if a ladder exists,
+        else the softest standard line across books."""
+        lad = alt_ladders.get((norm_name(nm), mkt))
+        mean = _mean(nm, mkt)
+        if lad and mean > 0:
+            opt = opt_alt_line(mkt, mean, lad)
+            if opt:
+                return opt[0], opt[1], opt[2]        # line, price, hit-prob
+        bo = _best_over(df[(df.name == nm) & (df.mkt == mkt)].to_dict("records"))
+        if bo:
+            return bo[0], bo[1], (pm.p_over(mkt, mean, bo[0]) if mean > 0 else None)
+        return None, None, None
 
     # identify QBs (have a pass_yds prop) and receivers (rec_yds prop), by team
     legs, used = [], set()
@@ -112,21 +186,21 @@ def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_le
         recs.sort(key=lambda x: x[1], reverse=True)
         return recs
 
-    # SPINE: each side's QB pass over + that QB's top-2 receivers rec over (the +0.16 stack)
+    # SPINE: each side's QB pass over + that QB's top-2 receivers rec over (the stack)
     for qb in passers[:2]:
         _, qteam, _ = role(qb)
-        bo = _best_over(df[(df.name == qb) & (df.mkt == "pass_yds")].to_dict("records"))
-        if bo:
-            add(qb, "pass_yds", bo[0], bo[1], "QB spine — a passing/shootout game lifts every over here")
+        ln, pr, hp = pick_line(qb, "pass_yds")
+        if ln:
+            add(qb, "pass_yds", ln, pr, f"QB spine — a shootout lifts every over here ({int((hp or 0)*100)}% to hit)")
         # this QB's receivers (same team preferred; fall back to any if team unknown)
         recs = [r for r in team_receivers(qteam) if r[2] == qteam] or team_receivers(qteam)
         for nm, _, _ in recs[:2]:
-            bo = _best_over(df[(df.name == nm) & (df.mkt == "rec_yds")].to_dict("records"))
-            if bo and add(nm, "rec_yds", bo[0], bo[1], "stacks with his QB (corr +0.16) — they hit together"):
+            ln, pr, hp = pick_line(nm, "rec_yds")
+            if ln and add(nm, "rec_yds", ln, pr, f"stacks with his QB (corr +0.59) — they hit together ({int((hp or 0)*100)}%)"):
                 # add his receptions over too (same player, tightly correlated)
-                bor = _best_over(df[(df.name == nm) & (df.mkt == "receptions")].to_dict("records"))
-                if bor and len(legs) < max_legs:
-                    add(nm, "receptions", bor[0], bor[1], "same player as his yards leg — moves with it")
+                lnr, prr, hpr = pick_line(nm, "receptions")
+                if lnr and len(legs) < max_legs:
+                    add(nm, "receptions", lnr, prr, f"same player as his yards leg — moves with it ({int((hpr or 0)*100)}%)")
 
     # anytime-TD of the top pass-catchers (correlated with a high-scoring game)
     if td_rows is not None and len(td_rows):
@@ -198,7 +272,8 @@ def build_all(key=None, days=14, projections=None, max_games=3):
             td_rows = tdb[tdb.game == gl] if len(tdb) else None
         except Exception:
             pass
-        sgp = build_sgp_for_game(props, td_rows, proj, gl)
+        alt = fetch_alt_ladders(key, e["id"])          # EV-optimal alternate-line selection
+        sgp = build_sgp_for_game(props, td_rows, proj, gl, alt_ladders=alt)
         if sgp:
             out.append(sgp)
     return out

@@ -133,6 +133,42 @@ def line_ev(mkt, proj_mean, lines, price_by_line=None):
     return pd.DataFrame(rows)
 
 
+def validate_copula(pg=None, min_games=8):
+    """SELF-TRAINING: check whether our copula's predicted joint hit-rate matches what actually
+    happened. For real stacks (QB+WR1, QB+WR1+WR2, ...), define each leg as 'over the player's
+    own median' (so each leg is ~50% by construction) and measure the REALIZED rate that all
+    legs cleared together, vs the naive-independent prediction and our copula prediction. If the
+    copula tracks reality, the correlation inputs are right; if not, we shrink/raise them."""
+    pg = pg if pg is not None else pd.read_parquet(f"{DATA}/prop_player_games.parquet")
+    rpg = _roles_per_game(pg)
+    # each player's own median per role-column (the proxy line -> ~50% marginal)
+    med = {c: rpg[c].median() for c in ["qb_pass", "wr1_rec", "wr2_rec", "rb_rush"]}
+    for c in med:  # over-median indicator
+        rpg[c + "_hit"] = (rpg[c] > med[c]).astype(float)
+    stacks = {"QB+WR1": ["qb_pass", "wr1_rec"],
+              "QB+WR1+WR2": ["qb_pass", "wr1_rec", "wr2_rec"],
+              "QB+WR1+WR2+RB": ["qb_pass", "wr1_rec", "wr2_rec", "rb_rush"]}
+    rel = {("qb_pass", "wr1_rec"): "qb_wr_same", ("qb_pass", "wr2_rec"): "qb_wr2_same",
+           ("wr1_rec", "wr2_rec"): "wr_wr_same", ("qb_pass", "rb_rush"): "qb_rb_same",
+           ("wr1_rec", "rb_rush"): "wr_rb_same", ("wr2_rec", "rb_rush"): "wr_rb_same"}
+    out = []
+    for name, cols in stacks.items():
+        f = rpg.dropna(subset=cols)
+        if len(f) < 50:
+            continue
+        hitcols = [c + "_hit" for c in cols]
+        realized = float((f[hitcols].sum(axis=1) == len(cols)).mean())
+        margins = [float(f[c + "_hit"].mean()) for c in cols]
+        naive = float(np.prod(margins))
+        legs = [{"p": margins[i], "rel": {j: rel.get((cols[j], cols[i]), rel.get((cols[i], cols[j]), "unrelated"))
+                                          for j in range(i)}} for i in range(len(cols))]
+        pred = fair_sgp([{**l, "price": -110} for l in legs])["true_joint_prob"]
+        out.append({"stack": name, "n_games": len(f), "realized": round(realized, 3),
+                    "copula_pred": round(pred, 3), "naive_indep": round(naive, 3),
+                    "copula_err": round(pred - realized, 3), "naive_err": round(naive - realized, 3)})
+    return pd.DataFrame(out)
+
+
 if __name__ == "__main__":
     print("=== TRUE leg correlations (measured, 2023-25) ===")
     c = measure_correlations()

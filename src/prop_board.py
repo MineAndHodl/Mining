@@ -27,7 +27,8 @@ API = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl"
 MARKET_MAP = {"player_reception_yds": "rec_yds", "player_receptions": "receptions",
               "player_rush_yds": "rush_yds", "player_pass_yds": "pass_yds",
               "player_rush_attempts": "rush_att", "player_pass_attempts": "pass_att",
-              "player_pass_completions": "pass_cmp"}
+              "player_pass_completions": "pass_cmp",
+              "player_kicking_points": "kicking_points", "player_field_goals": "field_goals"}
 # shop across all major bettable US books, not just three — line-shopping is guaranteed
 # better-than-field value, and cross-book dispersion is where the real prop edge lives.
 BOOKS = "draftkings,fanduel,betmgm,fanatics,betrivers,williamhill_us,espnbet,hardrockbet"
@@ -219,7 +220,8 @@ def reason(row, news=None):
     Quantitative facts are woven in but it reads like a desk, not a regression table."""
     mkt_lbl = {"rec_yds": "receiving yards", "rush_yds": "rushing yards",
                "receptions": "catches", "pass_yds": "passing yards", "rush_att": "rush attempts",
-               "pass_cmp": "completions", "pass_att": "pass attempts"}.get(row["mkt"], row["mkt"])
+               "pass_cmp": "completions", "pass_att": "pass attempts",
+               "kicking_points": "kicking points", "field_goals": "field goals"}.get(row["mkt"], row["mkt"])
     name, side, line, proj = row["name"], row["side"], row["line"], row["desk_proj"]
     edge_pts, ev, vig = row["edge"]*100, row["ev"]*100, row["vig"]*100
     status = row.get("status", classify(row))
