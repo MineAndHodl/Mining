@@ -91,7 +91,12 @@ The board is the product: every pick on it must be something a sharp would nod a
   TE1 +.07, backs +.08; n=36) and **the QB's passing yards RISE ~13%** (game-script confounding)
   — so NO QB downgrade for a WR1 absence. Applied to projected volume, xTD zone shares, the
   Injury Picture slider and the paragraph. 2026 loader falls back to the nflverse release CSV
-  and returns empty cleanly until reports post.
+  and returns empty cleanly until reports post. **Weights EARNED, not assumed
+  (`injury_validate.py`, 583 beneficiary player-games 2024-25):** realized-vs-predicted yardage
+  bump slope k*=0.84 (RB2 .98, RB3 1.08, WR2 .73, WR3 .91, TE1 1.28) — the cascade translates
+  nearly 1:1 into yards, applied at 0.84; without it beneficiaries are under-projected by ~8
+  yds. Questionable players who play produce like healthy ones (median ratio .845 vs .849) —
+  NO performance discount, only a scratch-risk flag and a small trust cut.
 - **Structural truths:** near-locks are minus-money and scarce (books balance ~50/50), so
   "8-10 near-locks at 100:1" is self-contradictory — the missile is an honest lotto of
   53-60% favorites. Week 1 is the weakest week (recency needs games across the offseason

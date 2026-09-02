@@ -1,0 +1,20 @@
+{
+ "role_cascade": {
+  "n": 583,
+  "k_star": 0.838,
+  "pred_bump_mean": 5.93,
+  "real_bump_mean": 8.04
+ },
+ "own_status": {
+  "Healthy": {
+   "n": 5050,
+   "median_ratio": 0.849,
+   "mean_ratio": 1.037
+  },
+  "Questionable": {
+   "n": 302,
+   "median_ratio": 0.845,
+   "mean_ratio": 0.961
+  }
+ }
+}

@@ -221,8 +221,8 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         p = price_ou(mkt, our_mu, b["line"], b["over_price"], b["under_price"])
         conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
         # own status shy of Out: Doubtful/Questionable erode trust (the scorecard shows it too)
-        if own_inj and own_inj.get("status") == "Doubtful": conf *= 0.5
-        elif own_inj and own_inj.get("status") == "Questionable": conf *= 0.8
+        if own_inj and own_inj.get("status") == "Doubtful": conf *= 0.5       # mostly don't play (scratch rail)
+        elif own_inj and own_inj.get("status") == "Questionable": conf *= 0.92 # measured: no performance drop; scratch risk only
         inj_lean, inj_note = (INJ.injury_lean(b["name"], mkt) if INJ else (None, None))
         out.append({"name": b["name"], "game": b["game"], "book": b["book"], "mkt": mkt,
                     "line": b["line"], "desk_proj": round(our_mu, 1),
@@ -397,8 +397,10 @@ def reason(row, news=None):
         inj_line = f" Injury angle: {rn}."
     elif st in ("Doubtful", "Questionable"):
         det = row.get("inj_detail") or "injury"
-        inj_line = (f" Injury caveat: he's listed {st} ({det}) — we've cut our trust accordingly; "
-                    f"confirm he's active before betting.")
+        inj_line = (f" Injury note: he's listed {st} ({det}). Questionable players who play produce like healthy ones "
+                    f"(measured), so this is a scratch risk, not a performance discount — confirm he's active before betting."
+                    if st == "Questionable" else
+                    f" Injury caveat: he's listed {st} ({det}) — Doubtful players mostly sit; treat as a scratch risk and confirm active.")
     tail = f" Beat note: {news}" if news else ""
     return lead + case + money + conf_note + inj_line + tail
 

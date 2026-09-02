@@ -25,7 +25,15 @@ import role_multiplier as rm
 HERE = os.path.dirname(os.path.abspath(__file__)); DATA = os.path.join(HERE, "..", "data")
 TEAM_FIX = {"LAR": "LA", "OAK": "LV", "SD": "LAC", "STL": "LA", "WSH": "WAS"}
 
-STATUS_PENALTY = {"Out": None, "Doubtful": -1.0, "Questionable": -0.4}
+# EARNED (injury_validate.py, 2024-25 walk-forward; data/injury_validation.json):
+#   ROLE_CASCADE_WEIGHT: realized yardage bump vs predicted bump slope k* = 0.84 over 583
+#     beneficiary player-games (RB2 .98, RB3 1.08, WR2 .73, WR3 .91, TE1 1.28). The cascade is
+#     real and translates nearly 1:1 into yards; applied at the earned 0.84, not assumed 1.0.
+#   Questionable: players who PLAY post a median actual/baseline of .845 vs healthy .849 — no
+#     performance discount. It is a scratch-risk flag ("confirm active"), so a mild lean and a
+#     small trust cut only. Doubtful mostly don't play -> hard rail (not a performance claim).
+ROLE_CASCADE_WEIGHT = 0.84
+STATUS_PENALTY = {"Out": None, "Doubtful": -1.0, "Questionable": -0.15}
 MKT_TYPE = {"rec_yds": "targets", "receptions": "targets", "rush_yds": "carries", "rush_att": "carries",
             "pass_yds": "pass", "anytime_td": "mixed"}
 
@@ -127,7 +135,8 @@ class InjuryLayer:
             if gained > 0.005:
                 notes.append(f"{a['name']} ({src}) is {a['status'].lower()} — we credit {name} with ~{int(round(frac*100))}% of his vacated "
                              f"{'carries' if typ=='carries' else 'targets'} (measured redistribution), about +{int(round(gained/my_share*100))}% volume")
-        return round(float(np.clip(mult, 0.6, 1.8)), 3), ("; ".join(notes) if notes else None)
+        mult = 1.0 + ROLE_CASCADE_WEIGHT * (mult - 1.0)          # earned weight, not assumed
+        return round(float(np.clip(mult, 0.6, 1.7)), 3), ("; ".join(notes) if notes else None)
 
     def injury_lean(self, name, mkt):
         """The Injury Picture slider: own status (negative) or opportunity from an absence (positive).
