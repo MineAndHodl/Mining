@@ -72,7 +72,8 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "model_p": r.get("model_p"), "price": r.get("price"), "book": r.get("book"),
                          "n_books": r.get("n_books"), "shop_adv": r.get("shop_adv"),
                          "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),
-                         "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", "")})
+                         "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", ""),
+                         "contrib": r.get("contrib")})
     if td_board is not None and len(td_board):
         for _, r in td_board[td_board["edge"].notna()].iterrows():
             mp = int((r.get("p_model") or 0) * 100); imp = int((r.get("p_implied") or 0) * 100)

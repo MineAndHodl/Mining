@@ -137,7 +137,13 @@ def attach_to_pick(pick, ctx):
             matchup = def_vs.get("RB", {}).get(opp)
         elif opp and pos in ("WR", "TE") and mkt in fsc.PASS_MKTS:
             matchup = def_vs.get("WR", {}).get(opp)
-    sc = fsc.scorecard(p2, proj_row=pr, script=script, weather=weather, matchup=matchup, adp=adp.get(key))
+        elif opp and pos == "QB" and mkt in ("pass_yds", "pass_att", "pass_cmp"):
+            # a QB's opponent pass-defense read: WR-receiving-yards-allowed vs league is our
+            # available proxy for how leaky a secondary is (weighted down in the scorecard, since
+            # matchup is our least-predictive lever).
+            matchup = def_vs.get("WR", {}).get(opp)
+    sc = fsc.scorecard(p2, proj_row=pr, script=script, weather=weather, matchup=matchup,
+                       adp=adp.get(key), contrib=pick.get("contrib"))
     pick["scorecard"] = sc
     return pick
 

@@ -20,16 +20,24 @@
     "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
     "score_mult": 1.08,
     "reason": "We're on Stefon Diggs over 41.5 receiving yards. He closed last season with games of 26, 138, 101, 43 yards (season line ~59.8). Our model weighs it out (mean-reversion pushes down, recent form pushes up, last game pushes down) and we land at 58.3 where the market's number implies about 48.8 \u2014 that gap is the over. Strip the 6% juice and the fair over is 49%; we make it 60% \u2014 +16 cents on the dollar at -110 (draftkings). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 5.45,
+     "form1": -0.84,
+     "def_delta": 0.15,
+     "total_c": -0.51,
+     "home": 0.0,
+     "base_c": -5.8
+    },
     "scorecard": {
      "Projected Usage": 1.0,
-     "Recent Trend": 0.79,
+     "Recent Trend": 0.53,
      "Game Flow": 0.5,
      "Opponent Defense": -0.24,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.14,
      "Market Read": -0.23,
-     "Regression": -0.11
+     "Regression": -0.99
     }
    },
    {
@@ -51,16 +59,24 @@
     "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
     "score_mult": 1.08,
     "reason": "We're on Michael Wilson over 40.5 receiving yards. He closed last season with games of 54, 52, 89, 99 yards (season line ~62.6). Our model weighs it out (mean-reversion pushes down, recent form pushes up, last game pushes up) and we land at 59.9 where the market's number implies about 48.9 \u2014 that gap is the over. Strip the 7% juice and the fair over is 51%; we make it 63% \u2014 +17 cents on the dollar at -120 (fanatics). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 2.77,
+     "form1": 1.83,
+     "def_delta": 0.3,
+     "total_c": -1.36,
+     "home": 0.0,
+     "base_c": -6.27
+    },
     "scorecard": {
      "Projected Usage": 1.0,
-     "Recent Trend": 0.29,
+     "Recent Trend": 0.51,
      "Game Flow": 1.0,
      "Opponent Defense": -0.46,
      "Injury Picture": null,
      "Weather": 0.0,
      "Play-Calling": -0.08,
      "Market Read": 0.06,
-     "Regression": -0.04
+     "Regression": -1.0
     }
    },
    {
@@ -82,16 +98,24 @@
     "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
     "score_mult": 1.08,
     "reason": "We're on Quentin Johnston over 42.5 receiving yards. He closed last season with games of 23, 8, 104, 98 yards (season line ~61.7). Our model weighs it out (mean-reversion pushes down, the game total pushes up, last game pushes up) and we land at 61.1 where the market's number implies about 50.1 \u2014 that gap is the over. Strip the 6% juice and the fair over is 50%; we make it 62% \u2014 +18 cents on the dollar at -112 (draftkings), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 1.32,
+     "form1": 1.82,
+     "def_delta": 0.15,
+     "total_c": 2.2,
+     "home": 0.0,
+     "base_c": -6.12
+    },
     "scorecard": {
      "Projected Usage": 1.0,
-     "Recent Trend": 0.3,
+     "Recent Trend": 0.34,
      "Game Flow": -1.0,
      "Opponent Defense": -0.24,
      "Injury Picture": null,
      "Weather": 0.0,
      "Play-Calling": -0.13,
      "Market Read": 0.02,
-     "Regression": -0.04
+     "Regression": -1.0
     }
    },
    {
@@ -113,16 +137,24 @@
     "verdict_note": "we're low AND the draft market sees a small role (deep) \u2014 the prop line looks too high; real under value",
     "score_mult": 1.08,
     "reason": "Give us Dalton Kincaid under 37.5 receiving yards. He closed last season with games of 41, 34, 0, 48 yards (season line ~42.9). Our model weighs it out (mean-reversion pushes down, recent form pushes down) and we land at 38.4 where the market's number implies about 45.7 \u2014 that gap is the under. Strip the 7% juice and the fair under is 49%; we make it 59% \u2014 +12 cents on the dollar at -112 (betrivers), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -2.49,
+     "form1": 0.26,
+     "def_delta": 0.33,
+     "total_c": 0.34,
+     "home": 0.0,
+     "base_c": -2.98
+    },
     "scorecard": {
      "Projected Usage": -0.1,
-     "Recent Trend": -0.59,
+     "Recent Trend": 0.39,
      "Game Flow": 0.17,
      "Opponent Defense": 0.51,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.39,
      "Market Read": 0.77,
-     "Regression": 0.08
+     "Regression": 0.78
     }
    },
    {
@@ -144,16 +176,24 @@
     "verdict_note": "we're low AND the draft market sees a small role (deep) \u2014 the prop line looks too high; real under value",
     "score_mult": 1.08,
     "reason": "Give us Travis Kelce under 41.5 receiving yards. He closed last season with games of 70, 6, 36, 12 yards (season line ~50.2). Our model weighs it out (recent form pushes down, mean-reversion pushes down, last game pushes down) and we land at 39.5 where the market's number implies about 49.3 \u2014 that gap is the under. Strip the 7% juice and the fair under is 49%; we make it 62% \u2014 +18 cents on the dollar at -114 (fanduel), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -5.13,
+     "form1": -1.92,
+     "def_delta": 0.25,
+     "total_c": 0.27,
+     "home": 0.0,
+     "base_c": -4.2
+    },
     "scorecard": {
      "Projected Usage": 0.19,
-     "Recent Trend": -0.36,
+     "Recent Trend": 1.0,
      "Game Flow": 0.33,
      "Opponent Defense": 0.38,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.09,
      "Market Read": 0.76,
-     "Regression": 0.05
+     "Regression": 1.0
     }
    },
    {
@@ -175,16 +215,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Cooper Kupp under 34.5 receiving yards. He closed last season with games of 46, 39, 6, 29 yards (season line ~37.1). Our model weighs it out (mean-reversion pushes down, recent form pushes down, the game total pushes up) and we land at 33.8 where the market's number implies about 40.7 \u2014 that gap is the under. Strip the 7% juice and the fair under is 52%; we make it 61% \u2014 +11 cents on the dollar at -125 (espnbet). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -1.98,
+     "form1": -0.41,
+     "def_delta": 0.44,
+     "total_c": 0.68,
+     "home": 0.0,
+     "base_c": -2.02
+    },
     "scorecard": {
      "Projected Usage": 0.08,
-     "Recent Trend": -0.45,
+     "Recent Trend": 0.47,
      "Game Flow": 0.39,
      "Opponent Defense": 0.68,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.11,
      "Market Read": 0.9,
-     "Regression": 0.06
+     "Regression": 0.6
     }
    },
    {
@@ -206,16 +254,24 @@
     "verdict_note": "big edge with no contradicting signal \u2014 treated as potential alpha, flagged for eyes",
     "score_mult": 1.0,
     "reason": "Give us T.J. Hockenson under 27.5 receiving yards. He closed last season with games of 59, 12, 66, 2 yards (season line ~27.9). Our model weighs it out (last game pushes down, the game total pushes up, mean-reversion pushes down) and we land at 26.6 where the market's number implies about 35 \u2014 that gap is the under. Strip the 6% juice and the fair under is 49%; we make it 63% \u2014 +20 cents on the dollar at -110 (draftkings), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -0.19,
+     "form1": -1.3,
+     "def_delta": 0.18,
+     "total_c": 0.51,
+     "home": 0.0,
+     "base_c": -0.48
+    },
     "scorecard": {
      "Projected Usage": 0.13,
-     "Recent Trend": -0.66,
+     "Recent Trend": 0.37,
      "Game Flow": 0.17,
      "Opponent Defense": 0.28,
      "Injury Picture": null,
      "Weather": -0.0,
      "Play-Calling": 0.31,
-     "Market Read": null,
-     "Regression": 0.09
+     "Market Read": -0.4,
+     "Regression": 0.18
     }
    },
    {
@@ -237,16 +293,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Khalil Shakir under 39.5 receiving yards. He closed last season with games of 16, 65, 34, 35 yards (season line ~42.9). Our model weighs it out (mean-reversion pushes down, last game pushes down) and we land at 40.5 where the market's number implies about 47.1 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 58% \u2014 +10 cents on the dollar at -115 (betrivers). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 0.29,
+     "form1": -0.4,
+     "def_delta": 0.33,
+     "total_c": 0.34,
+     "home": 0.0,
+     "base_c": -2.98
+    },
     "scorecard": {
      "Projected Usage": -0.1,
-     "Recent Trend": -0.55,
+     "Recent Trend": 0.02,
      "Game Flow": 0.17,
      "Opponent Defense": 0.51,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.32,
      "Market Read": 0.4,
-     "Regression": 0.08
+     "Regression": 0.74
     }
    },
    {
@@ -268,16 +332,24 @@
     "verdict_note": "big edge with no contradicting signal \u2014 treated as potential alpha, flagged for eyes",
     "score_mult": 1.0,
     "reason": "Give us Tre Harris under 26.5 receiving yards. He closed last season with games of 49, 54, 8, 28 yards (season line ~20.2). Our model weighs it out (the game total pushes up, recent form pushes up, mean-reversion pushes up) and we land at 25.3 where the market's number implies about 34.2 \u2014 that gap is the under. Strip the 7% juice and the fair under is 49%; we make it 63% \u2014 +21 cents on the dollar at -112 (betrivers), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 1.56,
+     "form1": 0.39,
+     "def_delta": 0.15,
+     "total_c": 2.2,
+     "home": 0.0,
+     "base_c": 0.8
+    },
     "scorecard": {
      "Projected Usage": 0.18,
-     "Recent Trend": -0.2,
+     "Recent Trend": -0.51,
      "Game Flow": 1.0,
      "Opponent Defense": 0.24,
      "Injury Picture": null,
      "Weather": -0.0,
      "Play-Calling": 0.63,
      "Market Read": null,
-     "Regression": 0.11
+     "Regression": -0.32
     }
    },
    {
@@ -299,16 +371,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Breece Hall under 18.5 receiving yards. He closed last season with games of 0, 14, 9, 18 yards (season line ~22.8). Our model weighs it out (recent form pushes down, the game total pushes down) and we land at 20 where the market's number implies about 24.6 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 58% \u2014 +10 cents on the dollar at -114 (fanduel). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -1.45,
+     "form1": -0.24,
+     "def_delta": -0.29,
+     "total_c": -1.19,
+     "home": 0.0,
+     "base_c": 0.37
+    },
     "scorecard": {
      "Projected Usage": -0.32,
-     "Recent Trend": -0.52,
+     "Recent Trend": 0.56,
      "Game Flow": -0.17,
      "Opponent Defense": null,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.51,
      "Market Read": -0.6,
-     "Regression": 0.07
+     "Regression": -0.18
     }
    }
   ],
@@ -332,16 +412,24 @@
     "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
     "score_mult": 1.08,
     "reason": "We're on Rhamondre Stevenson over 39.5 rushing yards. He closed last season with games of 50, 51, 47, 131 yards (season line ~41.5). Our model weighs it out (recent form pushes up, last game pushes up, mean-reversion pushes down) and we land at 53.4 where the market's number implies about 45.9 \u2014 that gap is the over. Strip the 7% juice and the fair over is 50%; we make it 60% \u2014 +14 cents on the dollar at -114 (fanduel), best of 3 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 9.69,
+     "form1": 4.6,
+     "def_delta": -0.98,
+     "total_c": 0.01,
+     "home": 0.0,
+     "base_c": -1.45
+    },
     "scorecard": {
      "Projected Usage": 1.0,
-     "Recent Trend": null,
+     "Recent Trend": 1.0,
      "Game Flow": -0.39,
      "Opponent Defense": -1.0,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.26,
      "Market Read": 0.25,
-     "Regression": null
+     "Regression": -0.27
     }
    },
    {
@@ -363,16 +451,24 @@
     "verdict_note": "we're high AND consensus sees a big role \u2014 corroborated over",
     "score_mult": 1.08,
     "reason": "We're on Derrick Henry over 77.5 rushing yards. He closed last season with games of 100, 128, 216, 126 yards (season line ~89.1). Our model weighs it out (recent form pushes up, mean-reversion pushes down, last game pushes up) and we land at 103.7 where the market's number implies about 85.3 \u2014 that gap is the over. Strip the 7% juice and the fair over is 50%; we make it 63% \u2014 +18 cents on the dollar at -115 (betrivers). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 18.83,
+     "form1": 1.9,
+     "def_delta": -0.3,
+     "total_c": -0.03,
+     "home": 0.0,
+     "base_c": -5.76
+    },
     "scorecard": {
      "Projected Usage": 1.0,
-     "Recent Trend": null,
+     "Recent Trend": 1.0,
      "Game Flow": 0.39,
      "Opponent Defense": -0.44,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 1.0,
      "Market Read": 0.91,
-     "Regression": null
+     "Regression": -0.56
     }
    },
    {
@@ -394,16 +490,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Cam Skattebo under 49.5 rushing yards. He closed last season with games of 59, 98, 60, 12 yards (season line ~51.2). Our model weighs it out (mean-reversion pushes down, last game pushes down, recent form pushes up) and we land at 48.5 where the market's number implies about 55.9 \u2014 that gap is the under. Strip the 6% juice and the fair under is 49%; we make it 59% \u2014 +14 cents on the dollar at -111 (draftkings). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 1.53,
+     "form1": -2.02,
+     "def_delta": 0.11,
+     "total_c": -0.01,
+     "home": 0.0,
+     "base_c": -2.32
+    },
     "scorecard": {
      "Projected Usage": 0.08,
-     "Recent Trend": null,
+     "Recent Trend": 0.07,
      "Game Flow": 0.28,
      "Opponent Defense": -0.16,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.47,
      "Market Read": -0.54,
-     "Regression": null
+     "Regression": 0.48
     }
    },
    {
@@ -425,16 +529,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Saquon Barkley under 76.5 rushing yards. He closed last season with games of 122, 78, 132, 68 yards (season line ~71.2). Our model weighs it out (recent form pushes up, mean-reversion pushes down, the matchup pushes up) and we land at 74 where the market's number implies about 84.5 \u2014 that gap is the under. Strip the 6% juice and the fair under is 49%; we make it 59% \u2014 +14 cents on the dollar at -111 (draftkings). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 5.99,
+     "form1": -0.16,
+     "def_delta": 1.11,
+     "total_c": -0.02,
+     "home": 0.0,
+     "base_c": -4.14
+    },
     "scorecard": {
      "Projected Usage": 0.13,
-     "Recent Trend": null,
+     "Recent Trend": -0.53,
      "Game Flow": -0.5,
      "Opponent Defense": -1.0,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.65,
      "Market Read": -0.85,
-     "Regression": null
+     "Regression": 0.56
     }
    },
    {
@@ -456,16 +568,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Josh Allen under 32.5 rushing yards. He closed last season with games of 78, 48, 17, 27 yards (season line ~36.2). Our model weighs it out (recent form pushes down, the matchup pushes down, mean-reversion pushes down) and we land at 32.3 where the market's number implies about 38.3 \u2014 that gap is the under. Strip the 6% juice and the fair under is 50%; we make it 60% \u2014 +13 cents on the dollar at -115 (draftkings). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -1.53,
+     "form1": -0.47,
+     "def_delta": -0.96,
+     "total_c": -0.01,
+     "home": 0.0,
+     "base_c": -0.96
+    },
     "scorecard": {
      "Projected Usage": 0.02,
-     "Recent Trend": null,
+     "Recent Trend": 0.41,
      "Game Flow": -0.17,
      "Opponent Defense": null,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.4,
      "Market Read": -0.65,
-     "Regression": null
+     "Regression": 0.3
     }
    },
    {
@@ -487,16 +607,24 @@
     "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
     "score_mult": 1.08,
     "reason": "We're on J.K. Dobbins over 49.5 rushing yards. He closed last season with games of 81, 111, 61, 77 yards (season line ~71.4). Our model weighs it out (mean-reversion pushes down, recent form pushes up, the matchup pushes down) and we land at 70.3 where the market's number implies about 55.8 \u2014 that gap is the over. Strip the 7% juice and the fair over is 50%; we make it 65% \u2014 +23 cents on the dollar at -114 (fanduel). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 3.23,
+     "form1": 0.29,
+     "def_delta": -0.48,
+     "total_c": 0.02,
+     "home": 0.0,
+     "base_c": -4.16
+    },
     "scorecard": {
      "Projected Usage": 1.0,
-     "Recent Trend": null,
+     "Recent Trend": 0.33,
      "Game Flow": -0.33,
      "Opponent Defense": -0.71,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.24,
      "Market Read": 0.1,
-     "Regression": null
+     "Regression": -0.59
     }
    },
    {
@@ -518,16 +646,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "We're on Chris Rodriguez Jr. over 32.5 rushing yards. He closed last season with games of 41, 52, 63, 65 yards (season line ~38.6). Our model weighs it out (recent form pushes up, last game pushes up, mean-reversion pushes down) and we land at 44.9 where the market's number implies about 38.8 \u2014 that gap is the over. Strip the 6% juice and the fair over is 50%; we make it 59% \u2014 +12 cents on the dollar at -113 (draftkings). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 5.96,
+     "form1": 1.36,
+     "def_delta": 0.17,
+     "total_c": -0.02,
+     "home": 0.0,
+     "base_c": -1.18
+    },
     "scorecard": {
      "Projected Usage": 1.0,
-     "Recent Trend": null,
+     "Recent Trend": 1.0,
      "Game Flow": 0.83,
      "Opponent Defense": 0.25,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.46,
      "Market Read": -0.86,
-     "Regression": null
+     "Regression": -0.26
     }
    },
    {
@@ -549,16 +685,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Bryce Young under 14.5 rushing yards. He closed last season with games of 49, 20, 27, -1 yards (season line ~13.5). Our model weighs it out (mean-reversion pushes up, last game pushes down, the matchup pushes up) and we land at 14.9 where the market's number implies about 18.2 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 59% \u2014 +11 cents on the dollar at -116 (draftkings), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 0.5,
+     "form1": -0.75,
+     "def_delta": 0.56,
+     "total_c": -0.0,
+     "home": 0.0,
+     "base_c": 1.09
+    },
     "scorecard": {
      "Projected Usage": -0.11,
-     "Recent Trend": null,
+     "Recent Trend": 0.11,
      "Game Flow": 0.28,
      "Opponent Defense": null,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.86,
-     "Market Read": null,
-     "Regression": null
+     "Market Read": -0.4,
+     "Regression": -0.73
     }
    },
    {
@@ -580,16 +724,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Tyler Shough under 18.5 rushing yards. He closed last season with games of 32, 8, 6, 34 yards (season line ~18.6). Our model weighs it out (last game pushes up, recent form pushes down, mean-reversion pushes up) and we land at 19.1 where the market's number implies about 23 \u2014 that gap is the under. Strip the 6% juice and the fair under is 50%; we make it 59% \u2014 +11 cents on the dollar at -115 (draftkings). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -0.72,
+     "form1": 0.79,
+     "def_delta": -0.19,
+     "total_c": 0.01,
+     "home": 0.0,
+     "base_c": 0.63
+    },
     "scorecard": {
      "Projected Usage": -0.13,
-     "Recent Trend": null,
+     "Recent Trend": -0.02,
      "Game Flow": 0.78,
      "Opponent Defense": null,
      "Injury Picture": null,
      "Weather": -0.0,
      "Play-Calling": 0.74,
      "Market Read": 0.77,
-     "Regression": null
+     "Regression": -0.33
     }
    },
    {
@@ -611,16 +763,24 @@
     "verdict_note": "big edge with no contradicting signal \u2014 treated as potential alpha, flagged for eyes",
     "score_mult": 1.0,
     "reason": "Give us Deshaun Watson under 19.5 rushing yards. He closed last season with games of 32, 14, 17, 0 yards (season line ~24.2). Our model weighs it out (recent form pushes down, last game pushes down, the matchup pushes down) and we land at 18 where the market's number implies about 24.3 \u2014 that gap is the under. Strip the 6% juice and the fair under is 50%; we make it 64% \u2014 +21 cents on the dollar at -114 (draftkings). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -3.87,
+     "form1": -1.24,
+     "def_delta": -1.24,
+     "total_c": 0.04,
+     "home": 0.0,
+     "base_c": 0.12
+    },
     "scorecard": {
      "Projected Usage": 0.31,
-     "Recent Trend": null,
+     "Recent Trend": 1.0,
      "Game Flow": 0.83,
      "Opponent Defense": null,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.65,
-     "Market Read": null,
-     "Regression": null
+     "Market Read": -0.4,
+     "Regression": -0.07
     }
    }
   ],
@@ -644,16 +804,24 @@
     "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
     "score_mult": 1.08,
     "reason": "We're on Quentin Johnston over 3.5 catches. He closed last season with games of 3, 2, 4, 5 catches (season line ~4.8). We project 4.4; the market's line implies about 3.5 \u2014 the gap is the over. Strip the 7% juice and the fair over is 43%; we make it 54% \u2014 +18 cents on the dollar at +116 (fanduel), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -0.25,
+     "form1": 0.01,
+     "def_delta": 0.01,
+     "total_c": 0.15,
+     "home": 0.0,
+     "base_c": -0.34
+    },
     "scorecard": {
      "Projected Usage": 1.0,
-     "Recent Trend": 0.3,
+     "Recent Trend": -0.36,
      "Game Flow": -1.0,
      "Opponent Defense": -0.24,
      "Injury Picture": null,
      "Weather": 0.0,
      "Play-Calling": -0.13,
      "Market Read": 0.02,
-     "Regression": -0.04
+     "Regression": -0.77
     }
    },
    {
@@ -675,16 +843,24 @@
     "verdict_note": "we're low AND the draft market sees a small role (deep) \u2014 the prop line looks too high; real under value",
     "score_mult": 1.08,
     "reason": "Give us Cooper Kupp under 2.5 catches. He closed last season with games of 5, 3, 1, 2 catches (season line ~2.9). We project 2.7; the market's line implies about 3.5 \u2014 the gap is the under. Strip the 6% juice and the fair under is 42%; we make it 55% \u2014 +22 cents on the dollar at +122 (draftkings), best of 3 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -0.21,
+     "form1": -0.04,
+     "def_delta": 0.02,
+     "total_c": 0.05,
+     "home": 0.0,
+     "base_c": -0.0
+    },
     "scorecard": {
      "Projected Usage": -0.32,
-     "Recent Trend": -0.45,
+     "Recent Trend": 0.62,
      "Game Flow": 0.39,
      "Opponent Defense": 0.68,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.11,
      "Market Read": 0.9,
-     "Regression": 0.06
+     "Regression": 0.0
     }
    },
    {
@@ -706,16 +882,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Rome Odunze under 3.5 catches. He closed last season with games of 6, 2, 3, 2 catches (season line ~3.6). We project 3.2; the market's line implies about 3.8 \u2014 the gap is the under. Strip the 7% juice and the fair under is 52%; we make it 62% \u2014 +11 cents on the dollar at -130 (fanduel), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -0.3,
+     "form1": -0.07,
+     "def_delta": 0.01,
+     "total_c": 0.07,
+     "home": 0.0,
+     "base_c": -0.13
+    },
     "scorecard": {
      "Projected Usage": 0.34,
-     "Recent Trend": -0.15,
+     "Recent Trend": 0.77,
      "Game Flow": 0.28,
      "Opponent Defense": 0.53,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.13,
      "Market Read": -0.43,
-     "Regression": 0.04
+     "Regression": 0.41
     }
    },
    {
@@ -737,16 +921,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us George Pickens under 5.5 catches. He closed last season with games of 3, 7, 4, 1 catches (season line ~5.6). Our model weighs it out (mean-reversion pushes down) and we land at 4.6 where the market's number implies about 5.3 \u2014 that gap is the under. Strip the 6% juice and the fair under is 57%; we make it 66% \u2014 +9 cents on the dollar at -159 (draftkings), best of 3 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -0.37,
+     "form1": -0.21,
+     "def_delta": -0.0,
+     "total_c": 0.08,
+     "home": 0.0,
+     "base_c": -0.48
+    },
     "scorecard": {
      "Projected Usage": 0.65,
-     "Recent Trend": -0.45,
+     "Recent Trend": 0.84,
      "Game Flow": 0.28,
      "Opponent Defense": -0.11,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.03,
      "Market Read": -0.76,
-     "Regression": 0.06
+     "Regression": 1.0
     }
    },
    {
@@ -768,16 +960,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Davante Adams under 4.5 catches. He closed last season with games of 5, 4, 4, 4 catches (season line ~4.4). We project 4.1; the market's line implies about 4.8 \u2014 the gap is the under. Strip the 6% juice and the fair under is 52%; we make it 61% \u2014 +12 cents on the dollar at -123 (draftkings), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -0.09,
+     "form1": -0.02,
+     "def_delta": 0.0,
+     "total_c": 0.1,
+     "home": 0.0,
+     "base_c": -0.27
+    },
     "scorecard": {
      "Projected Usage": 0.36,
-     "Recent Trend": -0.47,
+     "Recent Trend": 0.18,
      "Game Flow": 0.39,
      "Opponent Defense": 0.01,
      "Injury Picture": null,
      "Weather": -0.0,
      "Play-Calling": -0.3,
      "Market Read": -0.55,
-     "Regression": 0.07
+     "Regression": 0.66
     }
    },
    {
@@ -799,16 +999,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Harold Fannin Jr. under 4.5 catches. He closed last season with games of 8, 7, 4, 2 catches (season line ~4.5). We project 3.9; the market's line implies about 4.5 \u2014 the gap is the under. Strip the 6% juice and the fair under is 55%; we make it 64% \u2014 +9 cents on the dollar at -145 (draftkings), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -0.05,
+     "form1": -0.12,
+     "def_delta": 0.01,
+     "total_c": -0.13,
+     "home": 0.0,
+     "base_c": -0.29
+    },
     "scorecard": {
      "Projected Usage": 0.53,
-     "Recent Trend": -0.15,
+     "Recent Trend": 0.29,
      "Game Flow": -0.83,
      "Opponent Defense": 0.22,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.12,
      "Market Read": 0.15,
-     "Regression": 0.09
+     "Regression": 0.74
     }
    },
    {
@@ -830,16 +1038,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Bijan Robinson under 4.5 catches. He closed last season with games of 8, 7, 5, 3 catches (season line ~4.6). We project 4.3; the market's line implies about 5 \u2014 the gap is the under. Strip the 6% juice and the fair under is 50%; we make it 59% \u2014 +12 cents on the dollar at -115 (draftkings), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 0.09,
+     "form1": -0.07,
+     "def_delta": -0.01,
+     "total_c": -0.05,
+     "home": 0.0,
+     "base_c": -0.31
+    },
     "scorecard": {
      "Projected Usage": 0.18,
-     "Recent Trend": -0.38,
+     "Recent Trend": -0.03,
      "Game Flow": -0.33,
      "Opponent Defense": null,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.25,
      "Market Read": -0.97,
-     "Regression": 0.05
+     "Regression": 0.72
     }
    },
    {
@@ -861,16 +1077,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Chris Olave under 6.5 catches. He closed last season with games of 3, 6, 10, 8 catches (season line ~6.2). Our model weighs it out (mean-reversion pushes down, recent form pushes up) and we land at 6.1 where the market's number implies about 6.9 \u2014 that gap is the under. Strip the 6% juice and the fair under is 51%; we make it 59% \u2014 +10 cents on the dollar at -119 (draftkings), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 0.42,
+     "form1": 0.08,
+     "def_delta": -0.0,
+     "total_c": -0.02,
+     "home": 0.0,
+     "base_c": -0.59
+    },
     "scorecard": {
      "Projected Usage": 0.25,
-     "Recent Trend": -0.67,
+     "Recent Trend": -0.55,
      "Game Flow": -0.78,
      "Opponent Defense": -0.2,
      "Injury Picture": null,
      "Weather": -0.0,
      "Play-Calling": -0.08,
      "Market Read": -0.69,
-     "Regression": 0.1
+     "Regression": 0.97
     }
    },
    {
@@ -892,16 +1116,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us A.J. Brown under 4.5 catches. He closed last season with games of 6, 2, 9, 5 catches (season line ~5.1). We project 4.7; the market's line implies about 5.6 \u2014 the gap is the under. Strip the 6% juice and the fair under is 43%; we make it 53% \u2014 +15 cents on the dollar at +116 (draftkings), best of 3 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 0.05,
+     "form1": -0.0,
+     "def_delta": 0.02,
+     "total_c": -0.04,
+     "home": 0.0,
+     "base_c": -0.39
+    },
     "scorecard": {
      "Projected Usage": -0.18,
-     "Recent Trend": -0.6,
+     "Recent Trend": -0.07,
      "Game Flow": -0.39,
      "Opponent Defense": 0.7,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.04,
      "Market Read": -0.76,
-     "Regression": 0.09
+     "Regression": 0.83
     }
    },
    {
@@ -923,16 +1155,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Tre Harris under 2.5 catches. He closed last season with games of 3, 4, 1, 2 catches (season line ~2.1). We project 2.4; the market's line implies about 2.8 \u2014 the gap is the under. Strip the 7% juice and the fair under is 52%; we make it 60% \u2014 +8 cents on the dollar at -128 (draftkings), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 0.05,
+     "form1": -0.0,
+     "def_delta": 0.01,
+     "total_c": 0.15,
+     "home": 0.0,
+     "base_c": 0.14
+    },
     "scorecard": {
      "Projected Usage": 0.16,
-     "Recent Trend": -0.2,
+     "Recent Trend": -0.14,
      "Game Flow": 1.0,
      "Opponent Defense": 0.24,
      "Injury Picture": null,
      "Weather": -0.0,
      "Play-Calling": 0.63,
      "Market Read": null,
-     "Regression": 0.11
+     "Regression": -0.58
     }
    }
   ],
@@ -956,16 +1196,24 @@
     "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
     "score_mult": 1.08,
     "reason": "We're on Jared Goff over 261.5 passing yards. He closed last season with games of 338, 364, 197, 331 yards (season line ~271.2). Our model weighs it out (the game total pushes up, mean-reversion pushes down, last game pushes up) and we land at 291.8 where the market's number implies about 261.2 \u2014 that gap is the over. Strip the 7% juice and the fair over is 49%; we make it 61% \u2014 +14 cents on the dollar at -114 (fanduel), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 3.66,
+     "form1": 9.94,
+     "def_delta": 0.0,
+     "total_c": 22.48,
+     "home": 0.0,
+     "base_c": -15.47
+    },
     "scorecard": {
      "Projected Usage": 0.46,
-     "Recent Trend": 1.0,
+     "Recent Trend": 0.31,
      "Game Flow": -0.78,
-     "Opponent Defense": null,
+     "Opponent Defense": -0.61,
      "Injury Picture": null,
      "Weather": 0.0,
      "Play-Calling": 0.0,
      "Market Read": -0.28,
-     "Regression": -0.2
+     "Regression": -0.53
     }
    },
    {
@@ -987,16 +1235,24 @@
     "verdict_note": "we're low AND the draft market sees a small role (deep) \u2014 the prop line looks too high; real under value",
     "score_mult": 1.08,
     "reason": "Give us Malik Willis under 184.5 passing yards. He closed last season with games of 6, 7, 121, 288 yards (season line ~95.1). Our model weighs it out (mean-reversion pushes up, last game pushes up, the game total pushes down) and we land at 157.8 where the market's number implies about 184.5 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 65% \u2014 +23 cents on the dollar at -114 (fanduel). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 6.11,
+     "form1": 32.08,
+     "def_delta": 0.0,
+     "total_c": -12.69,
+     "home": 0.0,
+     "base_c": 37.21
+    },
     "scorecard": {
      "Projected Usage": 0.58,
      "Recent Trend": -1.0,
      "Game Flow": -0.39,
-     "Opponent Defense": null,
+     "Opponent Defense": -0.01,
      "Injury Picture": null,
      "Weather": -0.0,
      "Play-Calling": -0.0,
      "Market Read": 1.0,
-     "Regression": 0.8
+     "Regression": -1.0
     }
    },
    {
@@ -1018,16 +1274,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "We're on Aaron Rodgers over 210.5 passing yards. He closed last season with games of 224, 266, 168, 294 yards (season line ~207.6). Our model weighs it out (last game pushes up, recent form pushes up, mean-reversion pushes up) and we land at 233.3 where the market's number implies about 210.5 \u2014 that gap is the over. Strip the 7% juice and the fair over is 50%; we make it 59% \u2014 +12 cents on the dollar at -114 (fanduel). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 4.92,
+     "form1": 14.37,
+     "def_delta": 0.0,
+     "total_c": 2.9,
+     "home": 0.0,
+     "base_c": 3.56
+    },
     "scorecard": {
      "Projected Usage": 0.43,
-     "Recent Trend": 1.0,
+     "Recent Trend": 0.55,
      "Game Flow": -0.33,
-     "Opponent Defense": null,
+     "Opponent Defense": -0.08,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": 0.0,
-     "Market Read": null,
-     "Regression": -0.2
+     "Market Read": 0.4,
+     "Regression": 0.15
     }
    },
    {
@@ -1049,16 +1313,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us C.J. Stroud under 220.5 passing yards. He closed last season with games of 260, 187, 244, 169 yards (season line ~204.8). Our model weighs it out (last game pushes down, mean-reversion pushes up, the game total pushes down) and we land at 200.8 where the market's number implies about 220.5 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 59% \u2014 +11 cents on the dollar at -115 (fanatics), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -0.67,
+     "form1": -5.95,
+     "def_delta": 0.0,
+     "total_c": -1.81,
+     "home": 0.0,
+     "base_c": 4.4
+    },
     "scorecard": {
      "Projected Usage": 0.36,
-     "Recent Trend": -1.0,
+     "Recent Trend": 0.22,
      "Game Flow": -0.17,
-     "Opponent Defense": null,
+     "Opponent Defense": 0.7,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.0,
      "Market Read": 0.99,
-     "Regression": 0.2
+     "Regression": -0.22
     }
    },
    {
@@ -1080,16 +1352,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Kirk Cousins under 215.5 passing yards. He closed last season with games of 373, 197, 126, 180 yards (season line ~195.2). Our model weighs it out (mean-reversion pushes up, recent form pushes down, last game pushes down) and we land at 196.1 where the market's number implies about 215.5 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 59% \u2014 +12 cents on the dollar at -114 (fanduel). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -3.85,
+     "form1": -2.53,
+     "def_delta": 0.0,
+     "total_c": 0.0,
+     "home": 0.0,
+     "base_c": 7.27
+    },
     "scorecard": {
      "Projected Usage": 0.36,
-     "Recent Trend": -1.0,
+     "Recent Trend": 0.22,
      "Game Flow": 0.39,
-     "Opponent Defense": null,
+     "Opponent Defense": 0.47,
      "Injury Picture": null,
      "Weather": -0.0,
      "Play-Calling": -0.0,
-     "Market Read": null,
-     "Regression": 0.2
+     "Market Read": -0.4,
+     "Regression": -0.37
     }
    },
    {
@@ -1111,16 +1391,24 @@
     "verdict_note": "big edge with no contradicting signal \u2014 treated as potential alpha, flagged for eyes",
     "score_mult": 1.0,
     "reason": "Give us Geno Smith under 212.5 passing yards. He closed last season with games of 165, 116, 201, 176 yards (season line ~203). Our model weighs it out (the game total pushes down, recent form pushes down, mean-reversion pushes up) and we land at 185.3 where the market's number implies about 212.5 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 63% \u2014 +20 cents on the dollar at -114 (fanduel). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -5.42,
+     "form1": -4.49,
+     "def_delta": 0.0,
+     "total_c": -12.69,
+     "home": 0.0,
+     "base_c": 4.94
+    },
     "scorecard": {
      "Projected Usage": 0.51,
-     "Recent Trend": -1.0,
+     "Recent Trend": 0.36,
      "Game Flow": -0.17,
-     "Opponent Defense": null,
+     "Opponent Defense": -0.44,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.0,
-     "Market Read": null,
-     "Regression": 0.2
+     "Market Read": -0.4,
+     "Regression": -0.27
     }
    },
    {
@@ -1142,16 +1430,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Baker Mayfield under 247.5 passing yards. He closed last season with games of 277, 145, 346, 203 yards (season line ~220.4). Our model weighs it out (the game total pushes up, last game pushes down, recent form pushes up) and we land at 226 where the market's number implies about 246.8 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 59% \u2014 +10 cents on the dollar at -117 (betrivers). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 1.53,
+     "form1": -2.89,
+     "def_delta": 0.0,
+     "total_c": 7.25,
+     "home": 0.0,
+     "base_c": -0.27
+    },
     "scorecard": {
      "Projected Usage": 0.35,
-     "Recent Trend": -1.0,
+     "Recent Trend": 0.04,
      "Game Flow": -0.39,
-     "Opponent Defense": null,
+     "Opponent Defense": 0.7,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.0,
      "Market Read": 0.7,
-     "Regression": 0.2
+     "Regression": 0.01
     }
    },
    {
@@ -1173,16 +1469,24 @@
     "verdict_note": "big edge with no contradicting signal \u2014 treated as potential alpha, flagged for eyes",
     "score_mult": 1.0,
     "reason": "Give us Deshaun Watson under 179.5 passing yards. He closed last season with games of 176, 125, 168, 128 yards (season line ~174.1). Our model weighs it out (the game total pushes down, mean-reversion pushes up, last game pushes down) and we land at 155.3 where the market's number implies about 179.5 \u2014 that gap is the under. Strip the 6% juice and the fair under is 50%; we make it 64% \u2014 +22 cents on the dollar at -112 (draftkings). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -4.73,
+     "form1": -7.67,
+     "def_delta": 0.0,
+     "total_c": -19.94,
+     "home": 0.0,
+     "base_c": 13.58
+    },
     "scorecard": {
      "Projected Usage": 0.54,
-     "Recent Trend": -1.0,
+     "Recent Trend": 0.53,
      "Game Flow": -0.83,
-     "Opponent Defense": null,
+     "Opponent Defense": 0.22,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.0,
-     "Market Read": null,
-     "Regression": 0.2
+     "Market Read": -0.4,
+     "Regression": -0.87
     }
    },
    {
@@ -1204,16 +1508,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "Give us Jalen Hurts under 214.5 passing yards. He closed last season with games of 240, 175, 185, 110 yards (season line ~201.5). Our model weighs it out (last game pushes down, the game total pushes up, recent form pushes down) and we land at 196.3 where the market's number implies about 214.5 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 58% \u2014 +11 cents on the dollar at -114 (fanduel), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": -6.28,
+     "form1": -15.22,
+     "def_delta": 0.0,
+     "total_c": 10.88,
+     "home": 0.0,
+     "base_c": 5.38
+    },
     "scorecard": {
      "Projected Usage": 0.34,
-     "Recent Trend": -1.0,
+     "Recent Trend": 0.73,
      "Game Flow": 0.5,
-     "Opponent Defense": null,
+     "Opponent Defense": -0.37,
      "Injury Picture": null,
      "Weather": null,
      "Play-Calling": -0.0,
      "Market Read": 0.02,
-     "Regression": 0.2
+     "Regression": -0.27
     }
    },
    {
@@ -1235,16 +1547,24 @@
     "verdict_note": "moderate edge \u2014 no investigation needed",
     "score_mult": 1.0,
     "reason": "We're on Justin Herbert over 235.5 passing yards. He closed last season with games of 139, 210, 300, 236 yards (season line ~232.9). Our model weighs it out (the game total pushes up, mean-reversion pushes down, recent form pushes up) and we land at 255.2 where the market's number implies about 233.2 \u2014 that gap is the over. Strip the 7% juice and the fair over is 49%; we make it 57% \u2014 +10 cents on the dollar at -110 (fanatics). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+    "contrib": {
+     "form3": 2.21,
+     "form1": 0.52,
+     "def_delta": 0.0,
+     "total_c": 23.57,
+     "home": 0.0,
+     "base_c": -4.01
+    },
     "scorecard": {
      "Projected Usage": 0.33,
-     "Recent Trend": 1.0,
+     "Recent Trend": 0.07,
      "Game Flow": -1.0,
-     "Opponent Defense": null,
+     "Opponent Defense": -0.24,
      "Injury Picture": null,
      "Weather": 0.0,
      "Play-Calling": 0.0,
      "Market Read": -0.36,
-     "Regression": -0.2
+     "Regression": -0.16
     }
    }
   ],
@@ -1268,6 +1588,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 47% vs 66% implied \u2014 no edge; reference only.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": 0.18,
@@ -1295,6 +1616,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 46% to score vs 42% implied \u2014 we're higher, a genuine +value TD, but a one-sided market, so a small add.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": -0.64,
@@ -1322,6 +1644,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 44% to score vs 40% implied \u2014 we're higher, a genuine +value TD, but a one-sided market, so a small add.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": -0.96,
@@ -1349,6 +1672,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 44% vs 67% implied \u2014 no edge; reference only.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": 0.38,
@@ -1376,6 +1700,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 44% vs 60% implied \u2014 no edge; reference only.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": 0.14,
@@ -1403,6 +1728,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 42% vs 60% implied \u2014 no edge; reference only.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": -0.31,
@@ -1430,6 +1756,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 42% vs 75% implied \u2014 no edge; reference only.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": 1.0,
@@ -1457,6 +1784,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 41% vs 58% implied \u2014 no edge; reference only.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": 0.0,
@@ -1484,6 +1812,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 41% vs 56% implied \u2014 no edge; reference only.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": 0.59,
@@ -1511,6 +1840,7 @@
     "verdict_note": NaN,
     "score_mult": NaN,
     "reason": "Model 40% vs 45% implied \u2014 no edge; reference only.",
+    "contrib": NaN,
     "scorecard": {
      "Red-Zone Role": 1.0,
      "Finishing Rate": 0.27,
@@ -1541,16 +1871,24 @@
    "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
    "score_mult": 1.08,
    "reason": "We're on Jared Goff over 261.5 passing yards. He closed last season with games of 338, 364, 197, 331 yards (season line ~271.2). Our model weighs it out (the game total pushes up, mean-reversion pushes down, last game pushes up) and we land at 291.8 where the market's number implies about 261.2 \u2014 that gap is the over. Strip the 7% juice and the fair over is 49%; we make it 61% \u2014 +14 cents on the dollar at -114 (fanduel), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": 3.66,
+    "form1": 9.94,
+    "def_delta": 0.0,
+    "total_c": 22.48,
+    "home": 0.0,
+    "base_c": -15.47
+   },
    "scorecard": {
     "Projected Usage": 0.46,
-    "Recent Trend": 1.0,
+    "Recent Trend": 0.31,
     "Game Flow": -0.78,
-    "Opponent Defense": null,
+    "Opponent Defense": -0.61,
     "Injury Picture": null,
     "Weather": 0.0,
     "Play-Calling": 0.0,
     "Market Read": -0.28,
-    "Regression": -0.2
+    "Regression": -0.53
    }
   },
   {
@@ -1572,16 +1910,24 @@
    "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
    "score_mult": 1.08,
    "reason": "We're on Stefon Diggs over 41.5 receiving yards. He closed last season with games of 26, 138, 101, 43 yards (season line ~59.8). Our model weighs it out (mean-reversion pushes down, recent form pushes up, last game pushes down) and we land at 58.3 where the market's number implies about 48.8 \u2014 that gap is the over. Strip the 6% juice and the fair over is 49%; we make it 60% \u2014 +16 cents on the dollar at -110 (draftkings). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": 5.45,
+    "form1": -0.84,
+    "def_delta": 0.15,
+    "total_c": -0.51,
+    "home": 0.0,
+    "base_c": -5.8
+   },
    "scorecard": {
     "Projected Usage": 1.0,
-    "Recent Trend": 0.79,
+    "Recent Trend": 0.53,
     "Game Flow": 0.5,
     "Opponent Defense": -0.24,
     "Injury Picture": null,
     "Weather": null,
     "Play-Calling": -0.14,
     "Market Read": -0.23,
-    "Regression": -0.11
+    "Regression": -0.99
    }
   },
   {
@@ -1603,16 +1949,24 @@
    "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
    "score_mult": 1.08,
    "reason": "We're on Rhamondre Stevenson over 39.5 rushing yards. He closed last season with games of 50, 51, 47, 131 yards (season line ~41.5). Our model weighs it out (recent form pushes up, last game pushes up, mean-reversion pushes down) and we land at 53.4 where the market's number implies about 45.9 \u2014 that gap is the over. Strip the 7% juice and the fair over is 50%; we make it 60% \u2014 +14 cents on the dollar at -114 (fanduel), best of 3 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": 9.69,
+    "form1": 4.6,
+    "def_delta": -0.98,
+    "total_c": 0.01,
+    "home": 0.0,
+    "base_c": -1.45
+   },
    "scorecard": {
     "Projected Usage": 1.0,
-    "Recent Trend": null,
+    "Recent Trend": 1.0,
     "Game Flow": -0.39,
     "Opponent Defense": -1.0,
     "Injury Picture": null,
     "Weather": null,
     "Play-Calling": 0.26,
     "Market Read": 0.25,
-    "Regression": null
+    "Regression": -0.27
    }
   },
   {
@@ -1634,16 +1988,24 @@
    "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
    "score_mult": 1.08,
    "reason": "We're on Quentin Johnston over 42.5 receiving yards. He closed last season with games of 23, 8, 104, 98 yards (season line ~61.7). Our model weighs it out (mean-reversion pushes down, the game total pushes up, last game pushes up) and we land at 61.1 where the market's number implies about 50.1 \u2014 that gap is the over. Strip the 6% juice and the fair over is 50%; we make it 62% \u2014 +18 cents on the dollar at -112 (draftkings), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": 1.32,
+    "form1": 1.82,
+    "def_delta": 0.15,
+    "total_c": 2.2,
+    "home": 0.0,
+    "base_c": -6.12
+   },
    "scorecard": {
     "Projected Usage": 1.0,
-    "Recent Trend": 0.3,
+    "Recent Trend": 0.34,
     "Game Flow": -1.0,
     "Opponent Defense": -0.24,
     "Injury Picture": null,
     "Weather": 0.0,
     "Play-Calling": -0.13,
     "Market Read": 0.02,
-    "Regression": -0.04
+    "Regression": -1.0
    }
   },
   {
@@ -1665,16 +2027,24 @@
    "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
    "score_mult": 1.08,
    "reason": "We're on Michael Wilson over 40.5 receiving yards. He closed last season with games of 54, 52, 89, 99 yards (season line ~62.6). Our model weighs it out (mean-reversion pushes down, recent form pushes up, last game pushes up) and we land at 59.9 where the market's number implies about 48.9 \u2014 that gap is the over. Strip the 7% juice and the fair over is 51%; we make it 63% \u2014 +17 cents on the dollar at -120 (fanatics). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": 2.77,
+    "form1": 1.83,
+    "def_delta": 0.3,
+    "total_c": -1.36,
+    "home": 0.0,
+    "base_c": -6.27
+   },
    "scorecard": {
     "Projected Usage": 1.0,
-    "Recent Trend": 0.29,
+    "Recent Trend": 0.51,
     "Game Flow": 1.0,
     "Opponent Defense": -0.46,
     "Injury Picture": null,
     "Weather": 0.0,
     "Play-Calling": -0.08,
     "Market Read": 0.06,
-    "Regression": -0.04
+    "Regression": -1.0
    }
   },
   {
@@ -1696,16 +2066,24 @@
    "verdict_note": "we're high AND consensus sees a rotational role \u2014 corroborated over",
    "score_mult": 1.08,
    "reason": "We're on Quentin Johnston over 3.5 catches. He closed last season with games of 3, 2, 4, 5 catches (season line ~4.8). We project 4.4; the market's line implies about 3.5 \u2014 the gap is the over. Strip the 7% juice and the fair over is 43%; we make it 54% \u2014 +18 cents on the dollar at +116 (fanduel), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": -0.25,
+    "form1": 0.01,
+    "def_delta": 0.01,
+    "total_c": 0.15,
+    "home": 0.0,
+    "base_c": -0.34
+   },
    "scorecard": {
     "Projected Usage": 1.0,
-    "Recent Trend": 0.3,
+    "Recent Trend": -0.36,
     "Game Flow": -1.0,
     "Opponent Defense": -0.24,
     "Injury Picture": null,
     "Weather": 0.0,
     "Play-Calling": -0.13,
     "Market Read": 0.02,
-    "Regression": -0.04
+    "Regression": -0.77
    }
   },
   {
@@ -1727,16 +2105,24 @@
    "verdict_note": "we're high AND consensus sees a big role \u2014 corroborated over",
    "score_mult": 1.08,
    "reason": "We're on Derrick Henry over 77.5 rushing yards. He closed last season with games of 100, 128, 216, 126 yards (season line ~89.1). Our model weighs it out (recent form pushes up, mean-reversion pushes down, last game pushes up) and we land at 103.7 where the market's number implies about 85.3 \u2014 that gap is the over. Strip the 7% juice and the fair over is 50%; we make it 63% \u2014 +18 cents on the dollar at -115 (betrivers). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": 18.83,
+    "form1": 1.9,
+    "def_delta": -0.3,
+    "total_c": -0.03,
+    "home": 0.0,
+    "base_c": -5.76
+   },
    "scorecard": {
     "Projected Usage": 1.0,
-    "Recent Trend": null,
+    "Recent Trend": 1.0,
     "Game Flow": 0.39,
     "Opponent Defense": -0.44,
     "Injury Picture": null,
     "Weather": null,
     "Play-Calling": 1.0,
     "Market Read": 0.91,
-    "Regression": null
+    "Regression": -0.56
    }
   },
   {
@@ -1758,16 +2144,24 @@
    "verdict_note": "we're low AND the draft market sees a small role (deep) \u2014 the prop line looks too high; real under value",
    "score_mult": 1.08,
    "reason": "Give us Cooper Kupp under 2.5 catches. He closed last season with games of 5, 3, 1, 2 catches (season line ~2.9). We project 2.7; the market's line implies about 3.5 \u2014 the gap is the under. Strip the 6% juice and the fair under is 42%; we make it 55% \u2014 +22 cents on the dollar at +122 (draftkings), best of 3 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": -0.21,
+    "form1": -0.04,
+    "def_delta": 0.02,
+    "total_c": 0.05,
+    "home": 0.0,
+    "base_c": -0.0
+   },
    "scorecard": {
     "Projected Usage": -0.32,
-    "Recent Trend": -0.45,
+    "Recent Trend": 0.62,
     "Game Flow": 0.39,
     "Opponent Defense": 0.68,
     "Injury Picture": null,
     "Weather": null,
     "Play-Calling": 0.11,
     "Market Read": 0.9,
-    "Regression": 0.06
+    "Regression": 0.0
    }
   },
   {
@@ -1789,16 +2183,24 @@
    "verdict_note": "moderate edge \u2014 no investigation needed",
    "score_mult": 1.0,
    "reason": "Give us Rome Odunze under 3.5 catches. He closed last season with games of 6, 2, 3, 2 catches (season line ~3.6). We project 3.2; the market's line implies about 3.8 \u2014 the gap is the under. Strip the 7% juice and the fair under is 52%; we make it 62% \u2014 +11 cents on the dollar at -130 (fanduel), best of 2 books. Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": -0.3,
+    "form1": -0.07,
+    "def_delta": 0.01,
+    "total_c": 0.07,
+    "home": 0.0,
+    "base_c": -0.13
+   },
    "scorecard": {
     "Projected Usage": 0.34,
-    "Recent Trend": -0.15,
+    "Recent Trend": 0.77,
     "Game Flow": 0.28,
     "Opponent Defense": 0.53,
     "Injury Picture": null,
     "Weather": null,
     "Play-Calling": -0.13,
     "Market Read": -0.43,
-    "Regression": 0.04
+    "Regression": 0.41
    }
   },
   {
@@ -1820,16 +2222,24 @@
    "verdict_note": "we're low AND the draft market sees a small role (deep) \u2014 the prop line looks too high; real under value",
    "score_mult": 1.08,
    "reason": "Give us Malik Willis under 184.5 passing yards. He closed last season with games of 6, 7, 121, 288 yards (season line ~95.1). Our model weighs it out (mean-reversion pushes up, last game pushes up, the game total pushes down) and we land at 157.8 where the market's number implies about 184.5 \u2014 that gap is the under. Strip the 7% juice and the fair under is 50%; we make it 65% \u2014 +23 cents on the dollar at -114 (fanduel). Honest caveat: this leans on late-2025 form across the offseason \u2014 an early-season read, sized as a lean.",
+   "contrib": {
+    "form3": 6.11,
+    "form1": 32.08,
+    "def_delta": 0.0,
+    "total_c": -12.69,
+    "home": 0.0,
+    "base_c": 37.21
+   },
    "scorecard": {
     "Projected Usage": 0.58,
     "Recent Trend": -1.0,
     "Game Flow": -0.39,
-    "Opponent Defense": null,
+    "Opponent Defense": -0.01,
     "Injury Picture": null,
     "Weather": -0.0,
     "Play-Calling": -0.0,
     "Market Read": 1.0,
-    "Regression": 0.8
+    "Regression": -1.0
    }
   }
  ],
@@ -2203,5 +2613,5 @@
    "note": "9-leg same-game shootout stack. The legs are positively correlated (QB + his receivers + TDs rise together), so the true chance of it hitting is 6.03x the naive parlay math. Our FAIR price is +1707 \u2014 bet it at Draftkings only if their SGP quote is LONGER than that (that's when the book under-prices the correlation). Size it small."
   }
  ],
- "generated_at": "Sep 02, 2026 05:33 UTC"
+ "generated_at": "Sep 02, 2026 05:53 UTC"
 }

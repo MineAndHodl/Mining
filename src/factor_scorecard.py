@@ -90,7 +90,7 @@ def td_scorecard(pick, td=None, script=None, adp=None):
 
 
 def scorecard(pick, proj_row=None, script=None, weather=None, matchup=None,
-              adp_role=None, adp=None, regression=None):
+              adp_role=None, adp=None, regression=None, contrib=None):
     """Continuous lean in [-1,1] for EVERY factor (0 = checked-neutral, None = n/a).
     Signs flipped for the side so it reads correctly for overs and unders."""
     side = pick.get("side", "Over"); mkt = pick.get("mkt", "")
@@ -110,10 +110,16 @@ def scorecard(pick, proj_row=None, script=None, weather=None, matchup=None,
         gap = (our - line) / max(abs(line), 1.0)
         sc["Projected Usage"] = _for_side(_clip(gap / 0.25), side)
 
-    # --- Recent Trend: explicit form delta if given, else own-vs-role from the projection ---
-    fd = pr.get("_form_delta")
-    if fd is not None:
-        sc["Recent Trend"] = _for_side(_clip(fd / 12.0), side)
+    # --- Recent Trend: PRIMARY source is the model's OWN recent-form contribution (form3+form1
+    # from the multifactor fit, in stat units) so the slider reflects what actually moved our
+    # number and is never blank when the reason says "recent form pushes up". Falls back to an
+    # explicit delta, then own-vs-role for receiving. ---
+    ct = contrib or {}
+    if ct.get("form3") is not None or ct.get("form1") is not None:
+        form_c = (ct.get("form3") or 0) + (ct.get("form1") or 0)
+        sc["Recent Trend"] = _for_side(_clip(form_c / max(our, 1.0) / 0.15), side)
+    elif pr.get("_form_delta") is not None:
+        sc["Recent Trend"] = _for_side(_clip(pr["_form_delta"] / 12.0), side)
     else:
         ovr = _own_vs_role(pr, mkt)
         # form signal only meaningful for receiving markets (that's what own/role covers)
@@ -187,12 +193,24 @@ def scorecard(pick, proj_row=None, script=None, weather=None, matchup=None,
         mr = _clip((80 - float(adp)) / 80.0)   # ADP 1 -> +0.99, 80 -> 0, 160 -> -1
     elif adp_role in ("big", "rotational"): mr = 0.6
     elif adp_role in ("undrafted", "deep"): mr = -0.6
+    else:
+        # Not in the fantasy-draft pool (e.g. a veteran starter like a 42-yo QB, who no fantasy
+        # market drafts but the NFL market absolutely recognizes as the starter). Fall back to a
+        # role read from NFL track record so an established starter carries a real (modest) lean
+        # instead of a blank: a long sample IS a recognized role; a thin one is not.
+        hg = float(pr.get("hist_games", 0) or 0)
+        if hg >= 32: mr = 0.4
+        elif hg <= 8 and not pr.get("rookie"): mr = -0.3
     sc["Market Read"] = _for_side(mr, side)
 
     # --- Regression: explicit signal, else mean-reversion pull from own-vs-role on small samples ---
     rg = None
     if regression is not None:
         rg = _clip(-regression)                # +regression (overperformed) lowers stat
+    elif ct.get("base_c") is not None:
+        # the model's own mean-reversion term: +base_c means it pushed our number UP (he's been
+        # BELOW his level, due to bounce back = raises stat); -base_c means pulled down (ran hot).
+        rg = _clip(ct["base_c"] / max(our, 1.0) / 0.10)
     else:
         ovr = _own_vs_role(pr, mkt)
         if ovr is not None and mkt in PASS_MKTS:
