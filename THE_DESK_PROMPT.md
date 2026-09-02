@@ -144,7 +144,7 @@ the steering. Neither needs the owner's input.
   with the environment → top bucket calibrated out of sample (pred .50, hit .54). **Star
   reality: 1-TD/game players score in 51% of next season's games (62% weeks 1-3, small n);
   the market prices them 64-76%.** So TD confidence is edge at plus money, never hit rate,
-  and the TD Stack is three most-likely +EV scorers at 15-30:1 (a 6-12:1 three-leg needs the
+  and the Touchdown Tax is three most-likely +EV scorers at 15-30:1 (a 6-12:1 three-leg needs the
   overpriced stars — impossible with real edge). Tested and rejected: early-season goal-line
   stickiness (wash), healthy-roster shares (loses .1666 vs .1624). Rail: >1.5× the consensus
   in weeks 0-3 = stale-role suspicion, trust ×.8, off the stack — logged for the grading loop.
@@ -239,13 +239,17 @@ Do these in order. Each one is done only when it meets §8.
    coefficients from play-by-play games where a top-share player sat. Feed the Injury Picture
    slider with a real lean and name the vacated role in the paragraph. Plumbing must work even
    before Week-1 reports post.
-2. **Forward grading loop** — the biggest missing foundation. Log every recommended pick with
-   its number, grade, units, factor contributions, and closing line; grade each against the
-   close (CLV) and the outcome; keep the public record (straight bets and lotto lane
-   separately); re-learn factor weights on the graded history; re-check calibration by grade.
-   This is what turns backtest calibration into our own track record.
-3. **EARN features, one at a time**, each walk-forward-proven before it ships: pace, PROE,
-   opponent EPA, target share/aDOT, opponent red-zone defense, officials, line movement.
+2. **Forward grading loop — BUILT 2026-09-02, unproven on live data.** `ledger.py` freezes
+   every number (opened / latest / close); `grade_week.py` grades W/L/push/void, units at
+   price, CLV in points, separate records per lane, calibration by grade and by model_p over
+   the whole pool → `data/record.json`. `refresh_data.py` is the in-season data path and mode
+   switch (none existed before — the model would have stayed in offseason mode all season).
+   NEXT: let it run 3 weeks, then re-earn the intel weight, the cascade, the grade bands and
+   every ASSUMED Desk Score constant (IDEAS_LEDGER.md §4). See IDEAS_LEDGER.md for the audit.
+3. **EARN features, one at a time**, each walk-forward-proven before it ships: kicker lane
+   (Alex's favorite), execution-book view, weather forecast source, rookies on the market-role
+   baseline, pace, PROE, opponent EPA, target share/aDOT, officials, line movement. Opponent
+   red-zone defense — DONE (small, capped). The Daily Research Bot works this list.
 4. ~~SGP lane tuning~~ DONE — lanes flipped: Sunday Stack 6-12:1 from the slate; SGP lotto at 30-100:1 fair.
 5. **Publishing** — X/Discord/Whop keys (blocked on Alex); DK SGP quotes for calibration.
 

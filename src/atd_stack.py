@@ -1,4 +1,4 @@
-"""The TD Stack — 3-4 of our best anytime-TD scorers, cross-game, compounded (Alex's spec).
+"""The Touchdown Tax (Alex's name) — 3-4 of our best anytime-TD scorers, cross-game, compounded (Alex's spec).
 
 Same logic as the Sunday Stack, on touchdown scorers: legs from different games (independent,
 priced by the book as a plain product), each a REAL scorer (model >= 38% to score — no lottos)
@@ -16,7 +16,7 @@ import numpy as np
 # sample — so when we say 50% it is 50%, and the stars' Yes prices are 10-25 pts too rich.
 # The +EV touchdowns therefore live at plus money (36-48% scorers at +135..+410). A stack of
 # three of those pays ~15-30:1 and cashes ~8%; the 6-12:1 shape of the Sunday Stack would need
-# 55% scorers at -120, which are exactly the ones the market overprices. So the TD Stack is
+# 55% scorers at -120, which are exactly the ones the market overprices. So the Touchdown Tax is
 # 3 legs (4 only if 3 can't make the band) of the MOST LIKELY +EV scorers, one per game — the
 # objective is P(cash), not payout: it is the "real scorers" stack, honestly a lotto-lite.
 BAND = (12.0, 40.0)       # decimal payout ~11:1 .. 39:1 — where three plus-money scorers land

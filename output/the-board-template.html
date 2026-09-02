@@ -113,7 +113,7 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 <script>
 const D = /*DATA*/{};
 const CATLABEL={rec_yds:"Receiving Yds",rush_yds:"Rushing Yds",receptions:"Receptions",anytime_td:"Anytime TD",pass_yds:"Passing Yds",rush_att:"Rush Att"};
-const VIEWS=[["best","🎫 The Card"],["games","🏈 Games"],["stack","🧱 Sunday Stack"],["tdstack","🎯 TD Stack"]];
+const VIEWS=[["best","🎫 The Card"],["games","🏈 Games"],["stack","🧱 Sunday Stack"],["tdstack","🎯 Touchdown Tax"]];
 if((D.primetime_sgps||[]).length) VIEWS.push(["sgp","🏟️ Primetime SGP"]);
 Object.keys(D.by_category||{}).forEach(c=>VIEWS.push([c,CATLABEL[c]||c]));
 const HINTS={best:"Top plays across every category, ranked by conviction.",games:"Spreads, totals & moneylines — best value on the slate."};
@@ -221,12 +221,12 @@ function render(){
     return;
   }
   if(active==="tdstack"){
-    hint.textContent="THE TD STACK — 3 real scorers (36%+ on our numbers, positive edge at the shopped best price), one per game, chosen for the best chance to cash. Why it pays 15-30:1 and not 6-12:1: last season\u2019s touchdown-a-game backs score in only ~51% of next season\u2019s games (measured) and the market prices them at 64-76%, so the +EV scorers live at plus money. Real edge, lotto-lite sizing; its own record.";
+    hint.textContent="THE TOUCHDOWN TAX — 3 real scorers (36%+ on our numbers, positive edge at the shopped best price), one per game, chosen for the best chance to cash. Why it pays 15-30:1 and not 6-12:1: last season\u2019s touchdown-a-game backs score in only ~51% of next season\u2019s games (measured) and the market prices them at 64-76%, so the +EV scorers live at plus money. Real edge, lotto-lite sizing; its own record.";
     const m=D.td_stack;
     if(!m){L.innerHTML='<div class="empty">No TD stack this slate (needs 3+ real scorers with a positive edge across different games).</div>';return;}
     const ng=(m.games&&m.games.length)||1;
     L.innerHTML=`<div class="play top" style="cursor:default"><div class="rank">🎯</div>
-      <div class="pmain"><div class="nm">TD Stack</div><div class="meta"><span class="chip mk">${m.n_legs} legs · ${ng} games</span><span class="num">$100 → <b>$${Math.round(100*(m.combined_decimal||0)).toLocaleString()}</b></span><span class="num" style="color:var(--muted)">cashes ~${Math.round((m.true_prob||0)*100)}% on our numbers · fair ${m.fair_american>0?'+':''}${m.fair_american}</span><span class="edge">${m.ev!=null?((m.ev>=0?'+':'')+Math.round(m.ev*100)+'% EV'):''}</span></div></div>
+      <div class="pmain"><div class="nm">Touchdown Tax</div><div class="meta"><span class="chip mk">${m.n_legs} legs · ${ng} games</span><span class="num">$100 → <b>$${Math.round(100*(m.combined_decimal||0)).toLocaleString()}</b></span><span class="num" style="color:var(--muted)">cashes ~${Math.round((m.true_prob||0)*100)}% on our numbers · fair ${m.fair_american>0?'+':''}${m.fair_american}</span><span class="edge">${m.ev!=null?((m.ev>=0?'+':'')+Math.round(m.ev*100)+'% EV'):''}</span></div></div>
       <div class="pscore"><div class="v" style="color:var(--gold)">${(m.combined_american>0?'+':'')+m.combined_american}</div><div class="l">Payout</div></div></div>`+
       m.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta"><span class="grade" style="font-size:14px;color:${GCOL[l.grade]||'var(--dim)'}">${l.grade||''}</span><span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">model ${Math.round((l.model_p||0)*100)}%</span> <span class="num" style="color:var(--dim)">${l.game||''}</span> <span class="num" style="color:var(--dim)">${l.book||''}</span></div></div><div class="pscore"></div></div>`).join('')+
       `<div class="note" style="margin-top:12px">${m.note||''}</div>`;
@@ -246,7 +246,7 @@ function render(){
   }
   if(active==="games"){
     const g=D.best_games||[]; const ng=g.filter(x=>x.recommended).length;
-    hint.textContent=`Game lines are the most efficient market — ${ng} recommended this slate; the rest are leans (not counted). Games grade on the same scale as props (~1 pt of spread value ≈ 3% win probability).`;
+    hint.textContent=`MARKET INTEL, not model picks: each row is a bettable book sitting a point or more off Pinnacle (the sharpest number in the world), refreshed live. We have no validated edge on game sides yet (our ratings are ~50% ATS; a book being off does NOT predict the move), so nothing here goes on the Card — take the number if you like the side and expect it to move toward Pinnacle. ~1 pt ≈ 3% win probability.`;
     L.innerHTML=g.length?g.map(gameRow).join(""):'<div class="empty">No game edges clear the bar this slate.</div>';
   }else if(active==="best"){
     hint.textContent="THE CARD — the bets we\u2019re actually sending this week. Fewer, higher conviction, every one graded; these are the ones that count toward the record.";

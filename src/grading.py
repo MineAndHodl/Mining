@@ -185,6 +185,19 @@ def grade_board(ranked, weeks_played=0):
     rows = list(uniq.values())
     rec, summary = apply(rows, weeks_played)
     graded = {_key(r): r for r in rows}
+    # GAMES RAIL: no validated edge on game sides (ratings ~50% ATS, book-gap thesis disproven,
+    # CLV real but sub-vig) -> the games lane is market intel, never on the Card, until a games
+    # edge is proven forward by the grading loop (games_lane.GAMES_ON_CARD).
+    try:
+        from games_lane import GAMES_ON_CARD
+    except Exception:
+        GAMES_ON_CARD = False
+    if not GAMES_ON_CARD:
+        for r in rows:
+            if r.get("kind") and r.get("recommended"):
+                r["recommended"] = False; r["units"] = 0.0
+                r["rail"] = "games lane = market intel (no validated model edge on sides yet)"
+        rec = [r for r in rec if not r.get("kind")]
     for lst in tabs:
         for r in lst:
             g = graded.get(_key(r))

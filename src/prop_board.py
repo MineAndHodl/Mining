@@ -125,18 +125,44 @@ def price_ou(mkt, mu, line, over_price, under_price):
             "over_price_kept": over_price, "under_price_kept": under_price}
 
 
-def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, weather_by_game=None,
-                     days=14, recency_season=2025, recency_week=None):
-    """Returns the full priced prop board. The EDGE is recency: our recent-form number vs the
-    market line (validated +8-13% ROI out-of-sample; matchup did NOT predict, recency did)."""
+RAW_LINES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "_raw_prop_lines.parquet")
+
+
+def fetch_prop_board(key=None, days=14, max_games=None):
+    """Fetch every posted prop line from every book (raw, unpriced) and cache it so the board
+    can be RE-PRICED for free after any model change (mirrors td_board's fetch/price split)."""
     key = key or os.environ.get("ODDS_API_KEY")
-    if projections is None:
-        raise ValueError("pass projections (from props_projection.project)")
     events = fetch_events(key, days=days)
     ids = [e["id"] for e in events][:max_games] if max_games else [e["id"] for e in events]
     board, rem = fetch_props(key, ids)
+    try:
+        if len(board): board.to_parquet(RAW_LINES, index=False)
+    except Exception as e:
+        print("raw prop lines not cached:", e)
+    return board, rem
+
+
+def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, weather_by_game=None,
+                     days=14, recency_season=2025, recency_week=None, cached=False):
+    """Returns the full priced prop board. The EDGE is recency: our recent-form number vs the
+    market line (validated +8-13% ROI out-of-sample; matchup did NOT predict, recency did).
+    cached=True re-prices the last fetched raw lines (no credits)."""
+    if projections is None:
+        raise ValueError("pass projections (from props_projection.project)")
+    if cached and os.path.exists(RAW_LINES):
+        board, rem = pd.read_parquet(RAW_LINES), "cached"
+    else:
+        board, rem = fetch_prop_board(key=key, days=days, max_games=max_games)
     if not len(board):
         return pd.DataFrame(), rem
+    return price_prop_board(board, projections, weather_by_game=weather_by_game,
+                            recency_season=recency_season, recency_week=recency_week), rem
+
+
+def price_prop_board(board, projections, weather_by_game=None, recency_season=2025, recency_week=None):
+    """Price a raw multi-book line table: the multi-factor projection, the distribution, the
+    side, the edge, the injury/intel layers, and the line shop. Pure function of its inputs."""
+    rem = None
     proj = projections.copy()
     proj["_k"] = proj["name"].map(_norm)
     pj = proj.set_index("_k")
@@ -274,7 +300,7 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
                     "intel_signals": (intel or {}).get("signals"), "intel_hard": (intel or {}).get("hard")})
     df = pd.DataFrame(out)
     if not len(df):
-        return df, rem
+        return df
     # --- line shopping (at the SAME line): how many books offer our pick, and how much our
     # best price beats the field. The max-edge row is already the best line+price combo, so we
     # keep it and attach the shopping context at that exact line (never trade a better line for
@@ -294,7 +320,7 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         df["price"] = df["best_price"].fillna(df["price"]).astype(int)   # best price AT our line
         df["book"] = df["book_best"].fillna(df["book"])
         df["ev"] = (df["model_p"] * df["price"].map(american_profit) - (1 - df["model_p"])).round(3)
-    return df, rem
+    return df
 
 
 # trust band: how far our projection may sit from the line before we assume WE'RE stale

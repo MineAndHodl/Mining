@@ -1,3 +1,21 @@
-data/*.parquet
+# Research/legacy artifacts stay out; every parquet the WEEKLY RUN reads is committed so a fresh
+# clone (the scheduled Tuesday/Sunday/Monday sessions) reproduces the board without re-ingesting.
+data/backtest_results*.parquet
+data/features*.parquet
+data/p2_*.parquet
+data/pool_*.parquet
+data/pbp_2023_2025.parquet
+data/prop_player_games_3y.parquet
+data/prop_player_games_5y.parquet
+data/preseason_*.parquet
+data/clv_b*.parquet
+data/qb_values.parquet
+data/team_wk1_qb.parquet
+data/team_primary_qb.parquet
+data/team_snap_return.parquet
+data/team_coach.parquet
+data/hist_open_close.parquet
+data/weather_games.parquet
+data/game_crew_stats.parquet
 __pycache__/
 output/_*.png

@@ -111,12 +111,18 @@ XTD_FACTOR_COLS = ["xtd", "xtd_rush", "xtd_rec", "gl_share", "rz_tgt_share", "vu
                    "GL_rush_share", "IN10_rush_share", "RZ_rush_share", "OPEN_rush_opps"]
 
 
+IN_SEASON_FROM_WEEK = 4   # xTD's in-season mode was validated from week 4 on (weeks 1..k-1 -> k)
+
+
 def build_xtd_table(target_season=2026, refresh=False):
-    """The decomposed expected-TD table for the current season, cached. Uses the latest two
-    seasons of play-by-play (latest weighted), 2026 team overrides for offseason moves, and
-    week-1 shrinkage until current-season plays exist. See xtd_model.py / xtd_validation.json."""
+    """The decomposed expected-TD table for the current season, cached. Before week 4: the
+    latest two prior seasons (latest weighted), 2026 team overrides, week-1 goal-line shrink.
+    From week 4 (the validated in-season edge, +2-3% Brier): THIS season's zone shares and
+    coach tendencies, rebuilt per week. See xtd_model.py / xtd_validation.json."""
     import xtd_model as xm
-    cache = f"{DATA}/xtd_{target_season}.parquet"
+    wk = current_season_weeks_played(target_season)
+    in_season = wk >= IN_SEASON_FROM_WEEK
+    cache = f"{DATA}/xtd_{target_season}{'_w%02d' % wk if in_season else ''}.parquet"
     if os.path.exists(cache) and not refresh:
         return pd.read_parquet(cache)
     proj = pd.read_parquet(f"{DATA}/projection_2026.parquet")
@@ -127,8 +133,12 @@ def build_xtd_table(target_season=2026, refresh=False):
         new_coach = {t for t, c in c_now.items() if c and c_prev.get(t) and c != c_prev.get(t)}
     except Exception:
         new_coach = set()
-    xdf = xm.build_xtd([target_season - 2, target_season - 1], target_season=target_season,
-                       current_team=current_team, new_coach_teams=new_coach)
+    if in_season:
+        xdf = xm.build_xtd([target_season - 1, target_season], target_season=target_season,
+                           current_team=current_team, new_coach_teams=set(), week1_mode=False)
+    else:
+        xdf = xm.build_xtd([target_season - 2, target_season - 1], target_season=target_season,
+                           current_team=current_team, new_coach_teams=new_coach)
     xdf["_k"] = xdf["name"].map(norm_name)
     xdf.to_parquet(cache, index=False)
     return xdf
@@ -223,7 +233,7 @@ def build_td_board(key=None, max_games=None, days=8, cached=False):
         # for yardage props): with no current-season games, a last-season share can be a stale
         # role fact — Vidal's 2025 goal-line work came in Hampton's absence — and when we sit
         # >1.5x above EVERY book on a scorer, the likeliest explanation is a role read we're
-        # missing, not 13 points of edge. Trust is cut (score x0.8) and the TD Stack skips him
+        # missing, not 13 points of edge. Trust is cut (score x0.8) and the Touchdown Tax skips him
         # until current-season shares exist. Logged (mkt_ratio) for the grading loop to earn.
         wk = current_season_weeks_played()
         cons = out["implied_consensus"] if "implied_consensus" in out.columns else out["p_implied"]

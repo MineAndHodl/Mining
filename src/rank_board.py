@@ -204,7 +204,7 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
             if flagged:
                 sc = round(sc * 0.8, 1)
                 rsn += (f" Trust cut: we sit {r.get('mkt_ratio')}x above the whole market on a last-season role read with no "
-                        f"current-season games — the market's role read wins until he proves the share (off the TD Stack).")
+                        f"current-season games — the market's role read wins until he proves the share (off the Touchdown Tax).")
             rows.append({"cat": "anytime_td", "score": sc, "name": r["name"], "mkt_flag": flagged, "mkt_ratio": _nn(r.get("mkt_ratio")),
                          "game": r.get("game"), "line": 0.5, "side": "Yes",
                          "our_num": r.get("p_model"), "edge": r.get("edge"), "ev": None,

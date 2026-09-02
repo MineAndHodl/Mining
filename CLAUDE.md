@@ -1,6 +1,8 @@
 # The Desk — project brain
 
-**The full operating prompt is `THE_DESK_PROMPT.md` — read it first; this file is the short form.**
+**The full operating prompt is `THE_DESK_PROMPT.md` — read it first; this file is the short form.
+`IDEAS_LEDGER.md` is the audit of every idea Alex ever raised and its honest status — read it
+before proposing anything "new".**
 
 Read this first, every session. It is the accumulated clarity of a long iterative build:
 what we're doing, how we work, what's been proven, what every variable is for, and what's
@@ -143,9 +145,9 @@ The board is the product: every pick on it must be something a sharp would nod a
   +EV vs 67 DK-only; much TD edge is pure price. (6) Opponent red-zone defense measured small
   (soft tercile ×1.06, stingy ×.97), capped multiplier. (7) Early-season market-disagreement
   rail: >1.5× the consensus with no current-season games = stale-role suspicion (trust ×.8,
-  off the TD Stack), logged for the grading loop. Raw prices + environment are cached
+  off the Touchdown Tax), logged for the grading loop. Raw prices + environment are cached
   (`_raw_td_prices.parquet`, `_td_env.json`) so re-pricing never costs credits.
-- **TD Stack (`atd_stack.py`):** 3 of the MOST LIKELY +EV scorers (p≥.36, edge≥.03, one per
+- **Touchdown Tax (`atd_stack.py`, Alex's name; JSON key `td_stack`):** 3 of the MOST LIKELY +EV scorers (p≥.36, edge≥.03, one per
   game, ≤2 per position, parlay EV≥+30%), objective P(cash) not payout → lands 15-30:1 at ~8%.
   A 6-12:1 three-leg needs 55% scorers at -120 — exactly the overpriced stars — so that shape
   is impossible with real edge; say so on the page. Falls back to the best 2-leg.
@@ -214,26 +216,44 @@ correlation measurements, DK SGP calibration quotes.
   calibration (owner can paste slips).
 
 ## Pipeline (src/)
-`run_board.py` is the weekly run: odds → `prop_board` (multifactor projection, volume-CV
-pricing, 8-book line shop) → `td_board` (pooled + xTD blend, 8-book TD shop, measured env,
-RZ defense, rail) → `rank_board` (conviction Desk Score, diversity cap, TD anchor) →
-`grading` (The Card) → `board_factors`/`factor_scorecard` (per-market scorecards) →
-`sunday_stack` + `atd_stack` + `primetime_sgp` → `build_board_page` → `output/the-board.html`.
-`--cached` re-ranks offline: props from `_raw_prop_board.parquet` (pricing not recomputed),
-TDs RE-PRICED from the cached raw prices + environment (model changes are free).
+`refresh_data.py` FIRST (current-season pbp / player-games / schedules; nflverse-release
+fallbacks; idempotent) — it is the mode switch: `run_board` reads `season_state()` and runs
+OFFSEASON (last-season history, market-role baseline, half-strength form) until current-season
+games exist, then IN-SEASON (own baseline, recency, injury report; xTD in-season from week 4).
+`run_board.py` is the weekly run: odds → `prop_board` (fetch split from `price_prop_board`;
+multifactor projection, volume-CV pricing, 8-book line shop) → `td_board` (pooled + xTD blend,
+8-book TD shop, measured env, RZ defense, rail) → `games_lane` (live market-intel rows, never
+on the Card) → `rank_board` (conviction Desk Score, diversity cap, TD anchor) → `grading`
+(The Card + rails) → `board_factors`/`factor_scorecard` → `sunday_stack` + `atd_stack`
+(Touchdown Tax) + `primetime_sgp` → `ledger.snapshot` (opened/latest) → `build_board_page` →
+`output/the-board.html`. `--cached` RE-PRICES props and TDs from the cached raw lines (model
+changes never cost credits); `--refresh` runs the data refresh first.
+Grading loop: `grade_week.py <season> <week> --close` (Sunday AM: closing lines into the
+ledger) and `grade_week.py <season> <week>` (Monday: W/L/push/void, units at price, CLV,
+separate records per lane, calibration by grade and by model_p over the whole pool,
+`data/record.json`). Scheduled jobs (Tuesday card, Thursday Touchdown Tax, Sunday final,
+Monday grading, Daily Research Bot) clone GitHub and run exactly these commands; each GUARDs
+that the repo is current and emails "SKIPPED — repo behind" otherwise. Runtime parquets are
+committed (the weekly run must reproduce from a fresh clone).
 Research/validation: `multifactor.py`, `recency.py`, `xtd_model.py`, `xtd_validate.py`,
 `correlation_lab.py`, `clv_engine.py`. Tests: `python3 tests/test_pipeline.py` (must be green).
 
 ## Still owed
-- **Forward grading loop** (the biggest missing foundation — next up): log every pick's number and
-  factor contributions, grade vs close and outcome, re-learn weights. Turns a static model
-  into one that improves. Offered repeatedly; not yet greenlit.
-- Injuries/inactives feed; snap counts. Then the EARN features above, one at a time, each
-  proven walk-forward before it ships.
-- SGP payout/EV balance tuning (30-100:1 target) and stronger SGP selling copy.
-- Blocked on owner: X/Discord/Whop keys; DK SGP quotes for more calibration points.
+- **Run the grading loop** (built 2026-09-02, unproven on live data): Week 1 grades Monday; after
+  3 graded weeks re-earn the intel weight, the cascade, the grade bands and every ASSUMED
+  constant in the Desk Score (IDEAS_LEDGER §4 lists them); check the early-season TD top bucket.
+- Kicker lane (Alex's favorite; books under-model it) · execution-book view (DK/FD/MGM) beside
+  best-anywhere · weather forecast source for the Sunday pass (the validated module is idle) ·
+  rookies/no-history players on the market-role baseline in weeks 0-3 · PROE/pace for yardage
+  volume · game-day inactives. Each EARN feature proven walk-forward before it ships.
+- Archive the dead Sept-1 modules (IDEAS_LEDGER §5) so the live tree is ~25 modules.
+- Blocked on owner: **push the bundle** (every scheduled job runs old code until then);
+  X/Discord/Whop keys; DK SGP quotes for more calibration points; news API key for intel.
 
 ## Workflow notes
-Direct GitHub push is blocked from this session (repo not in the authorized set); commit
+Direct GitHub push is blocked from the quant session (repo not in the authorized set); commit
 locally and refresh `/home/claude/beat-the-close.bundle` (`git bundle create ... main`),
-which the owner pulls. Commit messages end with the session's attribution footer.
+which the owner pulls and pushes (`git pull <bundle> main && git push`). The scheduled jobs
+CAN push (they commit ledgers, boards and refreshed data). Commit messages end with the
+session's attribution footer. Tests: `python3 tests/test_pipeline.py --offline` must be green
+before any publish.

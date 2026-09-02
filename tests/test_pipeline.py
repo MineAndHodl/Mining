@@ -375,7 +375,7 @@ def test_selection_over_pool():
 
 
 def test_td_shopping_and_stack():
-    """Anytime-TD is line-shopped across books; the TD Stack is +EV real scorers, one per game."""
+    """Anytime-TD is line-shopped across books; the Touchdown Tax is +EV real scorers, one per game."""
     print("\n-- anytime TD: shopping + TD stack --")
     import json as _j
     t = pd.read_parquet(os.path.join(HERE, "..", "data", "_raw_td_board.parquet"))
@@ -393,6 +393,44 @@ def test_td_shopping_and_stack():
         check("TD stack pays ~4-39:1 and is +EV on our numbers", 400 <= s["combined_american"] <= 4000 and s["ev"] > 0, f"{s['combined_american']:+d} ev {s['ev']}")
         check("TD stack prefers 3 real scorers when 3 clear the band", len(legs) >= 3 or len([r for r in d.get("pool_summary", {}).get("td_candidates", [])]) < 3, f"n={len(legs)}")
         check("no early-season market-flagged scorer in the stack", not any(l.get("mkt_flag") for l in legs))
+
+
+def test_ledger_and_grader():
+    """The forward-grading loop: every number frozen in the ledger; settlement math exact."""
+    print("\n-- ledger + grader --")
+    import ledger as L, grade_week as gw, json as _j
+    from names import norm_name as nn
+    d = _j.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    snap = L.build_snapshot(d)
+    check("ledger resolves the slate's week from the schedule", snap["week"] is not None and snap["season"] == 2026, str((snap["season"], snap["week"])))
+    check("ledger freezes the Card with price, grade, units and factor contributions",
+          len(snap["card"]) > 0 and all(p.get("price") is not None and p.get("grade") and "contrib" in p for p in snap["card"]))
+    check("ledger carries the parlay lanes and the games intel lane", "sunday_stack" in snap and "td_stack" in snap and isinstance(snap["games"], list))
+    files = os.listdir(os.path.join(HERE, "..", "data", "ledger")) if os.path.isdir(os.path.join(HERE, "..", "data", "ledger")) else []
+    check("a ledger file exists for the current week", any(f.endswith(".json") for f in files))
+    check("prop settlement: over/under/push/void", gw.settle_prop("Over", 39.5, 52) == "WIN" and gw.settle_prop("Under", 39.5, 52) == "LOSS"
+          and gw.settle_prop("Over", 40, 40) == "PUSH" and gw.settle_prop("Over", 40, None) == "VOID")
+    check("game settlement: spread push / total under / ML", gw.settle_game("spread", "Buffalo Bills", 1.0, "Houston Texans", "Buffalo Bills", 24, 23) == "PUSH"
+          and gw.settle_game("total", "Under", 42.5, "H", "A", 20, 21) == "WIN" and gw.settle_game("ML", "Houston Texans", None, "Houston Texans", "Buffalo Bills", 24, 23) == "WIN")
+    check("units at American prices (-114 -> +0.877, +135 -> +1.35, loss -> -1)", gw.units_won("WIN", -114) == 0.877 and gw.units_won("WIN", 135) == 1.35 and gw.units_won("LOSS", 135) == -1)
+    check("CLV is signed in the direction of our side", gw.clv_points("Over", 39.5, 42.5) == 3.0 and gw.clv_points("Under", 39.5, 42.5) == -3.0)
+    stats = pd.DataFrame({"_k": [nn("Davante Adams"), nn("George Pickens")], "_tds": [1, 0], "receiving_yards": [70, 44]})
+    legs = [{"leg": "a", "name": "Davante Adams", "price": 135}, {"leg": "b", "name": "George Pickens", "price": 170}, {"leg": "c", "name": "Brock Bowers", "price": 200}]
+    f = lambda l: gw.grade_pick({"name": l["name"], "cat": "anytime_td", "side": "Yes", "line": 0.5, "price": l["price"], "id": l["leg"]}, stats, {}, {})
+    _, overall = gw.grade_parlay(legs, stats, {}, {}, f)
+    check("parlay: a lost leg loses, a void leg (DNP) drops out", overall == "LOSS" and gw.grade_parlay(legs[:1] + legs[2:], stats, {}, {}, f)[1] == "WIN")
+
+
+def test_games_lane():
+    """Games are rebuilt live, labeled, and never on the Card until a games edge is validated."""
+    print("\n-- games lane --")
+    import json as _j, games_lane as gl
+    d = _j.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    g = d.get("best_games", [])
+    check("game rows are labeled (game/market/side/book)", all(x.get("game") and x.get("market") and x.get("book") for x in g))
+    check("game rows are the live intel lane (not a stale carry-over)", all(x.get("lane") == "intel" for x in g))
+    check("no game on the Card while GAMES_ON_CARD is off", gl.GAMES_ON_CARD or not any(x.get("recommended") for x in g))
+    check("Card is straight props only", not any(r.get("kind") for r in d.get("recommended", [])))
 
 
 def test_td_environment():
@@ -421,7 +459,7 @@ if __name__ == "__main__":
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)
