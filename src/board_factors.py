@@ -18,16 +18,13 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import factor_scorecard as fsc
+from names import norm_name as _norm_name
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "..", "data")
 
 # projection team codes -> schedule team codes (nflverse abbrevs are consistent, a few aliases)
 TEAM_FIX = {"LAR": "LA", "OAK": "LV", "SD": "LAC", "STL": "LA", "WSH": "WAS"}
-
-
-def _norm_name(n):
-    return re.sub(r"[^a-z]", "", str(n).lower().replace(".", "").replace("'", ""))
 
 
 def _load_context():
@@ -74,14 +71,16 @@ def _game_ctx(game, team_code, sched_rows, code2full):
         a, h = r.get("away_team"), r.get("home_team")
         af, hf = code2full.get(a, a), code2full.get(h, h)
         if (af in away_full or away_full.endswith(str(a))) and (hf in home_full or home_full.endswith(str(h))):
-            spread = float(r.get("spread_line") or 0)   # nflverse: home spread (home favored = negative)
+            spread = float(r.get("spread_line") or 0)   # nflverse: POSITIVE = home favored
             total = float(r.get("total_line") or 44)
-            # team_spread from that team's perspective
+            # team_spread in the dog-positive convention the scorecard expects:
+            # favorite = negative, underdog = positive. Home is favored when spread_line>0,
+            # so the home team's spread is -spread_line and the away team's is +spread_line.
             tc = TEAM_FIX.get(team_code, team_code)
             if tc == h:
-                team_spread = spread
-            elif tc == a:
                 team_spread = -spread
+            elif tc == a:
+                team_spread = spread
             else:
                 team_spread = 0.0
             implied = total / 2 - team_spread / 2

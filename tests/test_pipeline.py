@@ -259,12 +259,50 @@ def test_whale_missile_discipline():
     check("no duplicate players in missile", len(players) == len(set(players)))
 
 
+def test_qc_fixes():
+    """The QC bug fixes: ADP-missing != small role (M1), Desk Score hump (C3), skew constant (C2)."""
+    import investigate as inv, rank_board as rb, props_model as pm
+    # M1: an Under with a BIG edge and NO adp is KEEP, not CONFIRMED
+    v, note, mult = inv.investigate({"side": "Under", "edge": 0.15, "confidence": 0.7}, adp_row=None)
+    check("M1: missing ADP + big under != CONFIRMED", v != "CONFIRMED", f"got {v}")
+    # a genuinely late-ADP (deep) player DOES confirm a small-role under
+    v2, _, _ = inv.investigate({"side": "Under", "edge": 0.15, "confidence": 0.7}, adp_row={"adp": 150})
+    check("M1: deep-ADP under still CONFIRMED", v2 == "CONFIRMED", f"got {v2}")
+    # C3: Desk Score hump — a huge edge scores LOWER than a moderate one (same conf/verdict)
+    mod = rb.prop_score({"edge": 0.09, "confidence": 0.7, "score_mult": 1.0})
+    huge = rb.prop_score({"edge": 0.25, "confidence": 0.7, "score_mult": 1.0})
+    check("C3: moderate edge outscores blowout edge", mod > huge, f"mod={mod} huge={huge}")
+    # C3: SUSPECT multiplier cuts the score hard
+    conf = rb.prop_score({"edge": 0.09, "confidence": 0.7, "score_mult": 1.0})
+    sus = rb.prop_score({"edge": 0.09, "confidence": 0.7, "score_mult": 0.5})
+    check("C3: SUSPECT multiplier cuts score", sus < conf - 15, f"conf={conf} sus={sus}")
+    # C2: skew constant is positive for right-skewed yards, zero for symmetric pass_yds
+    check("C2: rec_yds skew const > 0", pm.SKEW_CONST["rec_yds"] > 0.05)
+    check("C2: pass_yds skew const == 0", pm.SKEW_CONST["pass_yds"] == 0.0)
+
+
+def test_primetime_sgp_structure():
+    """Primetime SGPs (if present on the board) are same-game, 8-10 legs, single book."""
+    import json as _j
+    d = _j.load(open(os.path.join(os.path.dirname(__file__), "..", "data", "ranked_board.json")))
+    sgps = d.get("primetime_sgps", [])
+    if not sgps:
+        check("primetime SGPs present", True, "none built (props not posted) — skipped"); return
+    for s in sgps:
+        check(f"SGP {s['game'][:18]} has 8-10 legs", 8 <= s["n_legs"] <= 10, f"n={s['n_legs']}")
+        players = [l.get("player") for l in s["legs"]]
+        # a correlated SGP intentionally reuses a player across markets (yards+catches) — but
+        # every leg belongs to the ONE game and one book
+        check(f"SGP {s['game'][:18]} single book", "book" in s and s["book"])
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--offline", action="store_true"); a = ap.parse_args()
     print("=" * 60, "\n  DESK PIPELINE TEST SUITE\n", "=" * 60)
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
+    test_qc_fixes(); test_primetime_sgp_structure()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

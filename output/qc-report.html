@@ -125,7 +125,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:v
 
 <div class="verdict">
   <div class="lab">◆ Bottom line</div>
-  <p>The <strong>foundation is real</strong> — a legitimate EPA engine, clean walk-forward backtests, calibrated projections, a working live-odds pipeline. But there is <strong>no demonstrated, monetizable edge yet</strong>: the game model doesn't beat the closing spread, the one true signal (closing-line value) is too small to clear the vig, and the prop edge has <strong>never been tested against real book lines</strong>. Meanwhile the published board is shipping <strong>four logic bugs</strong>, and the "self-updating, autonomous, publicly-graded business" is largely scaffold. None of this is fatal — we found it preseason, before a dollar is bet. This is the punch-list.</p>
+  <p>The <strong>foundation is real</strong> — a legitimate EPA engine, clean walk-forward backtests, calibrated projections, a working live-odds pipeline. The <strong>four board bugs are now fixed</strong> and the pick-run is reproducible. What remains is the honest heart of it: there is <strong>no demonstrated, monetizable edge yet</strong>. The game model doesn't beat the closing spread; the DK-vs-sharp book-gap idea we tested this week is <strong>disproven on game sides</strong> (books converge by Monday); the real dispersion — and the likely edge — lives in <strong>props</strong> (9.6-pt cross-book range vs 0.3 on games), which still needs a forward CLV test. Nothing here is fatal — we found it preseason. This is the punch-list.</p>
 </div>
 
 <h2>The scorecard</h2>
@@ -142,8 +142,8 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:v
     <div class="dt">The market genuinely drifts toward our side (+0.46 pt, p&lt;1e-22). But it's too small to beat −110 juice on spreads.</div></div>
   <div class="sc"><div class="top"><span class="nm">Prop edge</span><span class="pill p-warn">Unproven</span></div>
     <div class="dt">Projections are calibrated, but never once backtested against posted book lines + results. The "Brier 0.051" headline is mathematically impossible.</div></div>
-  <div class="sc"><div class="top"><span class="nm">Published board</span><span class="pill p-bad">4 bugs live</span></div>
-    <div class="dt">Game-script backwards, sides that contradict the model, thin-data picks topping the board, "calibrated" TD model shipping raw numbers.</div></div>
+  <div class="sc"><div class="top"><span class="nm">Published board</span><span class="pill p-good">Bugs fixed</span></div>
+    <div class="dt">All four fixed &amp; committed: game-script sign, skew no longer flips sides, Desk Score hump so blowup edges can't top the board, TD model now calibrated. Plus a reproducible weekly pick-run.</div></div>
   <div class="sc"><div class="top"><span class="nm">Self-update + research bot</span><span class="pill p-bad">Scaffold</span></div>
     <div class="dt">Narrated as autonomous. Reality: re-tests one parameter; research "30-day sprint" was a relabeled one-shot simulation.</div></div>
   <div class="sc"><div class="top"><span class="nm">Automation + public record</span><span class="pill p-bad">Not built</span></div>
@@ -173,6 +173,10 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:v
 
 <h2>Critical — bugs in the picks being published now</h2>
 <div class="rule"></div>
+<div class="verdict" style="border-left-color:var(--good);margin-top:0">
+  <div class="lab" style="color:var(--good)">✓ All four resolved</div>
+  <p>Every bug below has been <strong>fixed, tested (53/53), and committed</strong>, and the board republished. They're kept here for the record. The pick-run is now a single committed entry point (<code>src/run_board.py</code>), so the fixes reproduce every week.</p>
+</div>
 <div class="find crit">
   <h3><span class="tag t-bad">C1</span>Game-script is backwards on every published pick</h3>
   <p>A sign error reads <code>spread_line</code> with the wrong convention, so <b>favorites are scored as underdogs</b> and vice-versa. On the live board a favorite's WR gets "pass-heavy script helps" and a road dog's RB gets "game script helps the run" — both inverted. It corrupts the Game Flow slider (fires on 10/10 picks) and the implied-points feeding anytime-TD.</p>
@@ -221,8 +225,8 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:v
 <h2>What I'd do next — in order</h2>
 <div class="rule"></div>
 <ol class="steps">
-  <li><b>Fix the four published bugs first.</b><span class="why">C1–C4 are cheap (mostly one line each) and they're wrong on the live board right now. Nothing else matters if the picks are visibly broken.</span></li>
-  <li><b>Commit one real, repeatable weekly pick-run.</b><span class="why">Odds pull → board build → publish → grade, as a single committed entry point. Without this the product literally can't run next week.</span></li>
+  <li><b>✓ Fix the four published bugs.</b><span class="why">Done — C1–C4 fixed, tested, committed, board republished. The top of the board is now established players with moderate edges, not thin-data blowups.</span></li>
+  <li><b>✓ Commit one repeatable weekly pick-run.</b><span class="why">Done — <code>src/run_board.py</code> is the single entry point (odds → board → parlays → publish). Next week is one command.</span></li>
   <li><b>Build the honest edge test before claiming any edge.</b><span class="why">Backtest props against real posted lines with hit-rate + ROI, and rebuild the calibration numbers. Decide what we can actually stand behind.</span></li>
   <li><b>Stand up the public graded-record page.</b><span class="why">Grade every pick vs the closing line, in public. For a picks brand this is the product — more than any single model tweak.</span></li>
   <li><b>Then decide the real thesis.</b><span class="why">If CLV is the only real signal, the honest brand is "we beat the number you'd get later," not "we beat the market." That's a legitimate, defensible pitch — but it changes what we build and how we sell it.</span></li>

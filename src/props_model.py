@@ -19,6 +19,13 @@ SHRINK_GAMES = 5.0
 # distribution spread; yards are right-skewed (gamma), counts use normal approx.
 CV = {"rec_yds": 0.85, "rush_yds": 0.88, "pass_yds": 0.34, "receptions": 0.62, "rush_att": 0.45, "pass_att": 0.20, "pass_cmp": 0.22}
 DIST = {"rec_yds": "gamma", "rush_yds": "gamma", "pass_yds": "normal", "receptions": "count", "rush_att": "count", "pass_att": "normal", "pass_cmp": "normal"}
+# Mean/median skew correction, computed from each market's DISTRIBUTION shape (not from a
+# slate's edges): a projection is a MEAN, but P(stat > mean) < 0.5 for right-skewed yards,
+# which silently tilts every skewed prop Under. SKEW_CONST = 0.5 - P(X > mean); we ADD it to
+# model_p_over so a fairly-priced player lands near the market, and a genuine market-wide
+# lean is preserved (unlike the old cross-sectional median hack, which erased real edges).
+SKEW_CONST = {"rec_yds": 0.113, "rush_yds": 0.117, "pass_yds": 0.0, "receptions": 0.052,
+              "rush_att": 0.063, "pass_att": 0.0, "pass_cmp": 0.0}
 MIN_GAMES = 6           # data-confidence floor to be eligible as a pick
 EDGE_MIN = 0.045        # model P(over/under) minus de-vigged implied, to flag
 

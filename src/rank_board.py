@@ -16,27 +16,36 @@ CAT_LABEL = {"rec_yds": "Receiving Yards", "rush_yds": "Rushing Yards", "recepti
              "pass_yds": "Passing Yards", "rush_att": "Rush Attempts", "anytime_td": "Anytime TD"}
 
 
+EDGE_PEAK = 0.11        # edge (11%) beyond which a bigger gap is treated as a stale-model red flag
+
 def prop_score(row):
-    """0-100 Desk Score for a prop PICK. The trick: a MODERATE edge on an ESTABLISHED
-    role is our best bet — a huge edge is usually the model being stale on a low-data
-    player, not free money. So the edge curve PEAKS around 8% and PENALIZES beyond ~11%,
-    and confidence (role certainty) is weighted heavily so unknowns can't top the board."""
+    """0-100 Desk Score for a prop PICK. A MODERATE edge on an ESTABLISHED role is our best
+    bet — a HUGE edge is usually the model being stale on a low-data player, not free money.
+    So the edge curve RISES to ~11% then PENALIZES beyond it (a real hump, per the design),
+    confidence (role certainty) is weighted heavily, and the per-play investigation verdict
+    multiplies the score (SUSPECT cut hard, CONFIRMED small boost) via investigate.score_mult."""
     edge = float(row.get("edge", 0))
     conf = float(row.get("confidence", 0.5))
-    verdict = row.get("verdict", "KEEP")
-    # Edge is the spine and the main spread-maker; confidence nudges; the per-play
-    # investigation verdict adjusts (SUSPECT cut hard, CONFIRMED small boost). Calibrated
-    # so picks span ~45 (marginal) to ~92 (elite), not everything bunched at the top.
-    base = 45 + edge * 300                          # 4%→57, 8%→69, 12%→81, 15%→90
-    conf_adj = (conf - 0.7) * 14                    # high role certainty +, low -
-    vadj = {"CONFIRMED": 2, "KEEP": 0, "SUSPECT": -30}.get(verdict, 0)
-    return round(float(np.clip(base + conf_adj + vadj, 28, 93)), 1)
+    mult = float(row.get("score_mult", 1.0))        # from investigate.adjudicate_board
+    # hump: linear up to the peak, then decay so a blowout edge can't top the board
+    if edge <= EDGE_PEAK:
+        base = 45 + edge * 300                       # 4%→57, 8%→69, 11%→78
+    else:
+        base = 45 + EDGE_PEAK * 300 - (edge - EDGE_PEAK) * 260   # 15%→68, 20%→55
+    conf_adj = (conf - 0.7) * 14                     # high role certainty +, low -
+    score = (base + conf_adj) * mult                 # verdict multiplies (1.08 / 1.0 / 0.5 / 0.45)
+    return round(float(np.clip(score, 28, 93)), 1)
 
 
 def td_score(row):
-    """TD board: edge vs implied on the same skewed scale."""
+    """TD board: same hump as props — a huge TD edge is usually the model overrating a
+    thin-sample rookie longshot, not free money, so it can't top the board."""
     edge = float(row.get("edge", 0) or 0)
-    return round(min(45 + edge * 300, 97), 1)
+    if edge <= EDGE_PEAK:
+        base = 45 + edge * 300
+    else:
+        base = 45 + EDGE_PEAK * 300 - (edge - EDGE_PEAK) * 260
+    return round(float(min(base, 90)), 1)
 
 
 def game_score(desk_conf):
@@ -62,7 +71,7 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "our_num": r.get("desk_proj"), "edge": r.get("edge"), "ev": r.get("ev"),
                          "price": r.get("price"), "book": r.get("book"),
                          "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),
-                         "reason": r.get("reason", "")})
+                         "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", "")})
     if td_board is not None and len(td_board):
         for _, r in td_board[td_board["edge"].notna()].iterrows():
             rows.append({"cat": "anytime_td", "score": td_score(r), "name": r["name"],

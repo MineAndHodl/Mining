@@ -119,7 +119,7 @@ def price_board(rates: pd.DataFrame, board_names: pd.DataFrame,
         team = (current_team or {}).get(b["name"], r["team"])
         mult = env_mult.get(team, 1.0)
         lam = r["lam_base"] * mult
-        p = 1 - np.exp(-lam)
+        p = p_calibrated(lam)          # use the fitted recalibration, not the raw Poisson
         rows.append({**b.to_dict(), "p_model": round(p, 3),
                      "p_implied": round(implied(b["price"]), 3),
                      "edge": round(p - implied(b["price"]), 3),

@@ -84,13 +84,14 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
   <div class="tabhint" id="hint"></div>
   <div id="list"></div>
 
-  <div class="note">Desk Score blends edge, expected value, and role certainty — a <b>moderate</b> edge on a locked-in role outranks a huge edge on an unknown (a blowout gap usually means our number's stale, not that we found free money). Best-across shows the top plays regardless of category, so a weak category can contribute nothing. The Whale Missile is its own lane — 8-10 near-locks across the slate, mostly minus-money, built so a lot of them hit. Not affiliated with any sportsbook.</div>
+  <div class="note">Desk Score blends edge, expected value, and role certainty — a <b>moderate</b> edge on a locked-in role outranks a huge edge on an unknown (a blowout gap usually means our number's stale, not that we found free money). Best-across shows the top plays regardless of category, so a weak category can contribute nothing. Two parlay lanes: the <b>Whale Missile</b> is 8-10 near-locks across <i>different</i> games (independent, so a lot of them hit), while each <b>Primetime SGP</b> is 8-10 legs in the <i>same</i> game, correlated so they hit together in a shootout. Not affiliated with any sportsbook.</div>
 </div>
 
 <script>
 const D = /*DATA*/{};
 const CATLABEL={rec_yds:"Receiving Yds",rush_yds:"Rushing Yds",receptions:"Receptions",anytime_td:"Anytime TD",pass_yds:"Passing Yds",rush_att:"Rush Att"};
 const VIEWS=[["best","🔥 Best Bets"],["games","🏈 Games"],["missile","🐋 Whale Missile"]];
+if((D.primetime_sgps||[]).length) VIEWS.push(["sgp","🏟️ Primetime SGP"]);
 Object.keys(D.by_category||{}).forEach(c=>VIEWS.push([c,CATLABEL[c]||c]));
 const HINTS={best:"Top plays across every category, ranked by conviction.",games:"Spreads, totals & moneylines — best value on the slate."};
 let active="best";
@@ -155,6 +156,18 @@ function render(){
       <div class="pscore"><div class="v" style="color:var(--gold)">${(m.combined_american>0?'+':'')+m.combined_american}</div><div class="l">Payout</div></div></div>`+
       m.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta">${l.lock?'<span class="vbadge v-confirmed">🔒 lock</span>':'<span class="chip mk">spice</span>'}<span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">model ${Math.round((l.p_model||0)*100)}%</span></div></div><div class="pscore"></div></div>`).join('')+
       `<div class="note" style="margin-top:12px">${m.note||''}</div>`;
+    return;
+  }
+  if(active==="sgp"){
+    hint.textContent="One correlated same-game parlay per primetime game (TNF/SNF/MNF) — legs that hit together in a shootout.";
+    const list=D.primetime_sgps||[];
+    if(!list.length){L.innerHTML='<div class="empty">No primetime props posted yet (they land Thu–Sat).</div>';return;}
+    L.innerHTML=list.map(s=>`<div style="margin-bottom:22px">
+      <div class="play top" style="cursor:default"><div class="rank">🏟️</div>
+        <div class="pmain"><div class="nm">${s.game}</div><div class="meta"><span class="chip mk">${s.n_legs} legs · same game</span><span class="num">$100 → <b>$${Math.round(100*(s.combined_decimal||0)).toLocaleString()}</b></span> <span class="num" style="color:var(--muted)">at ${(s.book||'').replace(/^./,c=>c.toUpperCase())}</span></div></div>
+        <div class="pscore"><div class="v" style="color:var(--gold)">${(s.combined_american>0?'+':'')+s.combined_american}</div><div class="l">Payout</div></div></div>`+
+      s.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta"><span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">${l.why||''}</span></div></div><div class="pscore"></div></div>`).join('')+
+      `<div class="note" style="margin-top:10px">${s.note||''}</div></div>`).join('');
     return;
   }
   if(active==="games"){

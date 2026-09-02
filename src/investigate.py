@@ -12,19 +12,25 @@ role read), the player's data reliability, and role/rookie flags:
   thin data (rookie / few games) + no corroboration -> SUSPECT (can't trust our number)
   no contradiction found                        -> KEEP as potential alpha (don't bury)
 """
+import os, sys
 import numpy as np
 import pandas as pd
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from names import norm_name
+
 
 def _adp_role(adp):
-    """ADP → rough role read. Lower ADP = bigger expected role."""
+    """ADP → rough role read. Lower ADP = bigger expected role. NOTE: 'unknown' (no ADP)
+    is NOT evidence of a small role — a posted prop already implies an NFL role; absence
+    from a 220-deep fantasy list tells us nothing, so it neither confirms nor suspects."""
     if adp is None or (isinstance(adp, float) and np.isnan(adp)):
-        return "undrafted"          # consensus sees ~no fantasy role
+        return "unknown"            # no draft-market signal either way
     if adp <= 60:
         return "big"                # every-week starter
     if adp <= 130:
         return "rotational"
-    return "deep"                   # late flier / minimal role
+    return "deep"                   # drafted late = genuinely small role
 
 
 def investigate(play, adp_row=None):
@@ -41,7 +47,7 @@ def investigate(play, adp_row=None):
     adp = adp_row.get("adp") if adp_row is not None else None
     role = _adp_role(adp)
     big_role = role in ("big", "rotational")
-    small_role = role in ("undrafted", "deep")
+    small_role = role == "deep"          # only a LATE-drafted player is confirmed small-role
 
     # thin data with no consensus support = can't trust our number
     if (rookie or conf < 0.4) and adp is None:
@@ -64,11 +70,11 @@ def investigate(play, adp_row=None):
 def adjudicate_board(picks, adp):
     """Attach verdict/note to each pick and a score multiplier. adp: DataFrame[name,adp]."""
     adp = adp.copy()
-    adp["_k"] = adp["name"].str.lower().str.replace(".", "", regex=False).str.replace("'", "", regex=False).str.strip()
+    adp["_k"] = adp["name"].map(norm_name)
     amap = adp.set_index("_k").to_dict("index")
     out = []
     for p in (picks if isinstance(picks, list) else picks.to_dict("records")):
-        k = str(p.get("name", "")).lower().replace(".", "").replace("'", "").strip()
+        k = norm_name(p.get("name", ""))
         v, note, mult = investigate(p, amap.get(k))
         out.append({**p, "verdict": v, "verdict_note": note, "score_mult": mult})
     return out

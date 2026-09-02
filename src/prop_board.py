@@ -11,8 +11,9 @@ For every posted player prop we show what actually makes it a bet:
   ev          expected value per $1 at the posted price
 Plus a data-rooted reason. Markets: rec yds, receptions, rush yds, pass yds, anytime TD.
 
-Confidence gates what becomes a PICK: stable-tier projections (calibrated, Brier .051)
-are pickable; movers/rookies are shown as lower-confidence context.
+Confidence gates what becomes a PICK: stable-tier projections are pickable; movers/rookies
+are shown as lower-confidence context. (Prop calibration vs real book lines is still being
+measured — see the CLV/backtest work; no headline calibration number is claimed here.)
 """
 import os, sys, json, urllib.request
 import numpy as np
@@ -82,8 +83,7 @@ def fetch_props(key, event_ids, books=BOOKS):
     return pd.DataFrame(rows), rem
 
 
-def _norm(n):
-    return str(n).lower().replace(".", "").replace("'", "").replace(" jr", "").replace(" iii", "").strip()
+from names import norm_name as _norm
 
 
 def price_ou(mkt, mu, line, over_price, under_price):
@@ -148,15 +148,16 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
     df = pd.DataFrame(out)
     if not len(df):
         return df, rem
-    # --- neutralize the market-wide skew bias -------------------------------
-    # A projection is a MEAN; yardage is right-skewed, so P(over the mean) < .5,
-    # which silently tilts every skewed prop Under. We remove the systematic per-
-    # market component (median over-probability offset) so only PLAYER-SPECIFIC
-    # disagreements survive as edges — the board balances, unders must be earned.
+    # --- correct the mean/median skew (principled, per-distribution) ---------
+    # A projection is a MEAN; yardage is right-skewed, so P(over the mean) < .5, which
+    # silently tilts every skewed prop Under. We add back a FIXED per-market skew constant
+    # derived from the distribution shape (props_model.SKEW_CONST) — NOT the slate's median
+    # edge. This debiases without erasing a genuine market-wide lean or flipping picks on
+    # cross-sectional noise (the old median-offset hack did both).
     for mkt in df["mkt"].unique():
         m = df["mkt"] == mkt
-        offset = float((df.loc[m, "model_p_over"] - df.loc[m, "fair_over"]).median())
-        adj = (df.loc[m, "model_p_over"] - offset).clip(0.02, 0.98)
+        offset = pm.SKEW_CONST.get(mkt, 0.0)
+        adj = (df.loc[m, "model_p_over"] + offset).clip(0.02, 0.98)
         df.loc[m, "adj_p_over"] = adj
         eo = adj - df.loc[m, "fair_over"]
         eu = (1 - adj) - (1 - df.loc[m, "fair_over"])
@@ -197,7 +198,8 @@ def reason(row, news=None):
     specific pick — soft line, our projection, a role/usage note, or a hard-disagree flag.
     Quantitative facts are woven in but it reads like a desk, not a regression table."""
     mkt_lbl = {"rec_yds": "receiving yards", "rush_yds": "rushing yards",
-               "receptions": "catches", "pass_yds": "passing yards"}[row["mkt"]]
+               "receptions": "catches", "pass_yds": "passing yards", "rush_att": "rush attempts",
+               "pass_cmp": "completions", "pass_att": "pass attempts"}.get(row["mkt"], row["mkt"])
     name, side, line, proj = row["name"], row["side"], row["line"], row["desk_proj"]
     edge_pts, ev, vig = row["edge"]*100, row["ev"]*100, row["vig"]*100
     status = row.get("status", classify(row))
