@@ -86,6 +86,14 @@ def build_features(pg=None):
 # raw feature set used both to fit and to predict live
 RAW_FEATURES = ["form3", "form1", "def_delta", "total_c", "home", "base_c"]
 
+# MEASURED (build_features, 2023-25): slope of resid on form3 for opening weeks 1-3 (where the
+# form window spans the offseason) as a fraction of the in-season slope. Recent form still
+# predicts across the gap, but at roughly half strength — and worst for rush/pass. Applied to
+# form3/form1 at predict time whenever the recent log is last season's (recency_week is None).
+#   in-season slope: rec .235 rush .353 pass .394 rec'ns .317 | opening: .153 .141 .140 .168
+OFFSEASON_FORM_RATIO = {"rec_yds": 0.65, "rush_yds": 0.40, "pass_yds": 0.35, "receptions": 0.53}
+OFFSEASON_FORM_DEFAULT = 0.50
+
 
 def fit_and_save(through_season=2025, l2=10.0, path=None):
     """Fit per-market weights on ALL data through `through_season` (raw features) and save them

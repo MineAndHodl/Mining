@@ -168,8 +168,28 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
             feats = {"form3": float(rr["last3"]) - baseline, "form1": float(rr["last1"]) - baseline,
                      "def_delta": ddelta, "total_c": total - 44.0, "home": home,
                      "base_c": baseline - model.get("base_med", {}).get(mkt, baseline)}
+            # OFFSEASON RAIL (measured, multifactor.OFFSEASON_FORM_RATIO): when the "recent" games
+            # are last season's finale (weeks 17-18 rest/backup noise), form predicts the residual
+            # at only ~35-65% of its in-season strength. The model's single form weight is fit on
+            # in-season rows, so applying it unscaled across the offseason roughly DOUBLED every
+            # Week-1 edge and manufactured a tail of absurd ones (a +45% "edge" on a rushing under).
+            role_base = baseline
+            if recency_week is None:
+                ratio = mf.OFFSEASON_FORM_RATIO.get(mkt, mf.OFFSEASON_FORM_DEFAULT)
+                feats["form3"] *= ratio; feats["form1"] *= ratio
+                # OFFSEASON ROLE BASELINE: with no current-season games, our baseline is last
+                # season's average — blind to the role changes the market has already priced (a
+                # backup now starting, a rookie's full role, a star's new QB). Every absurd Week-1
+                # edge traced to that gap (a 21% "edge" on Justin Jefferson under). So in Week 1
+                # the MARKET-IMPLIED MEAN is the role baseline and our edge is the discounted
+                # tilts on top of it — our alpha, the market's role read. Not anchoring: once
+                # current-season games exist we revert to our own (validated) baseline.
+                io_, iu_ = implied(b["over_price"]), implied(b["under_price"])
+                fair_o_ = io_ / (io_ + iu_) if (io_ + iu_) else 0.5
+                role_base = float(pm.market_mean(mkt, b["line"], fair_o_))
+                feats["base_c"] = role_base - model.get("base_med", {}).get(mkt, role_base)
             resid = mf.predict_residual(mkt, feats, model)
-            our_mu = max(baseline + resid, 0.1)
+            our_mu = max(role_base + resid, 0.1)
             trend = round(float(rr["last3"]) - baseline, 1)
             # per-factor contribution (weight x feature) for the honest scorecard/rationale
             w = model.get("weights", {}).get(mkt, {})

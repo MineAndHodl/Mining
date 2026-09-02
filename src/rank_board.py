@@ -42,10 +42,27 @@ def _desk_score(edge, model_p, mult=1.0, anchor=0.52):
     return round(float(np.clip(score, 20, 95)), 1)
 
 
+def _trust(row):
+    """Robustness of the edge — what separates an A+ from an A- when edges look alike:
+      sample depth : projection confidence (games of real history behind the number)
+      market breadth: how many books post this line (a one-book line is thinner evidence the
+                      number is real; 3+ books agreeing the line exists is firmer footing)
+    Range about -7 .. +9 Desk-Score points."""
+    conf = row.get("confidence"); nb = row.get("n_books")
+    t = 0.0
+    if conf is not None and not (isinstance(conf, float) and conf != conf):
+        t += (float(conf) - 0.7) * 22.0                  # 1.0 -> +6.6, 0.7 -> 0, 0.46 -> -5, 0.33 -> -8
+    if nb is not None and not (isinstance(nb, float) and nb != nb):
+        nb = int(nb); t += (-3.0 if nb <= 1 else (0.0 if nb == 2 else 3.0))
+    return t
+
+
 def prop_score(row):
-    """Desk Score for a prop pick: conviction (edge + hit-probability), times the investigate
-    verdict multiplier (SUSPECT cut hard, CONFIRMED boosted)."""
-    return _desk_score(row.get("edge"), row.get("model_p"), row.get("score_mult", 1.0))
+    """Desk Score for a prop pick: conviction (edge + hit-probability) + trust (sample depth,
+    market breadth), times the investigate verdict multiplier (SUSPECT cut, CONFIRMED boosted)."""
+    base = _desk_score(row.get("edge"), row.get("model_p"), 1.0)
+    s = (base + _trust(row)) * float(row.get("score_mult", 1.0) or 1.0)
+    return round(float(np.clip(s, 20, 95)), 1)
 
 
 TD_ANCHOR = 0.35   # a typical anytime-TD Yes is a ~35% dog to score — the neutral hit point here
@@ -149,7 +166,8 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "n_books": r.get("n_books"), "shop_adv": r.get("shop_adv"),
                          "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),
                          "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", ""),
-                         "contrib": r.get("contrib")})
+                         "contrib": r.get("contrib"), "confidence": r.get("confidence"),
+                         "offseason": r.get("offseason")})
     if td_board is not None and len(td_board):
         for _, r in td_board[td_board["edge"].notna()].iterrows():
             mp = int((r.get("p_model") or 0) * 100); imp = int((r.get("p_implied") or 0) * 100)

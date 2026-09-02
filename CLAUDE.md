@@ -63,6 +63,25 @@ The board is the product: every pick on it must be something a sharp would nod a
   replicated in 2024 and 2025** — its edge is responsiveness to current-season role and
   tendency changes. Adopted with linear recalibration (a=.084, b=.812); blended with the
   pooled model at w=.55 in Week 1, ramping to .85 by Week 5.
+- **Offseason form is half-strength (measured):** slope of residual on last-3 form is 0.334
+  in-season but 0.164 in weeks 1-3 (0.146 in Week 1); by market rush 40%, pass 35%, rec 65%,
+  rec'ns 53% of in-season. The single fitted form weight over-applied across the gap roughly
+  doubled every Week-1 edge. `multifactor.OFFSEASON_FORM_RATIO`, applied in `prop_board`.
+- **Week-1 baseline must be the market's role read:** every absurd Week-1 edge (+45% on a
+  rushing under, +21% on Jefferson under) traced to a stale last-season baseline blind to a
+  role change the market had priced (backup now starting, rookie's full role). With no
+  current-season games, the market-implied mean is the role baseline and our edge is the
+  discounted tilts on top — our alpha, the market's role read; NOT anchoring, since we revert
+  to our own validated baseline once current-season games exist. Result: PICK edges max +15%,
+  median +5.6% (was +44% / +11%).
+- **Grades & rails (`grading.py`):** Desk Score is a conviction rank, not a win probability.
+  A+ >=82 (2u), A 76-81 (1.5u), A- 70-75 (1u), B+ 64-69 (0.5u, the recommendation floor),
+  B lean (shown, not counted), C reference. Trust term (sample depth, book breadth) separates
+  the top. Rails: early-season sizing cap (wk 0-1 A-, wk 2-3 A), max 3 per thesis, 2 per
+  game, 15u/week; a validated macro thesis (backtested, in MACRO_THESES) may raise its cap.
+  Record rule: only recommended straight bets count; parlays are a separate lotto-lane record.
+  Games grade on the same scale (~1 pt spread value ~= 3% win prob) — the most efficient
+  market, so few games clear B+.
 - **Structural truths:** near-locks are minus-money and scarce (books balance ~50/50), so
   "8-10 near-locks at 100:1" is self-contradictory — the missile is an honest lotto of
   53-60% favorites. Week 1 is the weakest week (recency needs games across the offseason
