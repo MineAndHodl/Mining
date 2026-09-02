@@ -34,7 +34,7 @@ def dec_to_american(d):
     return round((d-1)*100) if d >= 2 else round(-100/(d-1))
 
 
-def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000):
+def build_missile(key=None, days=8, target=10, target_low=3000, target_high=10000):
     """Wavey-style near-lock parlay across the slate, tuned to a TARGET payout band
     (default +6000..+12000 = 60:1..120:1) so it hits far more often and builds engagement,
     instead of a 500:1 that never cashes. We add the highest-probability near-locks until the
@@ -42,6 +42,10 @@ def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000
     key = key or os.environ.get("ODDS_API_KEY")
     proj = pd.read_parquet(f"{DATA}/projection_2026.parquet")
     prop, _ = pb.build_prop_board(key=key, projections=proj, days=days)
+    # a near-lock parlay is about MARKET-likely legs on players with a real track record — never
+    # a rookie the model overrates (no recent games). Keep only players who HAVE a recent log.
+    if prop is not None and len(prop) and "edge_src" in prop.columns:
+        prop = prop[prop["edge_src"] == "recency"].copy()
     if prop is None or not len(prop):
         return None
     # credibility: prefer ESTABLISHED, recognizable players (real ADP / real NFL sample) over
@@ -67,20 +71,20 @@ def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000
 
     prop = prop.copy(); prop["_p"] = prop["model_p"].fillna(0)
     cand = []
-    for _, r in prop[prop["_p"] >= MIN_P].iterrows():
+    for _, r in prop.iterrows():
         p = float(r["_p"]); price = int(r["price"])
         pmkt = float(r.get("fair", p) or p)           # de-vigged MARKET probability (the honest read)
-        # A genuine near-lock is one the MARKET agrees is likely: minus-money AND high de-vigged
-        # prob. We select and rank by the MARKET number, not our model — that's what excludes the
-        # rookie-under illusions (model 0.95 / market 0.51) that only look like locks to us.
+        # Gate on the MARKET's probability (not our model) — that's what makes a leg genuinely
+        # likely and excludes the rookie-under illusions the model overrates. Books set most lines
+        # ~50/50, so true near-locks are scarce; we take the market-likeliest legs available.
         market_agrees = price <= -105
         cred = credibility(r["name"])
         is_lock = pmkt >= 0.58 and market_agrees
-        if pmkt < 0.55:                               # market doesn't see it as likely -> not for the missile
+        if pmkt < 0.53:                               # market sees it as a favorite (true locks are scarce)
             continue
-        if p < 0.50:                                  # our model must at least not disagree
+        if p < 0.50 or price > 110:                   # our model agrees; allow slight plus-money
             continue
-        if cred < 0.15:                               # keep it recognizable
+        if cred < 0.15:                               # recognizable, real track record
             continue
         # rank by MARKET probability, small recognizability tiebreak
         srt = pmkt + cred * 0.05
@@ -103,47 +107,29 @@ def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000
     if len(cand) < 5:
         return None
 
-    # Selection order: recognizable near-locks first (stars the public knows), then any
-    # near-lock, then at most 2 spice legs. Diversify: one leg per player, <=2 per game.
-    legs, per_game, seen_player, spice_used = [], {}, set(), 0
+    # Selection: add the market-likeliest favorites (highest de-vigged prob first) until the
+    # payout enters the target band. Diversify: one leg per player, <=2 per game. Recognizable
+    # names get a small tiebreak so the slip stays marketable.
+    legs, per_game, seen_player = [], {}, set()
 
-    def _try_add(c, allow_spice=True):
-        nonlocal spice_used
-        if len(legs) >= target + 1 or c["name"] in seen_player:
+    def _try_add(c):
+        if len(legs) >= target or c["name"] in seen_player:
             return
         if per_game.get(c["game"], 0) >= MAX_PER_GAME:
             return
-        is_spice = not c["lock"]
-        if is_spice and (not allow_spice or spice_used >= MAX_SPICE):
-            return
         legs.append(c); seen_player.add(c["name"]); per_game[c["game"]] = per_game.get(c["game"], 0) + 1
-        if is_spice: spice_used += 1
 
-    # ordered pool: to MAXIMIZE how many legs are expected to hit, add the highest-probability
-    # near-locks first (recognizable names get a small tiebreak so the slip stays marketable),
-    # then lower-prob locks, then spice. Higher-p legs are more juiced, so more of them are
-    # needed to reach the payout band — which is exactly what lifts the expected-hits count.
-    credible_locks = sorted([c for c in cand if c["lock"] and c["cred"] >= 0.30],
-                            key=lambda x: (x["p_mkt"], x["cred"]), reverse=True)
-    other_locks = sorted([c for c in cand if c["lock"] and c["cred"] < 0.30],
-                         key=lambda x: x["p_mkt"], reverse=True)
-    spice = sorted([c for c in cand if not c["lock"]], key=lambda x: x["_sort"], reverse=True)
-    pool = credible_locks + other_locks + spice
+    pool = sorted(cand, key=lambda x: (x["p_mkt"], x["cred"]), reverse=True)
 
     def _cur_odds():
         return dec_to_american(float(np.prod([american_to_dec(l["price"]) for l in legs]))) if legs else -10000
 
-    # add highest-probability near-locks until the payout enters the target band. Fewer, safer
-    # legs => higher hit rate. Spice only if we still can't reach the band with locks.
     for c in pool:
-        if _cur_odds() >= target_low and len(legs) >= 5:
-            break
-        allow = c in spice
-        if _cur_odds() >= target_low:              # already in band — stop adding
-            break
-        _try_add(c, allow_spice=allow)
-        if _cur_odds() > target_high and len(legs) >= 5:
-            legs.pop()                             # last leg overshot the band; drop it
+        if _cur_odds() >= target_low and len(legs) >= 6:
+            break                                  # in band with enough legs — stop
+        _try_add(c)
+        if _cur_odds() > target_high and len(legs) >= 6:
+            legs.pop()                             # last leg overshot the band
             break
     if len(legs) < 5:
         return None
@@ -160,11 +146,12 @@ def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000
             "combined_american": dec_to_american(dec), "combined_decimal": round(dec, 1),
             "p_all": round(p_all, 4), "expected_hits": exp_hits, "expected_hits_model": exp_hits_model,
             "n_locks": n_locks,
-            "note": (f"{len(legs)} legs across {len(games)} games — tuned to a "
-                     f"~{max(dec_to_american(dec)//1000*10, 60)}:1 payout so it cashes far more often "
-                     f"than a 500:1 moon-shot. On the market's own numbers we expect about {exp_hits} of "
-                     f"{len(legs)} to land (our model is a touch higher). Independent legs across games; "
-                     "the payout comes from stacking likely bets, not longshots — for engagement, size small.")}
+            "note": (f"{len(legs)} legs across {len(games)} games — every leg a market favorite "
+                     f"(~53-60%), tuned to ~{max(dec_to_american(dec)//100, 30)}:1. Honest math: on the "
+                     f"market's own numbers we expect about {exp_hits} of {len(legs)} to hit, and the full "
+                     f"slip cashes maybe 1 in {max(round(1/max(p_all,1e-4)), 20)} — a lotto built from "
+                     "solid favorites, not longshots (true 60%+ locks are too scarce to reach this payout). "
+                     "Independent-ish legs across games; size it small.")}
 
 
 if __name__ == "__main__":

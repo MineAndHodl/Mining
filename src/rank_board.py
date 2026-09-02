@@ -16,36 +16,35 @@ CAT_LABEL = {"rec_yds": "Receiving Yards", "rush_yds": "Rushing Yards", "recepti
              "pass_yds": "Passing Yards", "rush_att": "Rush Attempts", "anytime_td": "Anytime TD"}
 
 
-EDGE_PEAK = 0.11        # edge (11%) beyond which a bigger gap is treated as a stale-model red flag
+EDGE_PEAK = 0.11        # edge beyond which a bigger gap is a stale-model red flag, not free money
+MIN_HITTABLE = 0.45     # a "best bet" must have at least this chance to win — no lottery tickets
+
+def _desk_score(edge, model_p, mult=1.0):
+    """Unified Desk Score = CONVICTION, not raw edge. Two components:
+      value    — the edge, humped so a blowout gap can't top the board
+      hittable — reward likely plays and PENALIZE longshots, so a +1000 anytime-TD lottery with a
+                 big % edge can never outrank a -140 near-lock (the bug Alex caught).
+    A best bet is something you'd put real money on: probable AND +value AND a trusted signal."""
+    edge = float(edge or 0); p = float(model_p if model_p is not None else 0.5)
+    if edge <= EDGE_PEAK:
+        val = edge * 260                             # 4%→10, 8%→21, 11%→29
+    else:
+        val = EDGE_PEAK * 260 - (edge - EDGE_PEAK) * 260   # decay past the peak
+    hittable = (p - 0.52) * 55                        # p .70→+10, .52→0, .20 (longshot)→-18
+    score = (45 + val + hittable) * float(mult or 1.0)
+    return round(float(np.clip(score, 20, 95)), 1)
+
 
 def prop_score(row):
-    """0-100 Desk Score for a prop PICK. A MODERATE edge on an ESTABLISHED role is our best
-    bet — a HUGE edge is usually the model being stale on a low-data player, not free money.
-    So the edge curve RISES to ~11% then PENALIZES beyond it (a real hump, per the design),
-    confidence (role certainty) is weighted heavily, and the per-play investigation verdict
-    multiplies the score (SUSPECT cut hard, CONFIRMED small boost) via investigate.score_mult."""
-    edge = float(row.get("edge", 0))
-    conf = float(row.get("confidence", 0.5))
-    mult = float(row.get("score_mult", 1.0))        # from investigate.adjudicate_board
-    # hump: linear up to the peak, then decay so a blowout edge can't top the board
-    if edge <= EDGE_PEAK:
-        base = 45 + edge * 300                       # 4%→57, 8%→69, 11%→78
-    else:
-        base = 45 + EDGE_PEAK * 300 - (edge - EDGE_PEAK) * 260   # 15%→68, 20%→55
-    conf_adj = (conf - 0.7) * 14                     # high role certainty +, low -
-    score = (base + conf_adj) * mult                 # verdict multiplies (1.08 / 1.0 / 0.5 / 0.45)
-    return round(float(np.clip(score, 28, 93)), 1)
+    """Desk Score for a prop pick: conviction (edge + hit-probability), times the investigate
+    verdict multiplier (SUSPECT cut hard, CONFIRMED boosted)."""
+    return _desk_score(row.get("edge"), row.get("model_p"), row.get("score_mult", 1.0))
 
 
 def td_score(row):
-    """TD board: same hump as props — a huge TD edge is usually the model overrating a
-    thin-sample rookie longshot, not free money, so it can't top the board."""
-    edge = float(row.get("edge", 0) or 0)
-    if edge <= EDGE_PEAK:
-        base = 45 + edge * 300
-    else:
-        base = 45 + EDGE_PEAK * 300 - (edge - EDGE_PEAK) * 260
-    return round(float(min(base, 90)), 1)
+    """TD board on the SAME conviction scale — so a longshot anytime-TD (low model_p) scores low
+    and can't masquerade as a best bet, no matter how big its % edge vs a fat-margin market."""
+    return _desk_score(row.get("edge"), row.get("p_model"))
 
 
 def game_score(desk_conf):
@@ -69,7 +68,7 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
             rows.append({"cat": r["mkt"], "score": prop_score(r), "name": r["name"],
                          "game": r.get("game"), "line": r.get("line"), "side": r.get("side"),
                          "our_num": r.get("desk_proj"), "edge": r.get("edge"), "ev": r.get("ev"),
-                         "price": r.get("price"), "book": r.get("book"),
+                         "model_p": r.get("model_p"), "price": r.get("price"), "book": r.get("book"),
                          "n_books": r.get("n_books"), "shop_adv": r.get("shop_adv"),
                          "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),
                          "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", "")})
@@ -78,17 +77,22 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
             rows.append({"cat": "anytime_td", "score": td_score(r), "name": r["name"],
                          "game": r.get("game"), "line": 0.5, "side": "Yes",
                          "our_num": r.get("p_model"), "edge": r.get("edge"), "ev": None,
-                         "price": r.get("price"), "book": "draftkings",
-                         "reason": f"Model {int((r.get('p_model') or 0)*100)}% to score vs {int((r.get('p_implied') or 0)*100)}% implied."})
+                         "model_p": r.get("p_model"), "price": r.get("price"), "book": "draftkings",
+                         "reason": f"Model {int((r.get('p_model') or 0)*100)}% to score vs {int((r.get('p_implied') or 0)*100)}% implied — a lottery add, not a core play."})
     allp = pd.DataFrame(rows)
     if len(allp):
-        # per-category top N
+        # per-category top N. Anytime-TD is a "who's most likely to score" view — sort it by
+        # probability so the near-lock scorers (favorites) lead, not just +1000 lotteries.
         for cat in PROP_CATEGORIES:
-            sub = allp[allp.cat == cat].sort_values("score", ascending=False).head(top)
+            sub = allp[allp.cat == cat]
+            sort_col = "model_p" if cat == "anytime_td" else "score"
+            sub = sub.sort_values(sort_col, ascending=False, na_position="last").head(top)
             if len(sub):
                 out["by_category"][cat] = sub.to_dict("records")
-        # best across ALL props — some categories may not appear
-        out["best_props"] = allp.sort_values("score", ascending=False).head(top).to_dict("records")
+        # BEST BETS = best-across, but only genuinely hittable plays (no lottery longshots).
+        # A +1000 anytime-TD is not a "best bet" — it lives in its own tab, not here.
+        hittable = allp[allp["model_p"].fillna(0.5) >= MIN_HITTABLE]
+        out["best_props"] = hittable.sort_values("score", ascending=False).head(top).to_dict("records")
 
     # games (spreads/totals/ML) — already scored dicts with desk_conf
     if games:
