@@ -202,13 +202,21 @@ def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_le
                 if lnr and len(legs) < max_legs:
                     add(nm, "receptions", lnr, prr, f"same player as his yards leg — moves with it ({int((hpr or 0)*100)}%)")
 
-    # anytime-TD of the top pass-catchers (correlated with a high-scoring game)
+    # anytime-TD legs: pick by VALUE, not by always grabbing the chalkiest favorite. A heavy
+    # favorite is fine IF the model still sees value at its price; otherwise take the +edge dog.
     if td_rows is not None and len(td_rows):
-        for _, r in td_rows.sort_values("p_model", ascending=False).head(3).iterrows():
+        td = td_rows.copy()
+        if "edge" in td.columns:
+            td = td[td["edge"].fillna(-1) >= 0]                 # only TDs where we see value
+        # among value TDs, prefer the more likely (correlates better with the shootout)
+        td = td.sort_values(["edge", "p_model"], ascending=False) if "edge" in td.columns else td.sort_values("p_model", ascending=False)
+        for _, r in td.head(2).iterrows():
             if len(legs) >= max_legs:
                 break
+            fav = float(r.get("p_model", 0)) >= 0.5
             add(r["name"], "anytime_td", 0.5, int(r["price"]),
-                "anytime TD — ties to the same shootout script as the passing legs")
+                ("near-lock scorer, and still +value at the price — anchors the shootout" if fav
+                 else "value TD dog that pops in a high-scoring script"))
 
     legs = legs[:max_legs]
     if len(legs) < min_legs:
