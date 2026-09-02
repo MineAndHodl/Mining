@@ -20,6 +20,9 @@ body{background:var(--bg);color:var(--ink);margin:0;font:15px/1.5 -apple-system,
 h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;margin:0;line-height:1}
 .eyebrow{font-family:var(--disp);font-weight:700;letter-spacing:.24em;text-transform:uppercase;font-size:12px;color:var(--green)}
 .sub{color:var(--muted);margin-top:6px;max-width:600px;font-size:14px}
+.stamp{font-family:var(--mono,monospace);font-size:12px;color:var(--muted);margin-top:10px}
+.scalekey{font-size:12px;color:var(--ink);margin-top:6px}
+.rgfoot{font-size:11px;color:var(--dim);margin-top:12px;line-height:1.5;border-top:1px solid var(--line);padding-top:10px}
 .head{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
 /* toggle */
 .tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0 6px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
@@ -78,13 +81,16 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
     <div class="eyebrow">The Desk · The Board</div>
     <h1>What We're Betting, Ranked</h1>
     <div class="sub">Every row is a real play — the number, our number, the edge, and a Desk Score for how much we like it. Toggle between the best across everything, each prop category, and the games. Tap any play for the why.</div>
+    <div class="stamp" id="stamp"></div>
+    <div class="scalekey"><b>Desk Score:</b> 85+ top play · 70+ strong · 55+ lean · <span style="color:var(--muted)">lines move — reshop and skip anything past our number</span></div>
   </div>
 
   <div class="tabs" id="tabs"></div>
   <div class="tabhint" id="hint"></div>
   <div id="list"></div>
 
-  <div class="note">Desk Score blends edge, expected value, and role certainty — a <b>moderate</b> edge on a locked-in role outranks a huge edge on an unknown (a blowout gap usually means our number's stale, not that we found free money). Best-across shows the top plays regardless of category, so a weak category can contribute nothing. Two parlay lanes: the <b>Whale Missile</b> is 8-10 near-locks across <i>different</i> games (independent, so a lot of them hit), while each <b>Primetime SGP</b> is 8-10 legs in the <i>same</i> game, correlated so they hit together in a shootout. Not affiliated with any sportsbook.</div>
+  <div class="note">Desk Score blends edge, expected value, and role certainty — a <b>moderate</b> edge on a locked-in role outranks a huge edge on an unknown (a blowout gap usually means our number's stale, not that we found free money). Best-across shows the top plays regardless of category, so a weak category can contribute nothing. Two parlay lanes: the <b>Whale Missile</b> is 8-10 near-locks across <i>different</i> games (independent, so a lot of them hit), while each <b>Primetime SGP</b> is a same-game correlated stack (we show the fair price; bet DK only if its quote is longer).</div>
+  <div class="rgfoot">21+ · Gamble responsibly · Call 1-800-GAMBLER · Picks are opinions and analysis, not guarantees — for entertainment. Not affiliated with any sportsbook. Lines and availability change; always confirm the current number at your book.</div>
 </div>
 
 <script>
@@ -103,6 +109,8 @@ function fmtEdge(e){return e==null?"":(typeof e==="string"?e:("+"+Math.round(e*1
 function renderCard(sc){
   if(!sc) return '';
   const order=["Projected Usage","Recent Trend","Game Flow","Opponent Defense","Injury Picture","Weather","Play-Calling","Market Read","Regression"];
+  const populated=order.filter(f=>f in sc && sc[f]!==null&&sc[f]!==undefined).length;
+  if(populated<3) return '';   // don't show a wall of "n/a" — suppress a near-empty scorecard
   const strength=a=>a>=0.55?'strong':(a>=0.22?'clear':'slight');
   const rows=order.filter(f=>f in sc).map(f=>{
     const raw=sc[f];
@@ -185,5 +193,6 @@ function render(){
   }
 }
 function setView(v){active=v;render();window.scrollTo({top:0,behavior:"smooth"});}
+(function(){var s=document.getElementById("stamp");if(s)s.textContent=(D.week?("Week "+D.week+" · "):"")+"Lines as of "+(D.generated_at||"—");})();
 render();
 </script>

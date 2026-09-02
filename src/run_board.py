@@ -95,7 +95,9 @@ def run(key=None, days=14, rebuild_games=False, cached=False):
         except Exception as e:
             ranked["primetime_sgps"] = []; print("primetime SGPs skipped:", e)
 
-    # 6) write + rebuild page
+    # 6) freshness stamp + write + rebuild page
+    import datetime
+    ranked["generated_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%b %d, %Y %H:%M UTC")
     json.dump(ranked, open(f"{DATA}/ranked_board.json", "w"), indent=1)
     bbp.build()
     print(f"board rebuilt: {len(ranked.get('best_props', []))} best props, "

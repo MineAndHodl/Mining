@@ -16,8 +16,12 @@ lambda = player's expected TDs this game
 Edge vs a book: edge = P_model - implied(price). ATD 'Yes' is a one-sided
 market with fat margin, so only flag edges >= EDGE_MIN.
 """
+import os, sys
 import numpy as np
 import pandas as pd
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from names import norm_name
 
 RZ_YARD = 10          # "red zone opportunity" = carry/target inside this yardline
 BLEND_RESULTS = 0.55  # weight on realized TD rate vs RZ-opportunity expectation
@@ -110,8 +114,10 @@ def price_board(rates: pd.DataFrame, board_names: pd.DataFrame,
     """board_names: DataFrame[name, price, game, team_hint]. Returns model P,
     implied p, edge per board player (matched on display_name)."""
     rows = []
+    rates = rates.copy()
+    rates["_k"] = rates["display_name"].map(norm_name)
     for _, b in board_names.iterrows():
-        m = rates[rates["display_name"] == b["name"]]
+        m = rates[rates["_k"] == norm_name(b["name"])]     # normalized join (was exact-string, dropped ~21%)
         if not len(m):
             rows.append({**b.to_dict(), "p_model": None, "note": "no data"})
             continue

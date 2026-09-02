@@ -24,10 +24,11 @@ import props_model as pm
 import weather as wx
 
 API = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl"
+# Only markets we actually PROJECT — no point fetching (and paying credits for) markets the
+# projection can't price. pass_att/pass_cmp were credit burn with zero coverage.
 MARKET_MAP = {"player_reception_yds": "rec_yds", "player_receptions": "receptions",
               "player_rush_yds": "rush_yds", "player_pass_yds": "pass_yds",
-              "player_rush_attempts": "rush_att", "player_pass_attempts": "pass_att",
-              "player_pass_completions": "pass_cmp",
+              "player_rush_attempts": "rush_att",
               "player_kicking_points": "kicking_points", "player_field_goals": "field_goals"}
 # shop across all major bettable US books, not just three — line-shopping is guaranteed
 # better-than-field value, and cross-book dispersion is where the real prop edge lives.
@@ -199,9 +200,14 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
 # (the market repriced a role) rather than that we've found an edge.
 TRUST_LO, TRUST_HI = 0.62, 1.6
 
+FLAT_PRIOR_MARKETS = {"kicking_points", "field_goals"}   # league-prior projections, not per-player
+
 def classify(row):
     """PICK (calibrated disagreement), REVIEW (disagree too hard — market likely knows a
     role change), or PASS (edge too small)."""
+    # kicker markets run on a flat league prior (no per-player signal yet) — never a PICK
+    if row.get("mkt") in FLAT_PRIOR_MARKETS:
+        return "REVIEW"
     ratio = row["desk_proj"] / row["line"] if row["line"] else 1.0
     if not (TRUST_LO <= ratio <= TRUST_HI):
         return "REVIEW"

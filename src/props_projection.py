@@ -317,9 +317,13 @@ def project(season, team_vol_season=None):
                       "tier": "medium"})
 
     qdf = pd.DataFrame(qrows)
-    # keep only each team's QB1 (highest projected passing) — backups have ~no props
+    # keep only each team's QB1 — the STARTER, by depth-chart rank then real experience.
+    # (Never by projected pass yards: a run-heavy starter like Hurts averages below the league
+    # prior, so a rookie backup on the league prior would wrongly outrank him.)
     if len(qdf):
-        qdf = qdf.sort_values("pass_yds", ascending=False).drop_duplicates("team")
+        qdf["_depth"] = qdf["player_id"].map(lambda p: depth.get(p, 9))
+        qdf = (qdf.sort_values(["_depth", "hist_games", "pass_yds"], ascending=[True, False, False])
+               .drop_duplicates("team").drop(columns="_depth"))
         qdf["confidence"] = [0.20 if (rk or hg < 3) else round(min(hg / 24.0, 1.0) * (0.6 if mv else 1.0), 2)
                              for rk, hg, mv in zip(qdf["rookie"], qdf["hist_games"], qdf["moved"])]
         qdf["tier"] = pd.cut(qdf["confidence"], [-1, 0.34, 0.66, 1.01],

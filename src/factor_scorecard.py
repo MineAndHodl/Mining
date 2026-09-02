@@ -65,8 +65,14 @@ def scorecard(pick, proj_row=None, script=None, weather=None, matchup=None,
     sc = {}
 
     # --- Projected Usage: how far our number sits from the line (always available) ---
-    gap = (our - line) / max(abs(line), 1.0)
-    sc["Projected Usage"] = _for_side(_clip(gap / 0.25), side)
+    if mkt == "anytime_td":
+        # our_num here is a SCORING PROBABILITY, not a yardage number vs a 0.5 line — comparing
+        # it to 0.5 wrongly renders every TD pick "against". Use scoring prob vs a league
+        # baseline (~0.32) so a likelier scorer supports the Yes.
+        sc["Projected Usage"] = _for_side(_clip((our - 0.32) / 0.20), side)
+    else:
+        gap = (our - line) / max(abs(line), 1.0)
+        sc["Projected Usage"] = _for_side(_clip(gap / 0.25), side)
 
     # --- Recent Trend: explicit form delta if given, else own-vs-role from the projection ---
     fd = pr.get("_form_delta")

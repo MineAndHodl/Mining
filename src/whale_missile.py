@@ -69,20 +69,24 @@ def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000
     cand = []
     for _, r in prop[prop["_p"] >= MIN_P].iterrows():
         p = float(r["_p"]); price = int(r["price"])
-        # a genuine near-lock is MINUS-money: the market agrees it's likely. Plus-money "locks"
-        # are the model overrating a suppression on a thin-data player — not a lock at all.
-        # Keep those only as spice, and never let the model prob claim lock status on them.
+        pmkt = float(r.get("fair", p) or p)           # de-vigged MARKET probability (the honest read)
+        # A genuine near-lock is one the MARKET agrees is likely: minus-money AND high de-vigged
+        # prob. We select and rank by the MARKET number, not our model — that's what excludes the
+        # rookie-under illusions (model 0.95 / market 0.51) that only look like locks to us.
         market_agrees = price <= -105
         cred = credibility(r["name"])
-        is_lock = p >= LOCK_P and market_agrees
-        if not market_agrees and p < 0.66:            # weak model AND market disagrees -> skip
+        is_lock = pmkt >= 0.58 and market_agrees
+        if pmkt < 0.55:                               # market doesn't see it as likely -> not for the missile
             continue
-        if cred < 0.15 and not market_agrees:         # deep unknown w/o market backing -> skip
+        if p < 0.50:                                  # our model must at least not disagree
             continue
-        # rank by market-agreed prob, boosted by how recognizable/established the player is
-        srt = (p if market_agrees else p * 0.75) + cred * 0.10
+        if cred < 0.15:                               # keep it recognizable
+            continue
+        # rank by MARKET probability, small recognizability tiebreak
+        srt = pmkt + cred * 0.05
         cand.append({"leg": f"{r['name']} {r['side'].lower()} {r['line']:g} {mkt_lbl.get(r['mkt'], r['mkt'])}",
                      "price": price, "p_model": round(p, 3), "type": r["mkt"],
+                     "p_mkt": round(pmkt, 3),
                      "game": r.get("game"), "name": r["name"], "lock": is_lock,
                      "cred": round(cred, 2), "_sort": srt})
     # one near-lock anytime-TD (heavy favorite's bell cow / alpha) — never a pile of them
@@ -92,6 +96,7 @@ def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000
             if float(r["p_model"]) >= 0.55:
                 cand.append({"leg": f"{r['name']} anytime TD", "price": int(r["price"]),
                              "p_model": round(float(r["p_model"]), 3), "type": "anytime_td",
+                             "p_mkt": round(float(r.get("p_implied", r["p_model"]) or r["p_model"]), 3),
                              "game": r.get("game"), "name": r["name"], "lock": float(r["p_model"]) >= 0.6})
     except Exception:
         pass
@@ -119,9 +124,9 @@ def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000
     # then lower-prob locks, then spice. Higher-p legs are more juiced, so more of them are
     # needed to reach the payout band — which is exactly what lifts the expected-hits count.
     credible_locks = sorted([c for c in cand if c["lock"] and c["cred"] >= 0.30],
-                            key=lambda x: (x["p_model"], x["cred"]), reverse=True)
+                            key=lambda x: (x["p_mkt"], x["cred"]), reverse=True)
     other_locks = sorted([c for c in cand if c["lock"] and c["cred"] < 0.30],
-                         key=lambda x: x["p_model"], reverse=True)
+                         key=lambda x: x["p_mkt"], reverse=True)
     spice = sorted([c for c in cand if not c["lock"]], key=lambda x: x["_sort"], reverse=True)
     pool = credible_locks + other_locks + spice
 
@@ -144,18 +149,22 @@ def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000
         return None
 
     dec = float(np.prod([american_to_dec(l["price"]) for l in legs]))
-    p_all = float(np.prod([l["p_model"] for l in legs]))
-    exp_hits = round(sum(l["p_model"] for l in legs), 1)
+    # HONEST expected hits: use the de-vigged MARKET probability per leg, not our (optimistic)
+    # model prob. The market is the fairer read of how many actually land.
+    exp_hits = round(sum(l.get("p_mkt", l["p_model"]) for l in legs), 1)
+    exp_hits_model = round(sum(l["p_model"] for l in legs), 1)
+    p_all = float(np.prod([l.get("p_mkt", l["p_model"]) for l in legs]))
     n_locks = sum(1 for l in legs if l["lock"])
     games = sorted({l["game"] for l in legs})
     return {"legs": legs, "n_legs": len(legs), "games": games,
             "combined_american": dec_to_american(dec), "combined_decimal": round(dec, 1),
-            "p_all": round(p_all, 4), "expected_hits": exp_hits, "n_locks": n_locks,
-            "note": (f"{len(legs)} legs across {len(games)} games, all near-locks — tuned to a "
-                     f"~{dec_to_american(dec)//1000*10 or 60}:1 payout so it cashes far more often "
-                     f"than a 500:1 moon-shot (we expect about {exp_hits} of {len(legs)} to hit). "
-                     "Independent legs across games; the payout comes from stacking likely bets, not "
-                     "longshots. Shorter and safer by design — for engagement, not a lottery.")}
+            "p_all": round(p_all, 4), "expected_hits": exp_hits, "expected_hits_model": exp_hits_model,
+            "n_locks": n_locks,
+            "note": (f"{len(legs)} legs across {len(games)} games — tuned to a "
+                     f"~{max(dec_to_american(dec)//1000*10, 60)}:1 payout so it cashes far more often "
+                     f"than a 500:1 moon-shot. On the market's own numbers we expect about {exp_hits} of "
+                     f"{len(legs)} to land (our model is a touch higher). Independent legs across games; "
+                     "the payout comes from stacking likely bets, not longshots — for engagement, size small.")}
 
 
 if __name__ == "__main__":

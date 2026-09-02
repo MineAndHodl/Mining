@@ -251,8 +251,12 @@ def test_whale_missile_discipline():
         check("missile present in board", False, "no whale_missile key"); return
     legs = m["legs"]
     check("missile has 5-10 legs (odds-band tuned)", 5 <= len(legs) <= 10, f"n={len(legs)}")
-    check("missile payout in ~60-120:1 engagement band", 5000 <= m["combined_american"] <= 14000,
+    # payout targets 60-120:1 but is capped by how many genuine near-locks the slate offers
+    check("missile payout positive & within target ceiling", 300 <= m["combined_american"] <= 14000,
           f"{m['combined_american']:+d}")
+    # expected hits must be the HONEST (market-based) number, never above the leg count
+    check("missile expected_hits is market-based (<= legs)", m["expected_hits"] <= len(legs),
+          f"{m['expected_hits']} vs {len(legs)}")
     lock_prices_ok = all(l["price"] <= -105 for l in legs if l.get("lock"))
     check("every lock is minus-money (market-agreed)", lock_prices_ok)
     n_lock = sum(1 for l in legs if l.get("lock"))
