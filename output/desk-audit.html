@@ -1,0 +1,237 @@
+<title>The Desk Audit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F3F5F2; --surface:#FFFFFF; --ink:#17211C; --ink-2:#4A5650; --muted:#6F7B75; --rule:#D5DBD7;
+  --accent:#1F6B4A; --accent-soft:#E3F0E8;
+  --ok:#1F6B4A; --ok-bg:#E3F0E8; --warn:#9A6212; --warn-bg:#F7EBD3; --bad:#A8362F; --bad-bg:#F6E1DE; --dead:#5C6660; --dead-bg:#E7EAE8; --blocked:#4A4F9B; --blocked-bg:#E4E5F5;
+  --callout-bg:#17211C; --callout-ink:#F3F5F2;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111715; --surface:#182019; --ink:#E7ECE8; --ink-2:#B9C3BD; --muted:#8B968F; --rule:#2B3530;
+    --accent:#4FC28A; --accent-soft:#1D3328;
+    --ok:#4FC28A; --ok-bg:#1D3328; --warn:#E0A64B; --warn-bg:#3A2D14; --bad:#F08A80; --bad-bg:#3E1F1C; --dead:#A5AFA9; --dead-bg:#242C28; --blocked:#A9ACF0; --blocked-bg:#24264A;
+    --callout-bg:#E7ECE8; --callout-ink:#111715;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111715; --surface:#182019; --ink:#E7ECE8; --ink-2:#B9C3BD; --muted:#8B968F; --rule:#2B3530;
+  --accent:#4FC28A; --accent-soft:#1D3328;
+  --ok:#4FC28A; --ok-bg:#1D3328; --warn:#E0A64B; --warn-bg:#3A2D14; --bad:#F08A80; --bad-bg:#3E1F1C; --dead:#A5AFA9; --dead-bg:#242C28; --blocked:#A9ACF0; --blocked-bg:#24264A;
+  --callout-bg:#E7ECE8; --callout-ink:#111715;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:780px;margin:0 auto;padding:28px 18px 80px}
+h1,h2,h3{font-family:"IBM Plex Serif",Georgia,"Times New Roman",serif;text-wrap:balance;margin:0}
+h1{font-size:2rem;font-weight:600;line-height:1.15;letter-spacing:-.01em}
+h2{font-size:1.35rem;font-weight:600;margin-top:44px;padding-top:18px;border-top:1px solid var(--rule)}
+h3{font-size:1.05rem;font-weight:600;margin-top:22px}
+p{margin:10px 0;max-width:66ch}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.lede{color:var(--ink-2);font-size:1.02rem;max-width:62ch}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px 14px;margin:18px 0 0;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem}
+nav.toc a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent}
+nav.toc a:hover,nav.toc a:focus-visible{border-bottom-color:var(--accent);outline:none}
+.callout{background:var(--callout-bg);color:var(--callout-ink);padding:18px 20px;margin:26px 0 0;border-radius:6px}
+.callout .eyebrow{color:var(--callout-ink);opacity:.7}
+.callout p{color:inherit;margin:6px 0 0}
+.callout code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.86rem;background:rgba(127,127,127,.18);padding:1px 6px;border-radius:4px}
+.chip{display:inline-block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.68rem;letter-spacing:.06em;padding:2px 7px;border-radius:3px;white-space:nowrap;font-weight:500;vertical-align:middle}
+.LIVE,.EARNED,.DONE{color:var(--ok);background:var(--ok-bg)}
+.ASSUMED,.PARTIAL{color:var(--warn);background:var(--warn-bg)}
+.NOT-BUILT,.REJECTED,.GAP{color:var(--bad);background:var(--bad-bg)}
+.DEAD,.STALE,.SUPERSEDED{color:var(--dead);background:var(--dead-bg)}
+.BLOCKED{color:var(--blocked);background:var(--blocked-bg)}
+.fixes{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:12px}
+.fixes li{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:14px 16px}
+.fixes b{font-weight:600}
+.fixes .what{display:block;color:var(--ink-2);margin-top:4px;font-size:.95rem}
+.tablewrap{overflow-x:auto;margin:14px 0 0;border:1px solid var(--rule);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.92rem}
+th{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);font-weight:500}
+td{padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.idea{font-weight:500;width:34%}
+td.status{width:14%}
+td.note{color:var(--ink-2)}
+.model{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
+.model li{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:.95rem}
+.model li:last-child{border-bottom:none}
+.model .lane{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.model .parts{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.review{display:grid;gap:18px;margin-top:14px}
+.review section{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:14px 16px}
+.review h3{margin-top:0}
+.review ol,.review ul{margin:8px 0 0;padding-left:20px}
+.review li{margin:6px 0;color:var(--ink-2)}
+.review li b{color:var(--ink);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;font-size:.88rem;color:var(--ink-2)}
+.foot{margin-top:40px;color:var(--muted);font-size:.85rem;font-family:"IBM Plex Mono",ui-monospace,monospace}
+@media (max-width:560px){h1{font-size:1.65rem}.model li{grid-template-columns:1fr}.model .lane{padding-top:0}}
+@media (prefers-reduced-motion:no-preference){a{transition:border-color .15s}}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">The Desk · quant review · September 2, 2026</div>
+  <h1>Everything you asked for, and what became of it</h1>
+  <p class="lede">A line-by-line audit of every idea raised across the build — the memory of the whole collaboration, all 60 commits, the five scheduled jobs, and the live code — with its honest status, what is actually inside this week's model, and my own view on what to deepen, simplify, or remove.</p>
+  <nav class="toc" aria-label="Sections">
+    <a href="#push">The one blocker</a><a href="#fixed">Fixed today</a><a href="#lanes">Product lanes</a><a href="#model">Model &amp; data</a><a href="#ops">Brand &amp; ops</a><a href="#live">What's in the live model</a><a href="#review">Deepen · simplify · remove</a>
+  </nav>
+
+  <div class="callout" id="push">
+    <div class="eyebrow">Action item #1 — only you can do this</div>
+    <p><b>Push the bundle.</b> GitHub is ~60 commits behind the real code, and every scheduled job (Tuesday card, Thursday Touchdown Tax, Sunday final, Monday grading, Research Bot) clones GitHub — so until you run <code>git pull /path/to/beat-the-close.bundle main &amp;&amp; git push</code>, each job would run the September-1 model. I rewrote all five job prompts today; each now checks the repo is current and emails "SKIPPED — repo behind" instead of running old code. The Thursday job fires tomorrow at 1pm ET.</p>
+  </div>
+
+  <h2 id="fixed">Found during the audit and fixed the same day</h2>
+  <p>These were not on any list. They surfaced from reading the code the way an outside quant would, and each one would have hurt the record.</p>
+  <ul class="fixes">
+    <li><b>No in-season data path existed.</b><span class="what">The season list was hard-coded to 2021–25 and the board was always built in offseason mode. The model would have stayed on last season's history, the market-role baseline, and half-strength form all year — none of the validated in-season edges (recency, xTD's +2–3% Brier, the injury report) would ever have switched on. Built <code>refresh_data.py</code> and a mode switch; the board now prints OFFSEASON or IN-SEASON, and xTD enters its in-season mode from Week 4, where it was validated. Smoke-tested on 2025 data.</span></li>
+    <li><b>No grading loop.</b><span class="what">Work order 2, flagged repeatedly as the biggest missing foundation. Built the ledger (every number frozen at open, latest, and close) and the grader (win / loss / push / void, units at price, CLV in points, separate records per lane, calibration by grade and by model probability over the whole pool, a running record file). Settlement math is unit-tested; the stats path is verified against nflverse 2025. Week 1 is the first live test.</span></li>
+    <li><b>The Games tab was stale.</b><span class="what">Rows from September 1 were carried forward on every run with no game labels — Arizona +440 at FanDuel was long gone. Rebuilt live each run and relabeled as market intel: a bettable book off Pinnacle by a point or more. We have no validated edge on sides (ratings run ~50% ATS; a book being off does not predict the move), so nothing here goes on the Card.</span></li>
+    <li><b>A fresh clone could not build the board.</b><span class="what">Every data table the run reads was gitignored. The twenty it needs (~10 MB) are committed now.</span></li>
+    <li><b>Props re-pricing cost API credits.</b><span class="what">Fetch is now split from pricing for props, as it already was for touchdowns; a model change re-prices the cached lines for free.</span></li>
+    <li><b>Your name won.</b><span class="what">"TD Stack" is the <b>Touchdown Tax</b> everywhere.</span></li>
+  </ul>
+
+  <h2 id="lanes">Product lanes</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Idea (yours)</th><th>Status</th><th>Where it stands</th></tr></thead>
+    <tbody>
+      <tr><td class="idea">Weekly automated picks, iterated fast</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">The weekly run; scheduled jobs re-pointed to it (blocked on the push).</td></tr>
+      <tr><td class="idea">Tuesday card · Sunday final · Monday grading</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">Prompts rewritten today: grade last week first, refresh data, publish, commit.</td></tr>
+      <tr><td class="idea">"What I Like" board, Desk Confidence 6–10</td><td class="status"><span class="chip SUPERSEDED">SUPERSEDED</span></td><td class="note">Became The Card with A+…B+ grades and the Desk Score — your later ask for interpretable grades.</td></tr>
+      <tr><td class="idea">Picks only, you size (early) → units by grade (later)</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">Units are a suggested scale (A+ 2u … B+ 0.5u); you still size.</td></tr>
+      <tr><td class="idea">Unders first-class; great straight bets even if they parlay badly</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">The Card is straight bets; five of eight this week are Unders.</td></tr>
+      <tr><td class="idea">All props listed, the best surfaced</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">Category tabs over the full pool.</td></tr>
+      <tr><td class="idea">One massive primetime lotto SGP, 30–100:1</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">Fair price tuned to +2800…+9000; bet only if DK quotes longer than fair. DK's quotes can't be fetched; calibrated on two slips.</td></tr>
+      <tr><td class="idea">Whale missile → 4–6 leg cross-slate parlay at 6–12:1</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">The Sunday Stack (max-EV, one per game, ≤2 per thesis). Missile retired.</td></tr>
+      <tr><td class="idea">3–4 leg anytime-TD parlays (Touchdown Tax)</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">Three most-likely +EV scorers at 15–30:1. A 6–12:1 version with real edge is impossible: the 55% scorers are the overpriced stars.</td></tr>
+      <tr><td class="idea">Futures content (SB, divisions, win totals, yardage leaders)</td><td class="status"><span class="chip DEAD">DEAD</span></td><td class="note">Built Sept 1, never validated, not on the board. Retire until a futures lane earns a place.</td></tr>
+      <tr><td class="idea">Kicker props (you love them)</td><td class="status"><span class="chip NOT-BUILT">NOT BUILT</span></td><td class="note">Only a flat league prior, gated to REVIEW. Top candidate for the next lane (below).</td></tr>
+      <tr><td class="idea">Deep "smash spot" longshots when stars align</td><td class="status"><span class="chip DEAD">DEAD</span></td><td class="note">Sept-1 module not wired. Revisit once the grading loop shows the distribution tails are calibrated.</td></tr>
+      <tr><td class="idea">Referee overlay, exotic visible inputs</td><td class="status"><span class="chip NOT-BUILT">NOT BUILT</span></td><td class="note">Crew data exists; never earned a weight. On the Research Bot's list.</td></tr>
+      <tr><td class="idea">Tap-to-load DK slips, DK referral</td><td class="status"><span class="chip BLOCKED">BLOCKED</span></td><td class="note">DK is policy-blocked for automation; the affiliate account is yours.</td></tr>
+      <tr><td class="idea">"Watch the game" live commiseration</td><td class="status"><span class="chip BLOCKED">BLOCKED</span></td><td class="note">Needs X keys and a live feed.</td></tr>
+      <tr><td class="idea">Player-guess game unlocking a free pick</td><td class="status"><span class="chip NOT-BUILT">NOT STARTED</span></td><td class="note">Your call: model first, games later.</td></tr>
+      <tr><td class="idea">Degen / meme naming</td><td class="status"><span class="chip PARTIAL">PARTIAL</span></td><td class="note">The Card, Sunday Stack, Touchdown Tax, Primetime Lotto. "Whale missile" retired by your own flip.</td></tr>
+      <tr><td class="idea">Board readable on mobile</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">Hosted page, slimmed payload.</td></tr>
+      <tr><td class="idea">Bet across DK + FanDuel + BetMGM only</td><td class="status"><span class="chip GAP">GAP</span></td><td class="note">"Best price" spans eight books (Fanatics, BetRivers, Caesars…). Small to-do: show best-at-your-books beside best-anywhere.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="model">Model and data</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Idea (yours)</th><th>Status</th><th>Where it stands</th></tr></thead>
+    <tbody>
+      <tr><td class="idea">"Market efficiency" is a hypothesis — find a real edge</td><td class="status"><span class="chip EARNED">EARNED</span></td><td class="note">Recency: +8.6% / +13.3% ROI out of sample.</td></tr>
+      <tr><td class="idea">Weight every signal together, not one factor</td><td class="status"><span class="chip EARNED">EARNED</span></td><td class="note">Ridge on form, matchup, total, home, mean-reversion; five-season fit.</td></tr>
+      <tr><td class="idea">Read five years of play-by-play</td><td class="status"><span class="chip EARNED">EARNED</span></td><td class="note">Adopted where it won; dead heat elsewhere.</td></tr>
+      <tr><td class="idea">Coaching and play-calling drive props; goal-line and red-zone roles</td><td class="status"><span class="chip PARTIAL">PARTIAL</span></td><td class="note">Earned for touchdowns (xTD, coach-change flip). Pace / pass-rate for yardage volume was staged and never wired — on the EARN list.</td></tr>
+      <tr><td class="idea">Expected touchdowns from our own data</td><td class="status"><span class="chip EARNED">EARNED</span></td><td class="note">xTD, +2–3% Brier in-season; today's environment fix and star reality (1-TD-a-game backs score in 51% of next season's games; market prices 64–76%).</td></tr>
+      <tr><td class="idea">Injury feed before data flows; role multiplier</td><td class="status"><span class="chip EARNED">EARNED</span></td><td class="note">Cascade weight k*=.87; Questionable = scratch risk only. The 2026 report loader has not yet seen a real report — first test Wednesday of Week 1.</td></tr>
+      <tr><td class="idea">"Don't over-weight injuries — test it"</td><td class="status"><span class="chip EARNED">EARNED</span></td><td class="note">Validated walk-forward on 583 beneficiary games.</td></tr>
+      <tr><td class="idea">Beat writers and pundits woven into every pick</td><td class="status"><span class="chip PARTIAL">PARTIAL</span></td><td class="note">Layer is live (date-gated, hard gates, Beat Intel lever, provisional 4-point score weight). No news API, so the Tuesday job does a per-player web pass. Weight is owed to the grading loop.</td></tr>
+      <tr><td class="idea">Intel must influence selection, not annotate survivors</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">Selection runs over the full pool; coverage rule top-40.</td></tr>
+      <tr><td class="idea">Continuity across the offseason (coach, returners, college stats, scheme fit)</td><td class="status"><span class="chip PARTIAL">PARTIAL</span></td><td class="note">Coach-change effect measured and used; QB continuity null. Rookies are draft capital only — their projections are junk and railed to REVIEW; college stats / scheme fit not built.</td></tr>
+      <tr><td class="idea">Early numbers that move our way — the real "beat the close"</td><td class="status"><span class="chip PARTIAL">PARTIAL</span></td><td class="note">Tuesday is the early number; from Week 1 the ledger captures the close and Monday grades CLV.</td></tr>
+      <tr><td class="idea">Fantasy ADP as an input</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">FFC ADP feeds the Market Read (ESPN blocked).</td></tr>
+      <tr><td class="idea">Expected-stats "lucky vs due" flags</td><td class="status"><span class="chip DEAD">DEAD</span></td><td class="note">Superseded by recency and mean-reversion; TD regression lives inside xTD.</td></tr>
+      <tr><td class="idea">Weather on passing props</td><td class="status"><span class="chip PARTIAL">PARTIAL</span></td><td class="note">Module validated, but the weekly run never receives weather — there is no forecast source. Needs a forecast API for the Sunday pass.</td></tr>
+      <tr><td class="idea">Autonomous daily research bot</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">Re-pointed today: one hypothesis a day through the repo's own walk-forward harnesses; proposes a branch, never promotes.</td></tr>
+      <tr><td class="idea">Weekly self-update engine, model registry (74 params)</td><td class="status"><span class="chip STALE">STALE</span></td><td class="note">The registry contradicts the current model (it still "monitors" the skew-Under effect we removed as a bug). Archive it; CLAUDE.md and the validation files are the truth.</td></tr>
+      <tr><td class="idea">"Improve" alone should yield real gains</td><td class="status"><span class="chip PARTIAL">PARTIAL</span></td><td class="note">The architecture review exists; the grading loop built today is what makes it real. Weights get re-earned after three graded weeks.</td></tr>
+      <tr><td class="idea">Sliders in player direction · consistent Desk Score · edge in probability points · fewer, higher-conviction Card · on-brand names · ATD dial-in</td><td class="status"><span class="chip LIVE">LIVE</span></td><td class="note">All shipped.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="ops">Brand and operations</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Item</th><th>Status</th><th>Where it stands</th></tr></thead>
+    <tbody>
+      <tr><td class="idea">X: @TheDeskNFL rename</td><td class="status"><span class="chip BLOCKED">BLOCKED</span></td><td class="note">X's profile-review period; bio saved.</td></tr>
+      <tr><td class="idea">Discord server · Whop paywall · bot token</td><td class="status"><span class="chip BLOCKED">BLOCKED</span></td><td class="note">Server built; paywall and token are yours.</td></tr>
+      <tr><td class="idea">Engagement Lab (weekly)</td><td class="status"><span class="chip BLOCKED">BLOCKED</span></td><td class="note">Scheduled; needs X API keys.</td></tr>
+      <tr><td class="idea">Automated tweets, recaps, bet slips</td><td class="status"><span class="chip NOT-BUILT">NOT BUILT</span></td><td class="note">Keys first.</td></tr>
+      <tr><td class="idea">GitHub push from the quant session</td><td class="status"><span class="chip BLOCKED">BLOCKED</span></td><td class="note">The bundle is the transport. Pull and push is action item #1.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="live">What actually makes it into this week's board</h2>
+  <p>The live model, piece by piece, with each piece labeled by how it got its number. <span class="chip EARNED">EARNED</span> means measured walk-forward and adopted only because it won. <span class="chip ASSUMED">ASSUMED</span> means it is in the run but I set the number by hand — those are what the grading loop is owed.</p>
+  <ul class="model">
+    <li><span class="lane">Yardage &amp; counts</span><span class="parts">
+      <span>Baseline: market-implied mean in Weeks 0–3</span><span class="chip EARNED">EARNED</span>
+      <span>→ own 16-game history once games exist</span><span class="chip EARNED">EARNED</span>
+      <span>Residual: ridge on form3 · form1 · matchup · total · home · mean-reversion, five seasons</span><span class="chip EARNED">EARNED</span>
+      <span>Offseason form at half strength</span><span class="chip EARNED">EARNED</span>
+      <span>Gamma distribution with volume-dependent spread</span><span class="chip EARNED">EARNED</span>
+      <span>Injury Out gate + role cascade</span><span class="chip EARNED">EARNED</span>
+      <span>Beat intel hard gates</span><span class="chip LIVE">LIVE</span>
+      <span>Beat intel score weight (4 pts)</span><span class="chip ASSUMED">ASSUMED</span>
+      <span>Trust term, Desk Score hump/tail, grade bands, rails</span><span class="chip ASSUMED">ASSUMED</span>
+      <span>Weather</span><span class="chip NOT-BUILT">NOT APPLIED</span>
+    </span></li>
+    <li><span class="lane">Anytime TD</span><span class="parts">
+      <span>xTD (zone × type: team plays × coach mix × player share × conversion)</span><span class="chip EARNED">EARNED</span>
+      <span>Environment on the measured implied-points scale</span><span class="chip EARNED">EARNED</span>
+      <span>Calibration refit with the environment; blend .55 with the pooled model</span><span class="chip EARNED">EARNED</span>
+      <span>Opponent red-zone defense (small, capped)</span><span class="chip EARNED">EARNED</span>
+      <span>Eight-book price shop</span><span class="chip LIVE">LIVE</span>
+      <span>Early-season market-disagreement rail; TD anchor .35</span><span class="chip ASSUMED">ASSUMED</span>
+    </span></li>
+    <li><span class="lane">Games</span><span class="parts"><span>Market intel only — a bettable book off Pinnacle; never on the Card</span><span class="chip LIVE">LIVE</span></span></li>
+    <li><span class="lane">Parlays</span><span class="parts"><span>Sunday Stack and Touchdown Tax are products of the above; SGPs priced through the measured copula</span><span class="chip EARNED">EARNED</span><span>Fair-vs-DK rule</span><span class="chip ASSUMED">ASSUMED</span></span></li>
+  </ul>
+  <p>Three graded weeks is the first honest read on the ASSUMED items; six is a verdict.</p>
+
+  <h2 id="review">Deepen · simplify · remove</h2>
+  <div class="review">
+    <section>
+      <h3>Deepen, in this order</h3>
+      <ol>
+        <li><b>Run the loop.</b> Week 1 grades Monday. After three weeks: re-earn the intel weight, the cascade, the grade bands; check the early-season TD top bucket (an open finding: our .45–.55 predictions hit ~62% in weeks 1–3 historically).</li>
+        <li><b>Kicker lane.</b> Your favorite, and books under-model it: team field-goal-range drive rate × distance make-rate × the kicker. About a day; earn it before it ships.</li>
+        <li><b>Execution-book view.</b> DK / FanDuel / BetMGM price beside best-anywhere; the ledger records both.</li>
+        <li><b>Weather forecast source.</b> Open-Meteo is free; it finally activates the validated weather module in the Sunday pass.</li>
+        <li><b>Rookies and no-history players</b> on the market-role baseline in weeks 0–3, so beat intel or an injury can still surface one. Today they are silently REVIEW.</li>
+        <li><b>Pace and pass-rate for yardage volume</b>, done the multi-factor way.</li>
+      </ol>
+    </section>
+    <section>
+      <h3>Simplify or remove</h3>
+      <ul>
+        <li><b>Archive the September-1 modules</b> that are no longer in the run (whale missile, ML/futures board, smash spots, usage layer, enrich, model update, the ratings engine, cards, context bundle, desk card, verify, fantasy). The live tree should be ~25 modules, not 50; the dead ones confuse future sessions and the research bot. Mechanical — a session where you can eyeball the list.</li>
+        <li><b>The model registry and the v1 research log</b> become archives, not truth.</li>
+        <li><b>The pooled TD model</b> can retire after Week 5 if the blend weight stays at .85 in-season.</li>
+        <li><b>The games lane</b> stays only as CLV content for the brand; if it clutters, drop it.</li>
+        <li><b>The primetime SGP</b> is lotto content with honest limits (no DK quote feed, two calibration slips) — never sold as edge.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Risks I would name to the owner</h3>
+      <ol>
+        <li><b>The push.</b> Nothing scheduled works on the new model until the bundle is on GitHub.</li>
+        <li><b>Week 1 is the weakest week by construction</b> — offseason mode, median edge ~3%. Expect the Card to run 52–56% early, not 60%; weeks 1–3 are for the record and the CLV read.</li>
+        <li><b>The in-season paths were never exercised on live 2026 data.</b> Smoke-tested on 2025; the Week 2 Tuesday email's "mode:" line is the first real check.</li>
+        <li><b>The 2026 injury loader</b> has not seen a real report yet.</li>
+        <li><b>Beat intel</b> is a web search per player run by a scheduled agent — variable quality. Only the hard gates should be trusted blind.</li>
+      </ol>
+    </section>
+  </div>
+
+  <h3>Legend</h3>
+  <div class="legend">
+    <span><span class="chip LIVE">LIVE</span> in the weekly run</span>
+    <span><span class="chip EARNED">EARNED</span> measured walk-forward, adopted because it won</span>
+    <span><span class="chip ASSUMED">ASSUMED</span> in the run, number set by hand, owed to grading</span>
+    <span><span class="chip PARTIAL">PARTIAL</span> some of it</span>
+    <span><span class="chip NOT-BUILT">NOT BUILT</span> never built</span>
+    <span><span class="chip DEAD">DEAD</span> built early, no longer in the run</span>
+    <span><span class="chip BLOCKED">BLOCKED</span> needs something only you can provide</span>
+  </div>
+  <p class="foot">Source of record: IDEAS_LEDGER.md in the repo (commit 09c8c29). Tests 113/113. The audit itself is the deliverable; nothing on this page changed a model weight.</p>
+</div>
