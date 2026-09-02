@@ -48,6 +48,7 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 .num{font-family:var(--mono);color:var(--ink)}
 .num b{color:var(--green)}
 .edge{color:var(--green);font-weight:700}
+.edge.neg{color:var(--bad)}
 .pscore{text-align:center;min-width:64px}
 .pscore .v{font-family:var(--disp);font-weight:800;font-size:26px;line-height:1}
 .pscore .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim)}
@@ -136,7 +137,7 @@ function propRow(p,i){
   return `<div class="play ${top?'top':''}" onclick="this.querySelector('.why').classList.toggle('hide')">
     <div class="rank">${i+1}</div>
     <div class="pmain"><div class="nm">${top?'🔥 ':''}${p.name} <span style="color:var(--muted);font-weight:600">${p.side||''}</span></div>
-      <div class="meta"><span class="chip mk">${mk}</span>${p.verdict&&p.verdict!=="KEEP"?`<span class="vbadge v-${p.verdict.toLowerCase()}">${p.verdict==="CONFIRMED"?"✓ confirmed":p.verdict}</span>`:""}<span class="num">${num}</span> <span class="edge">${fmtEdge(p.edge)}</span> <span class="num" style="color:var(--muted)">${price} ${p.book||''}${p.n_books>1?` · best of ${p.n_books}`:''}</span></div></div>
+      <div class="meta"><span class="chip mk">${mk}</span>${p.verdict&&p.verdict!=="KEEP"?`<span class="vbadge v-${p.verdict.toLowerCase()}">${p.verdict==="CONFIRMED"?"✓ confirmed":p.verdict}</span>`:""}<span class="num">${num}</span> <span class="edge${(typeof p.edge==="number"&&p.edge<0)?" neg":""}">${fmtEdge(p.edge)}</span> <span class="num" style="color:var(--muted)">${price} ${p.book||''}${p.n_books>1?` · best of ${p.n_books}`:''}</span></div></div>
     <div class="pscore"><div class="v" style="color:${col}">${sc}</div><div class="l">Desk Score</div><div class="sbar"><i style="width:${sc}%;background:${col}"></i></div></div>
     <div class="why hide">${p.reason||'—'}${renderCard(p.scorecard)}</div>
   </div>`;

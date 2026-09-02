@@ -20,18 +20,24 @@ EDGE_PEAK = 0.11        # edge beyond which a bigger gap is a stale-model red fl
 MIN_HITTABLE = 0.45     # a "best bet" must have at least this chance to win — no lottery tickets
 CAT_CAP = 3             # max picks from any single market on the best-bets board (diversity)
 
-def _desk_score(edge, model_p, mult=1.0):
+def _desk_score(edge, model_p, mult=1.0, anchor=0.52):
     """Unified Desk Score = CONVICTION, not raw edge. Two components:
-      value    — the edge, humped so a blowout gap can't top the board
-      hittable — reward likely plays and PENALIZE longshots, so a +1000 anytime-TD lottery with a
-                 big % edge can never outrank a -140 near-lock (the bug Alex caught).
+      value    — the edge, humped so a blowout gap can't top the board, and DISCOUNTED for
+                 low-probability plays (a tail edge is noisier and carries favorite-longshot
+                 bias, so a +1000 lotto's big % edge counts far less than a coin-flip's).
+      hittable — reward likely plays, penalize longshots, measured against `anchor` — the
+                 neutral hit-probability for THIS market. Yardage/counts are ~50/50 bets
+                 (anchor 0.52); a TD Yes is always a dog to score, so its neutral point is
+                 much lower (~0.35). Using one flat anchor let a +1000 TD lotto outrank a +135
+                 value TD; a market-appropriate anchor fixes it.
     A best bet is something you'd put real money on: probable AND +value AND a trusted signal."""
     edge = float(edge or 0); p = float(model_p if model_p is not None else 0.5)
     if edge <= EDGE_PEAK:
         val = edge * 260                             # 4%→10, 8%→21, 11%→29
     else:
         val = EDGE_PEAK * 260 - (edge - EDGE_PEAK) * 260   # decay past the peak
-    hittable = (p - 0.52) * 55                        # p .70→+10, .52→0, .20 (longshot)→-18
+    val *= min(1.0, p / 0.40)                          # tail-reliability (harmless for p>=.40)
+    hittable = (p - anchor) * 55
     score = (45 + val + hittable) * float(mult or 1.0)
     return round(float(np.clip(score, 20, 95)), 1)
 
@@ -42,10 +48,13 @@ def prop_score(row):
     return _desk_score(row.get("edge"), row.get("model_p"), row.get("score_mult", 1.0))
 
 
+TD_ANCHOR = 0.35   # a typical anytime-TD Yes is a ~35% dog to score — the neutral hit point here
+
 def td_score(row):
-    """TD board on the SAME conviction scale — so a longshot anytime-TD (low model_p) scores low
-    and can't masquerade as a best bet, no matter how big its % edge vs a fat-margin market."""
-    return _desk_score(row.get("edge"), row.get("p_model"))
+    """TD board on the SAME conviction scale, but anchored to TD reality (a Yes is a dog to
+    score, so 0.35 is neutral, not 0.52). A +1000 lotto still can't top it (tail discount +
+    hittable penalty), and a juiced -195 favorite whose Yes is NEGATIVE-edge still floors at 20."""
+    return _desk_score(row.get("edge"), row.get("p_model"), anchor=TD_ANCHOR)
 
 
 def game_score(desk_conf):
@@ -93,12 +102,16 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "reason": rsn})
     allp = pd.DataFrame(rows)
     if len(allp):
-        # per-category top N. Anytime-TD is a "who's most likely to score" view — sort it by
-        # probability so the near-lock scorers (favorites) lead, not just +1000 lotteries.
+        # per-category top N, sorted by Desk Score EVERYWHERE (including anytime-TD). Sorting TD
+        # by raw probability was wrong: it floated juiced favorites (Jonathan Taylor -195, our
+        # model 47% -> a NEGATIVE-edge bet) to the top of the tab with a Desk Score of 20, above
+        # the actual +value plays (Adams +135, Rice +150). Desk Score already balances both
+        # failure modes — it sinks +1000 lottery longshots (low hit prob) AND -195 negative-edge
+        # favorites (no Yes value) — so it is the honest sort for a picks board, and it makes the
+        # "ranked by Desk Score" header true.
         for cat in PROP_CATEGORIES:
             sub = allp[allp.cat == cat]
-            sort_col = "model_p" if cat == "anytime_td" else "score"
-            sub = sub.sort_values(sort_col, ascending=False, na_position="last").head(top)
+            sub = sub.sort_values("score", ascending=False, na_position="last").head(top)
             if len(sub):
                 out["by_category"][cat] = sub.to_dict("records")
         # BEST BETS = best-across, but only genuinely hittable plays (no lottery longshots).
