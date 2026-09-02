@@ -134,7 +134,21 @@ the steering. Neither needs the owner's input.
   year-over-year; coach pass tendency persists if the coach stays (0.44), flips on a change.
 - **xTD (decomposed expected TDs)** = Σ zone × type of [team plays × coach pass-rate × player
   share × conversion]. Dead heat vs pooled at Week 1; **wins in-season by 2-3% Brier,
-  replicated 2024 and 2025.** Linear recal a=.084 b=.812; blend w=.55 → .85 by Week 5.
+  replicated 2024 and 2025.** Linear recal a=.085 b=.741 (refit WITH the environment); blend
+  w=.55 → .85 by Week 5.
+- **ATD dial-in (`td_env_validate.py`, `td_env_validation.json`).** The TD environment was on
+  the wrong scale: 0.0957 TDs per implied point assumed, **0.1387·pts − 0.717 measured** on
+  2,718 team-games — every offense under-counted ~10%, the best ~17%, and that (not the
+  market) is why every star sat 10-25 pts under his price. Last season's team TD rate adds
+  nothing beyond implied points; the full env ratio (k=1) earned the best Brier. Recal refit
+  with the environment → top bucket calibrated out of sample (pred .50, hit .54). **Star
+  reality: 1-TD/game players score in 51% of next season's games (62% weeks 1-3, small n);
+  the market prices them 64-76%.** So TD confidence is edge at plus money, never hit rate,
+  and the TD Stack is three most-likely +EV scorers at 15-30:1 (a 6-12:1 three-leg needs the
+  overpriced stars — impossible with real edge). Tested and rejected: early-season goal-line
+  stickiness (wash), healthy-roster shares (loses .1666 vs .1624). Rail: >1.5× the consensus
+  in weeks 0-3 = stale-role suspicion, trust ×.8, off the stack — logged for the grading loop.
+  Raw TD prices + environment are cached so re-pricing never costs credits.
 - **Structural truths**: near-locks are minus-money and scarce; heavy TD favorites are usually
   negative-edge Yes bets and TD value lives on moderate dogs; anytime-TD needs its own
   conviction anchor (0.35, not 0.52); game lines are the most efficient market and rarely

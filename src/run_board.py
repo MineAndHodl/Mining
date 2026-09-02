@@ -55,12 +55,16 @@ def run(key=None, days=14, rebuild_games=False, cached=False):
 
     # 2) TD board (now calibrated)
     try:
-        if cached and os.path.exists(cache_t):
+        # cached = re-PRICE the last fetched prices (model changes never cost credits);
+        # falls back to the last priced board only if the raw price cache is missing
+        if cached and os.path.exists(tb.RAW_PRICES):
+            tdb, _ = tb.build_td_board(key=key, days=days, cached=True)
+        elif cached and os.path.exists(cache_t):
             tdb = pd.read_parquet(cache_t)
         else:
             tdb, _ = tb.build_td_board(key=key, days=days)
-            if len(tdb):
-                tdb.to_parquet(cache_t)
+        if len(tdb):
+            tdb.to_parquet(cache_t)
     except Exception as e:
         tdb = pd.DataFrame(); print("td board skipped:", e)
 
@@ -97,8 +101,9 @@ def run(key=None, days=14, rebuild_games=False, cached=False):
 
     # 6) parlay lanes. The Sunday Stack is built from the graded slate (offline, every run);
     #    the primetime SGPs need odds (reused in cached mode).
-    import sunday_stack as ss
+    import sunday_stack as ss, atd_stack as ats
     ranked["sunday_stack"] = ss.build_stack(ranked)
+    ranked["td_stack"] = ats.build_stack([r for r in pool if r.get("cat") == "anytime_td"])
     ranked.pop("whale_missile", None)
     if cached:
         ranked["primetime_sgps"] = prev.get("primetime_sgps", [])
@@ -123,6 +128,7 @@ def run(key=None, days=14, rebuild_games=False, cached=False):
     print(f"board rebuilt: {len(ranked.get('best_props', []))} best props, "
           f"{len(ranked.get('best_games', []))} games, "
           f"{'stack ' + str(ranked['sunday_stack']['combined_american']) if ranked.get('sunday_stack') else 'no stack'}, "
+          f"{'TD stack ' + str(ranked['td_stack']['combined_american']) if ranked.get('td_stack') else 'no TD stack'}, "
           f"{len(ranked.get('primetime_sgps', []))} SGPs")
     return ranked
 

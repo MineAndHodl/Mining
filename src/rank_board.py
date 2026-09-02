@@ -139,6 +139,9 @@ def _td_reason(r, mp, imp, edge):
     rn = r.get("role_note")
     if isinstance(rn, str) and rn:
         bits.append(f"injury angle: {rn}")
+    zn = r.get("rz_note")
+    if isinstance(zn, str) and zn:
+        bits.append(f"the opponent is {zn} — a measured but small effect (~5%)")
     body = "; ".join(bits)
     lead = f"{name} to score. "
     if lam is not None:
@@ -146,12 +149,14 @@ def _td_reason(r, mp, imp, edge):
     else:
         lead += f"We make him ~{mp}% to find the end zone. "
     case = (body[0].upper() + body[1:] + ". ") if body else ""
+    bk = r.get("book"); nb = _fnum(r.get("n_books")); pr = _fnum(r.get("price"))
+    shop = (f" Best price {int(pr):+d} at {str(bk).replace('_us','').title()}" + (f" (shopped across {int(nb)} books)" if nb and nb > 1 else "") + ".") if (pr is not None and bk) else ""
     if edge >= 0.03:
         price = (f"The market has him at {imp}% implied; we're higher, so there's real Yes value here — "
-                 f"but anytime-TD is a one-sided, fat-margin market, so it's sized as a small add.")
-    elif mp >= 50:
-        price = (f"He's a likely scorer, but the market already prices that ({imp}% implied) — no Yes value at this number; "
-                 f"we show him as a red-zone reference and an SGP building block, not a straight bet.")
+                 f"but anytime-TD is a one-sided, fat-margin market, so it's sized as a small add.{shop}")
+    elif mp >= 45:
+        price = (f"He's one of the likelier scorers on the slate, but the market prices him even higher ({imp}% implied at the best "
+                 f"book) — star touchdowns get overbet, so there's no Yes value; a red-zone reference and an SGP building block, not a bet.")
     else:
         price = f"Against {imp}% implied there's no edge — reference only."
     return lead + case + price
@@ -194,10 +199,17 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
             mp = int((r.get("p_model") or 0) * 100); imp = int((r.get("p_implied") or 0) * 100)
             edge = float(r.get("edge") or 0)
             rsn = _td_reason(r, mp, imp, edge)
-            rows.append({"cat": "anytime_td", "score": td_score(r), "name": r["name"],
+            sc = td_score(r)
+            flagged = bool(r.get("mkt_flag")) if r.get("mkt_flag") is not None and r.get("mkt_flag") == r.get("mkt_flag") else False
+            if flagged:
+                sc = round(sc * 0.8, 1)
+                rsn += (f" Trust cut: we sit {r.get('mkt_ratio')}x above the whole market on a last-season role read with no "
+                        f"current-season games — the market's role read wins until he proves the share (off the TD Stack).")
+            rows.append({"cat": "anytime_td", "score": sc, "name": r["name"], "mkt_flag": flagged, "mkt_ratio": _nn(r.get("mkt_ratio")),
                          "game": r.get("game"), "line": 0.5, "side": "Yes",
                          "our_num": r.get("p_model"), "edge": r.get("edge"), "ev": None,
-                         "model_p": r.get("p_model"), "price": r.get("price"), "book": "draftkings",
+                         "model_p": r.get("p_model"), "price": r.get("price"), "book": _nn(r.get("book")) or "draftkings",
+                         "n_books": _nn(r.get("n_books")), "position": _nn(r.get("position")),
                          "reason": rsn})
     allp = pd.DataFrame(rows)
     if len(allp):

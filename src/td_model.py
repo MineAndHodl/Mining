@@ -94,18 +94,33 @@ def team_env(sample_team_tds_pg: dict, market_spread_home, market_total, home, a
     return out
 
 
-CAL_A, CAL_B = 0.055, 0.87  # linear recalibration fitted on 2025 w10-18 holdout
+CAL_A, CAL_B = 0.055, 0.916  # refit WITH the env multiplier (td_env_validate.py --final: fit 2022->23 + 2023->24, test 2024->25)
 
 
 def p_calibrated(lam):
     return float(np.clip(CAL_A + CAL_B * (1 - np.exp(-lam)), 0.02, 0.85))
 
 
+# MEASURED (td_env_validate.py, 2,718 team-games 2021-25): offensive TDs = 0.1387 * implied
+# points - 0.717. The old constant (0.62*1.08/7 = 0.0957/pt, no intercept) under-counted every
+# offense by ~10% and the best offenses by ~17% (27 implied pts -> 2.58 TDs vs 3.03 real), and
+# was the reason every star scorer sat 10-25 pts under his market price. Last season's team TD
+# rate adds NOTHING beyond the market's implied points (coef .007), and the full ratio (k=1)
+# earned the best out-of-sample Brier (.1650 vs .1665 with no environment).
+TD_PER_IMPLIED_PT, TD_INTERCEPT = 0.1387, -0.717
+ENV_CLIP = (0.5, 1.8)
+
+
+def implied_team_tds(pts):
+    return max(TD_PER_IMPLIED_PT * float(pts) + TD_INTERCEPT, 0.6)
+
+
 def env_multipliers(team_td_baseline: dict, spread_home, total, home, away):
-    """Real-baseline env: implied TDs from market vs team's actual TDs/gm."""
+    """Environment: the market's implied TDs for each team (measured scale) over the team's
+    own baseline TDs/gm that the player's lambda was built on."""
     pts_home = (total - spread_home) / 2
     pts_away = total - pts_home
-    return {t: (p*OFF_TD_POINTS_SHARE/7.0*1.08) / max(team_td_baseline.get(t, 2.4), 0.8)
+    return {t: float(np.clip(implied_team_tds(p) / max(team_td_baseline.get(t, 2.4), 0.8), *ENV_CLIP))
             for t, p in ((home, pts_home), (away, pts_away))}
 
 

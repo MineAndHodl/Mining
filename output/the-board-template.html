@@ -113,7 +113,7 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 <script>
 const D = /*DATA*/{};
 const CATLABEL={rec_yds:"Receiving Yds",rush_yds:"Rushing Yds",receptions:"Receptions",anytime_td:"Anytime TD",pass_yds:"Passing Yds",rush_att:"Rush Att"};
-const VIEWS=[["best","🎫 The Card"],["games","🏈 Games"],["stack","🧱 Sunday Stack"]];
+const VIEWS=[["best","🎫 The Card"],["games","🏈 Games"],["stack","🧱 Sunday Stack"],["tdstack","🎯 TD Stack"]];
 if((D.primetime_sgps||[]).length) VIEWS.push(["sgp","🏟️ Primetime SGP"]);
 Object.keys(D.by_category||{}).forEach(c=>VIEWS.push([c,CATLABEL[c]||c]));
 const HINTS={best:"Top plays across every category, ranked by conviction.",games:"Spreads, totals & moneylines — best value on the slate."};
@@ -220,6 +220,18 @@ function render(){
       `<div class="note" style="margin-top:12px">${m.note||''}</div>`;
     return;
   }
+  if(active==="tdstack"){
+    hint.textContent="THE TD STACK — 3 real scorers (36%+ on our numbers, positive edge at the shopped best price), one per game, chosen for the best chance to cash. Why it pays 15-30:1 and not 6-12:1: last season\u2019s touchdown-a-game backs score in only ~51% of next season\u2019s games (measured) and the market prices them at 64-76%, so the +EV scorers live at plus money. Real edge, lotto-lite sizing; its own record.";
+    const m=D.td_stack;
+    if(!m){L.innerHTML='<div class="empty">No TD stack this slate (needs 3+ real scorers with a positive edge across different games).</div>';return;}
+    const ng=(m.games&&m.games.length)||1;
+    L.innerHTML=`<div class="play top" style="cursor:default"><div class="rank">🎯</div>
+      <div class="pmain"><div class="nm">TD Stack</div><div class="meta"><span class="chip mk">${m.n_legs} legs · ${ng} games</span><span class="num">$100 → <b>$${Math.round(100*(m.combined_decimal||0)).toLocaleString()}</b></span><span class="num" style="color:var(--muted)">cashes ~${Math.round((m.true_prob||0)*100)}% on our numbers · fair ${m.fair_american>0?'+':''}${m.fair_american}</span><span class="edge">${m.ev!=null?((m.ev>=0?'+':'')+Math.round(m.ev*100)+'% EV'):''}</span></div></div>
+      <div class="pscore"><div class="v" style="color:var(--gold)">${(m.combined_american>0?'+':'')+m.combined_american}</div><div class="l">Payout</div></div></div>`+
+      m.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta"><span class="grade" style="font-size:14px;color:${GCOL[l.grade]||'var(--dim)'}">${l.grade||''}</span><span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">model ${Math.round((l.model_p||0)*100)}%</span> <span class="num" style="color:var(--dim)">${l.game||''}</span> <span class="num" style="color:var(--dim)">${l.book||''}</span></div></div><div class="pscore"></div></div>`).join('')+
+      `<div class="note" style="margin-top:12px">${m.note||''}</div>`;
+    return;
+  }
   if(active==="sgp"){
     hint.textContent="THE LOTTO LANE — one correlated same-game stack per primetime game, tuned to 30-100:1 and priced by our correlation model. Bet it at DK only if their quote is LONGER than our fair price (the book under-pricing the correlation). Its own record.";
     const list=D.primetime_sgps||[];
@@ -245,7 +257,9 @@ function render(){
   }else{
     const p=(D.by_category||{})[active]||[];
     const nrec=p.filter(x=>x.recommended).length;
-    hint.textContent=`Top ${p.length} in ${CATLABEL[active]||active}, ranked by Desk Score — ${nrec} recommended, the rest shown as leans/reference (not counted).`;
+    hint.textContent=(active==="anytime_td")
+      ? `Anytime TD, shopped across 8 books, ranked by Desk Score. Why it's dogs: last season's touchdown-a-game backs score in only ~51% of next season's games (measured on 5 seasons), and the market prices them at 64-76% — stars get overbet. Our 50%s hit 54% out of sample, so the +EV touchdowns are the 36-48% scorers at plus money. A good TD play is a good price, not a lock.`
+      : `Top ${p.length} in ${CATLABEL[active]||active}, ranked by Desk Score — ${nrec} recommended, the rest shown as leans/reference (not counted).`;
     L.innerHTML=p.length?`<div class="count">${p.length} plays · ${nrec} recommended</div>`+p.map(propRow).join(""):'<div class="empty">Nothing in this category clears the bar.</div>';
   }
 }

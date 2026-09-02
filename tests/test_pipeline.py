@@ -374,13 +374,54 @@ def test_selection_over_pool():
     check("slate rows carry scorecards (main tab has sliders)", all((r.get("scorecard") or {}) for r in d.get("recommended", []) if not r.get("kind")))
 
 
+def test_td_shopping_and_stack():
+    """Anytime-TD is line-shopped across books; the TD Stack is +EV real scorers, one per game."""
+    print("\n-- anytime TD: shopping + TD stack --")
+    import json as _j
+    t = pd.read_parquet(os.path.join(HERE, "..", "data", "_raw_td_board.parquet"))
+    check("TD board carries shopped fields", all(c in t.columns for c in ("n_books", "implied_best", "implied_consensus", "book")))
+    check("TD prices come from multiple books (median >= 3)", t["n_books"].median() >= 3, f"median {t['n_books'].median()}")
+    check("best price never worse than consensus", (t["implied_best"] <= t["implied_consensus"] + 1e-9).all())
+    d = _j.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    s = d.get("td_stack")
+    check("TD stack present", bool(s))
+    if s:
+        legs = s["legs"]
+        check("TD stack has 2-4 legs", 2 <= len(legs) <= 4, f"n={len(legs)}")
+        check("one scorer per game", len({l["game"] for l in legs}) == len(legs))
+        check("every leg a real scorer (>=33%) with +edge", all(l["model_p"] >= 0.33 and (l.get("edge") or 0) >= 0.02 for l in legs))
+        check("TD stack pays ~4-39:1 and is +EV on our numbers", 400 <= s["combined_american"] <= 4000 and s["ev"] > 0, f"{s['combined_american']:+d} ev {s['ev']}")
+        check("TD stack prefers 3 real scorers when 3 clear the band", len(legs) >= 3 or len([r for r in d.get("pool_summary", {}).get("td_candidates", [])]) < 3, f"n={len(legs)}")
+        check("no early-season market-flagged scorer in the stack", not any(l.get("mkt_flag") for l in legs))
+
+
+def test_td_environment():
+    """The TD environment is on the MEASURED scale (td_env_validate.py), and the early-season
+    market-disagreement rail flags stale-role scorers."""
+    print("\n-- TD environment: measured scale, rail --")
+    import td_model as tdm, td_board as tb, xtd_model as xm
+    check("implied team TDs on the measured scale (27 pts -> ~3.0, not 2.6)", abs(tdm.implied_team_tds(27) - 3.03) < 0.05, f"{tdm.implied_team_tds(27):.2f}")
+    check("league-average implied points ~ league-average TDs (multiplier ~1)", abs(tdm.implied_team_tds(22.3) - 2.38) < 0.06)
+    b = {"DET": 3.647, "NO": 2.0}
+    m = tdm.env_multipliers(b, -7.0, 47.0, "DET", "NO")
+    check("elite offense no longer crushed by its own baseline (DET mult > 0.8)", m["DET"] > 0.8, f"{m['DET']:.2f}")
+    check("recalibration refit with the environment applied", xm.CAL["b"] < 0.8 and 0.7 < tdm.CAL_B < 1.0, f"{xm.CAL} {tdm.CAL_B}")
+    t = pd.read_parquet(os.path.join(HERE, "..", "data", "_raw_td_board.parquet"))
+    check("TD board carries the market-disagreement rail fields", "mkt_ratio" in t.columns and "mkt_flag" in t.columns)
+    fl = t[t.mkt_flag == True]
+    check("flagged scorers are the >1.5x-consensus cases", len(fl) == 0 or fl["mkt_ratio"].min() > tb.TD_MAX_MARKET_RATIO, f"min ratio {fl['mkt_ratio'].min() if len(fl) else None}")
+    check("raw TD prices + environment cached for free re-pricing", os.path.exists(tb.RAW_PRICES) and os.path.exists(tb.RAW_ENV))
+    top = t[t.p_model.notna()].sort_values("p_model", ascending=False).head(5)
+    check("top scorers priced in the measured 45-60% range (not 40-45)", top["p_model"].mean() > 0.45, f"{top['p_model'].mean():.3f}")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--offline", action="store_true"); a = ap.parse_args()
     print("=" * 60, "\n  DESK PIPELINE TEST SUITE\n", "=" * 60)
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

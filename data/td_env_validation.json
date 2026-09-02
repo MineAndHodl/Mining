@@ -1,0 +1,443 @@
+{
+ "scale": {
+  "n_team_games": 2718,
+  "mean_tds": 2.372,
+  "mean_imp_pts": 22.27,
+  "tds_per_point_naive": 0.1065,
+  "old_model_tds_per_point": 0.0957,
+  "ols_slope": 0.1387,
+  "ols_intercept": -0.717,
+  "corr_imp_pts": 0.381,
+  "walk_forward_2025": {
+   "implied_only": {
+    "mae_2025": 1.0422,
+    "coef": [
+     0.14,
+     -0.741
+    ]
+   },
+   "implied_plus_base": {
+    "mae_2025": 1.0425,
+    "coef": [
+     0.139,
+     0.007,
+     -0.746
+    ]
+   },
+   "base_only": {
+    "mae_2025": 1.1261,
+    "coef": [
+     0.427,
+     1.324
+    ]
+   }
+  },
+  "finding": "team TDs = 0.139*implied_pts -0.717; last season's team TD rate adds NOTHING beyond the market's implied points (coef ~0) -> the environment is the market's number, on the measured scale"
+ },
+ "elasticity": {
+  "measured_scale_k0.0": {
+   "k": 0.0,
+   "xtd_brier": 0.167,
+   "old_brier": 0.1673,
+   "blend_brier": 0.1665,
+   "blend_logloss": 0.5106,
+   "recal_xtd": [
+    0.084,
+    0.812
+   ],
+   "recal_old": [
+    0.063,
+    0.964
+   ],
+   "top_bucket": {
+    "n": 238,
+    "pred": 0.518,
+    "hit": 0.492
+   }
+  },
+  "measured_scale_k0.5": {
+   "k": 0.5,
+   "xtd_brier": 0.166,
+   "old_brier": 0.166,
+   "blend_brier": 0.1653,
+   "blend_logloss": 0.5077,
+   "recal_xtd": [
+    0.079,
+    0.82
+   ],
+   "recal_old": [
+    0.054,
+    0.995
+   ],
+   "top_bucket": {
+    "n": 202,
+    "pred": 0.517,
+    "hit": 0.545
+   }
+  },
+  "measured_scale_k0.75": {
+   "k": 0.75,
+   "xtd_brier": 0.1657,
+   "old_brier": 0.1657,
+   "blend_brier": 0.1651,
+   "blend_logloss": 0.507,
+   "recal_xtd": [
+    0.08,
+    0.807
+   ],
+   "recal_old": [
+    0.054,
+    0.982
+   ],
+   "top_bucket": {
+    "n": 201,
+    "pred": 0.51,
+    "hit": 0.512
+   }
+  },
+  "measured_scale_k1.0": {
+   "k": 1.0,
+   "xtd_brier": 0.1656,
+   "old_brier": 0.1657,
+   "blend_brier": 0.165,
+   "blend_logloss": 0.5069,
+   "recal_xtd": [
+    0.082,
+    0.783
+   ],
+   "recal_old": [
+    0.056,
+    0.953
+   ],
+   "top_bucket": {
+    "n": 187,
+    "pred": 0.507,
+    "hit": 0.508
+   }
+  },
+  "old_scale_k0.0": {
+   "k": 0.0,
+   "xtd_brier": 0.167,
+   "old_brier": 0.1673,
+   "blend_brier": 0.1665,
+   "blend_logloss": 0.5106,
+   "recal_xtd": [
+    0.084,
+    0.812
+   ],
+   "recal_old": [
+    0.063,
+    0.964
+   ],
+   "top_bucket": {
+    "n": 238,
+    "pred": 0.518,
+    "hit": 0.492
+   }
+  },
+  "old_scale_k0.5": {
+   "k": 0.5,
+   "xtd_brier": 0.1662,
+   "old_brier": 0.1662,
+   "blend_brier": 0.1655,
+   "blend_logloss": 0.5082,
+   "recal_xtd": [
+    0.081,
+    0.843
+   ],
+   "recal_old": [
+    0.056,
+    1.025
+   ],
+   "top_bucket": {
+    "n": 201,
+    "pred": 0.512,
+    "hit": 0.532
+   }
+  },
+  "old_scale_k0.75": {
+   "k": 0.75,
+   "xtd_brier": 0.166,
+   "old_brier": 0.166,
+   "blend_brier": 0.1653,
+   "blend_logloss": 0.5077,
+   "recal_xtd": [
+    0.083,
+    0.841
+   ],
+   "recal_old": [
+    0.056,
+    1.028
+   ],
+   "top_bucket": {
+    "n": 181,
+    "pred": 0.508,
+    "hit": 0.547
+   }
+  },
+  "old_scale_k1.0": {
+   "k": 1.0,
+   "xtd_brier": 0.1659,
+   "old_brier": 0.166,
+   "blend_brier": 0.1653,
+   "blend_logloss": 0.5077,
+   "recal_xtd": [
+    0.086,
+    0.827
+   ],
+   "recal_old": [
+    0.06,
+    1.012
+   ],
+   "top_bucket": {
+    "n": 162,
+    "pred": 0.504,
+    "hit": 0.531
+   }
+  }
+ },
+ "stars_realized": {
+  "(0.0, 0.2]": {
+   "n": 4762,
+   "hit": 0.17,
+   "lam_prev": 0.13,
+   "poisson_of_prev": 0.122,
+   "hit_early_w1_3": 0.16,
+   "n_early": 856
+  },
+  "(0.2, 0.4]": {
+   "n": 4550,
+   "hit": 0.229,
+   "lam_prev": 0.291,
+   "poisson_of_prev": 0.253,
+   "hit_early_w1_3": 0.21,
+   "n_early": 813
+  },
+  "(0.4, 0.6]": {
+   "n": 2339,
+   "hit": 0.322,
+   "lam_prev": 0.494,
+   "poisson_of_prev": 0.39,
+   "hit_early_w1_3": 0.307,
+   "n_early": 423
+  },
+  "(0.6, 0.8]": {
+   "n": 1017,
+   "hit": 0.383,
+   "lam_prev": 0.695,
+   "poisson_of_prev": 0.501,
+   "hit_early_w1_3": 0.424,
+   "n_early": 170
+  },
+  "(0.8, 1.0]": {
+   "n": 347,
+   "hit": 0.473,
+   "lam_prev": 0.905,
+   "poisson_of_prev": 0.595,
+   "hit_early_w1_3": 0.508,
+   "n_early": 61
+  },
+  "(1.0, 2.0]": {
+   "n": 168,
+   "hit": 0.512,
+   "lam_prev": 1.173,
+   "poisson_of_prev": 0.691,
+   "hit_early_w1_3": 0.621,
+   "n_early": 29
+  }
+ },
+ "decision": {
+  "env_tds_per_point": 0.1387,
+  "env_intercept": -0.717,
+  "k_star": 1.0,
+  "recal_xtd": [
+   0.085,
+   0.741
+  ],
+  "recal_old": [
+   0.055,
+   0.916
+  ]
+ },
+ "stickiness": {
+  "stick_0.29": {
+   "stick": 0.29,
+   "recal_xtd_w1_3": [
+    0.062,
+    0.731
+   ],
+   "w1_3": {
+    "n": 699,
+    "brier": 0.1715,
+    "logloss": 0.5224,
+    "top_n": 18,
+    "top_pred": 0.482,
+    "top_hit": 0.611
+   },
+   "w4_9": {
+    "n": 1260,
+    "brier": 0.168,
+    "logloss": 0.5146,
+    "top_n": 34,
+    "top_pred": 0.493,
+    "top_hit": 0.647
+   }
+  },
+  "stick_0.37": {
+   "stick": 0.37,
+   "recal_xtd_w1_3": [
+    0.063,
+    0.729
+   ],
+   "w1_3": {
+    "n": 699,
+    "brier": 0.1715,
+    "logloss": 0.5223,
+    "top_n": 19,
+    "top_pred": 0.48,
+    "top_hit": 0.632
+   },
+   "w4_9": {
+    "n": 1260,
+    "brier": 0.168,
+    "logloss": 0.5146,
+    "top_n": 36,
+    "top_pred": 0.49,
+    "top_hit": 0.639
+   }
+  },
+  "stick_0.6": {
+   "stick": 0.6,
+   "recal_xtd_w1_3": [
+    0.065,
+    0.72
+   ],
+   "w1_3": {
+    "n": 699,
+    "brier": 0.1714,
+    "logloss": 0.5223,
+    "top_n": 18,
+    "top_pred": 0.481,
+    "top_hit": 0.611
+   },
+   "w4_9": {
+    "n": 1260,
+    "brier": 0.168,
+    "logloss": 0.5148,
+    "top_n": 32,
+    "top_pred": 0.494,
+    "top_hit": 0.656
+   }
+  },
+  "stick_0.75": {
+   "stick": 0.75,
+   "recal_xtd_w1_3": [
+    0.066,
+    0.714
+   ],
+   "w1_3": {
+    "n": 699,
+    "brier": 0.1714,
+    "logloss": 0.5222,
+    "top_n": 19,
+    "top_pred": 0.479,
+    "top_hit": 0.579
+   },
+   "w4_9": {
+    "n": 1260,
+    "brier": 0.1681,
+    "logloss": 0.5149,
+    "top_n": 33,
+    "top_pred": 0.492,
+    "top_hit": 0.667
+   }
+  }
+ },
+ "healthy_roster_shares": {
+  "raw": {
+   "xtd_brier": 0.1624,
+   "logloss": 0.5009,
+   "w1_3_brier": 0.171,
+   "w1_3_logloss": 0.5221,
+   "recal": [
+    0.092,
+    0.717
+   ],
+   "top_n": 152,
+   "top_pred": 0.496,
+   "top_hit": 0.546
+  },
+  "healthy_core2": {
+   "xtd_brier": 0.1666,
+   "logloss": 0.5104,
+   "w1_3_brier": 0.1743,
+   "w1_3_logloss": 0.5306,
+   "recal": [
+    0.098,
+    0.678
+   ],
+   "top_n": 170,
+   "top_pred": 0.499,
+   "top_hit": 0.429
+  },
+  "note": "zone shares measured only in games where the group's core (top-2 by opps/game, min 4 games) were all active; recal fit on 2022->23 + 2023->24, test 2024->25, week-1 mode with env",
+  "soft_weight_0.5": {
+   "xtd_brier": 0.1627,
+   "logloss": 0.5014,
+   "w1_3_brier": 0.1708,
+   "recal": [
+    0.092,
+    0.689
+   ],
+   "top_n": 169,
+   "top_pred": 0.496,
+   "top_hit": 0.515
+  },
+  "decision": "NOT adopted: hard mask loses clearly; soft 0.5 weight -> see soft_weight_0.5"
+ },
+ "final_recal": {
+  "recal_xtd": [
+   0.085,
+   0.741
+  ],
+  "recal_old": [
+   0.055,
+   0.916
+  ],
+  "blend_w0.45": {
+   "brier": 0.1649,
+   "logloss": 0.5067,
+   "top_n": 150,
+   "top_pred": 0.5,
+   "top_hit": 0.533
+  },
+  "blend_w0.55": {
+   "brier": 0.1649,
+   "logloss": 0.5066,
+   "top_n": 148,
+   "top_pred": 0.501,
+   "top_hit": 0.541
+  },
+  "blend_w0.65": {
+   "brier": 0.1649,
+   "logloss": 0.5067,
+   "top_n": 146,
+   "top_pred": 0.501,
+   "top_hit": 0.541
+  },
+  "blend_w0.75": {
+   "brier": 0.165,
+   "logloss": 0.5069,
+   "top_n": 149,
+   "top_pred": 0.501,
+   "top_hit": 0.544
+  },
+  "blend_w1.0": {
+   "brier": 0.1654,
+   "logloss": 0.5082,
+   "top_n": 160,
+   "top_pred": 0.5,
+   "top_hit": 0.537
+  }
+ }
+}

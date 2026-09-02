@@ -43,7 +43,13 @@ POS_OK = ("RB", "WR", "TE", "QB", "FB")
 # shrinkage strengths (pseudo-observations)
 SHARE_PSEUDO_GAMES = 4.0      # player zone-share -> prior, weighted by games of data
 CONV_PSEUDO_OPPS = 25.0       # player conversion -> position x zone prior
-GL_YOY_STICKINESS = 0.29      # measured: how much last-season GL share survives to next season
+GL_YOY_STICKINESS = 0.37      # measured (5 seasons): slope of next-season GL share on last season's
+# Tested and NOT adopted (td_env_validate.py --stick): the goal-line role erodes through a season
+# (slope .65 in weeks 1-3, .48 weeks 4-9, .36 weeks 10-18), so a higher early-season stickiness
+# was tried — out-of-sample it was a wash (weeks 1-3 Brier .1715 vs .1714 across .29/.37/.60/.75).
+# Open finding for the grading loop: week-1-mode predictions of .45-.55 HIT ~62% in weeks 1-3
+# (n=63, 3 seasons) vs ~50% mid-season — early-season stars may be under-priced by the shrink,
+# but the sample is too small to hand-apply a bump. build_xtd(gl_stick=...) is there to retest.
 COACH_CHANGE_SHRINK = 0.6     # new coach: pull RZ pass tendency this far toward league mean
 
 
@@ -118,15 +124,55 @@ def coach_map(season):
 
 
 # --------------------------------------------------------------------------- player layer
-def player_zone_shares(ev):
+HEALTHY_LEAD_MIN = {"rush": 3, "target": 2}   # a core player "played" if he had this many opps
+HEALTHY_CORE = 2                                # the group's core = top-2 by opps per game (>= 4 games)
+
+
+def healthy_mask(ev):
+    """Boolean per event row: were the team's CORE players of that type (top-2 by opportunities
+    per game, min 4 games) all active in that game? A backup's share measured while the starter
+    was hurt is stale the moment the starter returns (Vidal 2025: 150 carries in LAC weeks 6-13
+    with Hampton out; 5-14/game beside him), and the season TOTAL can even make the fill-in
+    look like the lead. Shares are measured on the healthy roster; the injury layer supplies the
+    cascade forward when a starter IS out — so the two never double count."""
+    pg = ev.groupby(["season", "posteam", "type", "pid", "game_id"]).size().reset_index(name="n")
+    rate = pg.groupby(["season", "posteam", "type", "pid"]).agg(g=("game_id", "nunique"), n=("n", "sum")).reset_index()
+    rate = rate[rate.g >= 4]; rate["pg"] = rate.n / rate.g
+    core = (rate.sort_values("pg", ascending=False).groupby(["season", "posteam", "type"]).head(HEALTHY_CORE)
+                .rename(columns={"pid": "core_pid"})[["season", "posteam", "type", "core_pid"]])
+    # per game: did every core player reach the threshold?
+    thr = pg["type"].map(HEALTHY_LEAD_MIN)
+    played = pg[pg.n >= thr][["season", "posteam", "type", "pid", "game_id"]].rename(columns={"pid": "core_pid"})
+    cg = core.merge(played, on=["season", "posteam", "type", "core_pid"], how="left")
+    ncore = core.groupby(["season", "posteam", "type"]).size().rename("n_core")
+    present = cg.dropna(subset=["game_id"]).groupby(["season", "posteam", "type", "game_id"]).size().rename("n_present").reset_index()
+    present = present.merge(ncore.reset_index(), on=["season", "posteam", "type"])
+    ok_games = present[present.n_present >= present.n_core][["season", "posteam", "type", "game_id"]]
+    ok_games["_ok"] = True
+    e = ev.merge(ok_games, on=["season", "posteam", "type", "game_id"], how="left")
+    return e["_ok"].fillna(False).values
+
+
+def player_zone_shares(ev, healthy_only=False, unhealthy_weight=1.0):
     """Per (player, team): share of the team's plays of each type in each zone, plus games.
-    A goal-line vulture shows up as a non-lead back holding GL rush share."""
-    tz = ev.groupby(["posteam", "zone", "type"]).size().rename("team_n")
-    pz = ev.groupby(["pid", "posteam", "zone", "type"]).agg(n=("td", "size"), tds=("td", "sum")).reset_index()
+    A goal-line vulture shows up as a non-lead back holding GL rush share. healthy_only drops
+    (or, with unhealthy_weight<1, down-weights) games where the group's core wasn't all active.
+    TESTED, NOT ADOPTED (td_env_validation.json healthy_roster_shares): dropping them loses
+    clearly out of sample (Brier .1666 vs .1624) — backups who got work keep getting some, and
+    starters get hurt again; the raw season share is the better predictor on average."""
+    if healthy_only and "season" in ev.columns:
+        ok = healthy_mask(ev)
+        ev = ev.assign(_w=np.where(ok, 1.0, float(unhealthy_weight)))
+        ev = ev[ev._w > 0]
+    else:
+        ev = ev.assign(_w=1.0)
+    tz = ev.groupby(["posteam", "zone", "type"])["_w"].sum().rename("team_n")
+    pz = ev.groupby(["pid", "posteam", "zone", "type"]).agg(n=("_w", "sum"), tds=("td", "sum")).reset_index()
     pz = pz.merge(tz.reset_index(), on=["posteam", "zone", "type"])
-    pz["share"] = pz["n"] / pz["team_n"].clip(lower=1)
-    games = ev.groupby(["pid", "posteam"])["game_id"].nunique().rename("games").reset_index()
-    pz = pz.merge(games, on=["pid", "posteam"])
+    pz["share"] = pz["n"] / pz["team_n"].clip(lower=1e-9)
+    # games of evidence behind the share = healthy games he appeared in for that type
+    games = ev.groupby(["pid", "posteam", "type"])["game_id"].nunique().rename("games").reset_index()
+    pz = pz.merge(games, on=["pid", "posteam", "type"])
     return pz
 
 
@@ -141,7 +187,7 @@ def conversion_priors(ev, players):
 
 # --------------------------------------------------------------------------- the model
 def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None,
-              new_coach_teams=None, week1_mode=None):
+              new_coach_teams=None, week1_mode=None, gl_stick=None, healthy_only=False, unhealthy_weight=1.0):
     """Return DataFrame[pid, name, position, team, xtd, xtd_rush, xtd_rec, gl_share, rz_tgt_share,
     coach_gl_pass_rate, vulture_share, conv_rush_gl, conv_tgt_rz, tds_last, xtd_last].
 
@@ -162,7 +208,7 @@ def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None
     tzp = team_zone_profile(ev_latest, latest)
     lg = league_zone_profile(tzp)
     conv = conversion_priors(ev_all, players)
-    shares = player_zone_shares(ev_latest)
+    shares = player_zone_shares(ev_latest, healthy_only=healthy_only, unhealthy_weight=unhealthy_weight)
     shares = shares.merge(players[["gsis_id", "position", "display_name"]], left_on="pid", right_on="gsis_id", how="left")
     shares = shares[shares.position.isin(POS_OK)]
 
@@ -178,7 +224,7 @@ def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None
     rows = []
     for (pid, team), g in shares.groupby(["pid", "posteam"]):
         pos = g["position"].iloc[0]; name = g["display_name"].iloc[0]
-        games = float(g["games"].iloc[0])
+        games = float(g["games"].max())
         tm = current_team.get(norm_name(name), team)       # play for whoever he plays for NOW
         mult = float(env_mult.get(tm, 1.0))
         xtd_rush = xtd_rec = 0.0
@@ -195,18 +241,20 @@ def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None
             plays_pg *= mult                                   # today's environment
             for typ in TYPES:
                 r = g[(g.zone == zone) & (g.type == typ)]
-                n = int(r["n"].iloc[0]) if len(r) else 0
+                n = float(r["n"].iloc[0]) if len(r) else 0.0
                 tds = int(r["tds"].iloc[0]) if len(r) else 0
                 share_obs = float(r["share"].iloc[0]) if len(r) else 0.0
                 # share shrinkage: toward his own overall share of that type (role), by games
                 own_type = g[g.type == typ]
                 own_share = float(own_type["n"].sum() / max(own_type["team_n"].sum(), 1)) if len(own_type) else 0.0
-                w = games / (games + SHARE_PSEUDO_GAMES)
+                g_typ = float(r["games"].iloc[0]) if len(r) else games
+                w = g_typ / (g_typ + SHARE_PSEUDO_GAMES)
                 share = w * share_obs + (1 - w) * own_share
                 # goal-line role is only ~29% sticky year over year: in week-1 mode, regress the
                 # GL share hard toward his general rush role (the honest prior for a new season)
                 if week1_mode and zone == "GL" and typ == "rush":
-                    share = GL_YOY_STICKINESS * share + (1 - GL_YOY_STICKINESS) * own_share
+                    st = GL_YOY_STICKINESS if gl_stick is None else float(gl_stick)
+                    share = st * share + (1 - st) * own_share
                 p_type = pass_rate if typ == "target" else (1 - pass_rate)
                 opps = plays_pg * p_type * share
                 c = conv_rate(pos, zone, typ, n, tds)
@@ -243,7 +291,10 @@ def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None
 # --------------------------------------------------------------------------- calibration
 # Fitted on the 2023->2024 walk-forward fold (see data/xtd_validation.json). Raw Poisson is
 # over-dispersed (the low bucket under-predicts, the top over-predicts); this compresses it.
-CAL = {"a": 0.084, "b": 0.812}
+# linear recalibration, refit WITH the environment multiplier applied (td_env_validate.py:
+# --final: fit 2022->23 + 2023->24, test 2024->25; top bucket pred .50 / hit .54). The earlier (0.084, 0.812)
+# was fit at env=1 and then applied under a mis-scaled multiplier -> stars under-priced.
+CAL = {"a": 0.085, "b": 0.741}
 def p_atd(xtd):
     raw = 1 - np.exp(-np.asarray(xtd, dtype=float))
     return np.clip(CAL["a"] + CAL["b"] * raw, 0.02, 0.85)

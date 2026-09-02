@@ -127,6 +127,28 @@ The board is the product: every pick on it must be something a sharp would nod a
 - **Parlay lanes flipped (Alex):** Sunday Stack = 4-6 recommended bets, one per game, 6-12:1, max-EV
   (compounds real edge; own record). Primetime SGP = the lotto, fair +2800..+9000 (~30-100:1 at DK),
   max correlation lift, bet only if DK quotes longer than our fair. `sunday_stack.py`, `primetime_sgp.tune_to_band`.
+- **TD environment + star calibration (`td_env_validate.py`, `td_env_validation.json`) — the ATD
+  dial-in:** (1) the env multiplier assumed 0.0957 TDs per implied point; measured on 2,718
+  team-games it is **0.1387·pts − 0.717** — every offense was under-counted ~10%, the best ~17%,
+  which is why every star sat 10-25 pts under his price. Last season's team TD rate adds NOTHING
+  beyond the market's implied points (coef .007); the full ratio (k=1) EARNED the best Brier
+  (.1650 vs .1665 no-env). (2) Recal refit WITH the environment (xTD .085/.741, pooled .055/.916,
+  blend .55): top bucket pred .50 → hit .54 out of sample — **when we say 50% it is 50%.**
+  (3) STAR REALITY: players at 1+ TD/game score in only **51%** of next season's games (62% in
+  weeks 1-3, n=29; 0.8-1.0 tier 47%); the market prices them 64-76% → stars are overbet, the
+  +EV touchdowns are 36-48% scorers at plus money. (4) Tested and NOT adopted: early-season
+  goal-line stickiness (.60 vs .37 — wash), healthy-roster shares (dropping games where a
+  starter was out LOSES, .1666 vs .1624; soft-weight a wash) — backups who got work keep getting
+  some. (5) Anytime-TD line-shopped across 8 books (`TD_BOOKS`; best price vs consensus): 194
+  +EV vs 67 DK-only; much TD edge is pure price. (6) Opponent red-zone defense measured small
+  (soft tercile ×1.06, stingy ×.97), capped multiplier. (7) Early-season market-disagreement
+  rail: >1.5× the consensus with no current-season games = stale-role suspicion (trust ×.8,
+  off the TD Stack), logged for the grading loop. Raw prices + environment are cached
+  (`_raw_td_prices.parquet`, `_td_env.json`) so re-pricing never costs credits.
+- **TD Stack (`atd_stack.py`):** 3 of the MOST LIKELY +EV scorers (p≥.36, edge≥.03, one per
+  game, ≤2 per position, parlay EV≥+30%), objective P(cash) not payout → lands 15-30:1 at ~8%.
+  A 6-12:1 three-leg needs 55% scorers at -120 — exactly the overpriced stars — so that shape
+  is impossible with real edge; say so on the page. Falls back to the best 2-leg.
 - **Structural truths:** near-locks are minus-money and scarce (books balance ~50/50), so
   "8-10 near-locks at 100:1" is self-contradictory — the missile is an honest lotto of
   53-60% favorites. Week 1 is the weakest week (recency needs games across the offseason
@@ -168,11 +190,14 @@ correlation measurements, DK SGP calibration quotes.
   per-zone conversion vs position prior (finishing) · environment multiplier from implied
   team points · last-season TDs vs role-expected (regression) · Week-1 goal-line shrink
   (29% stickiness) · blend with pooled model (ramps in-season) · linear recalibration.
-- EARN: opponent red-zone defense (TDs allowed per RZ trip, pbp) · QB-sneak share of
-  goal-line carries (already in pbp as a rusher; make it explicit as a vulture) · 2-point
-  and short-field (turnover/field-position) drive starts · red-zone route share ·
-  score-state (trailing teams throw at the goal line).
-- NEED: goal-line personnel/formation · injuries (a starter out reshuffles every share).
+- WIRED (measured): environment on the measured implied-points scale (k=1) · opponent red-zone
+  defense (small, capped) · 8-book line shop · early-season market-disagreement rail ·
+  injury Out gate + role cascade.
+- EARN: QB-sneak share of goal-line carries (already in pbp as a rusher; make it explicit as a
+  vulture) · 2-point and short-field (turnover/field-position) drive starts · red-zone route
+  share · score-state (trailing teams throw at the goal line) · early-season top-bucket
+  under-prediction (.45-.55 predictions hit ~62% in weeks 1-3, n=63 — grading loop to settle).
+- NEED: goal-line personnel/formation · game-day inactives.
 
 ### Games (spreads, totals, moneylines)
 - WIRED: Desk Confidence (off-market points vs consensus, key numbers) · CLV engine · multi-
@@ -190,10 +215,12 @@ correlation measurements, DK SGP calibration quotes.
 
 ## Pipeline (src/)
 `run_board.py` is the weekly run: odds → `prop_board` (multifactor projection, volume-CV
-pricing, 8-book line shop) → `td_board` (pooled + xTD blend) → `rank_board` (conviction
-Desk Score, diversity cap, TD anchor) → `board_factors`/`factor_scorecard` (per-market
-scorecards) → `whale_missile` + `primetime_sgp` → `build_board_page` → `output/the-board.html`.
-`--cached` re-ranks offline from `_raw_*` parquets (no credits; won't recompute pricing).
+pricing, 8-book line shop) → `td_board` (pooled + xTD blend, 8-book TD shop, measured env,
+RZ defense, rail) → `rank_board` (conviction Desk Score, diversity cap, TD anchor) →
+`grading` (The Card) → `board_factors`/`factor_scorecard` (per-market scorecards) →
+`sunday_stack` + `atd_stack` + `primetime_sgp` → `build_board_page` → `output/the-board.html`.
+`--cached` re-ranks offline: props from `_raw_prop_board.parquet` (pricing not recomputed),
+TDs RE-PRICED from the cached raw prices + environment (model changes are free).
 Research/validation: `multifactor.py`, `recency.py`, `xtd_model.py`, `xtd_validate.py`,
 `correlation_lab.py`, `clv_engine.py`. Tests: `python3 tests/test_pipeline.py` (must be green).
 
