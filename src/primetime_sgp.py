@@ -193,14 +193,16 @@ def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_le
         if ln:
             add(qb, "pass_yds", ln, pr, f"QB spine — a shootout lifts every over here ({int((hp or 0)*100)}% to hit)")
         # this QB's receivers (same team preferred; fall back to any if team unknown)
+        # stack the QB with his top-3 receivers — ONE market per player (never a player's yards
+        # AND his catches; those are ~the same event, DK haircuts the pair to almost nothing and
+        # it wastes a leg). Diversify across more pass-catchers instead.
         recs = [r for r in team_receivers(qteam) if r[2] == qteam] or team_receivers(qteam)
-        for nm, _, _ in recs[:2]:
+        for nm, _, _ in recs[:3]:
+            if len(legs) >= max_legs:
+                break
             ln, pr, hp = pick_line(nm, "rec_yds")
-            if ln and add(nm, "rec_yds", ln, pr, f"stacks with his QB (corr +0.59) — they hit together ({int((hp or 0)*100)}%)"):
-                # add his receptions over too (same player, tightly correlated)
-                lnr, prr, hpr = pick_line(nm, "receptions")
-                if lnr and len(legs) < max_legs:
-                    add(nm, "receptions", lnr, prr, f"same player as his yards leg — moves with it ({int((hpr or 0)*100)}%)")
+            if ln:
+                add(nm, "rec_yds", ln, pr, f"stacks with his QB (corr +0.59) — they rise together in a passing script ({int((hp or 0)*100)}%)")
 
     # anytime-TD legs: pick by VALUE, not by always grabbing the chalkiest favorite. A heavy
     # favorite is fine IF the model still sees value at its price; otherwise take the +edge dog.

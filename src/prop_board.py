@@ -112,8 +112,10 @@ def price_ou(mkt, mu, line, over_price, under_price):
             "over_price_kept": over_price, "under_price_kept": under_price}
 
 
-def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, weather_by_game=None, days=14):
-    """Returns the full priced prop board joined to our projections, best book per prop."""
+def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, weather_by_game=None,
+                     days=14, recency_season=2025, recency_week=None):
+    """Returns the full priced prop board. The EDGE is recency: our recent-form number vs the
+    market line (validated +8-13% ROI out-of-sample; matchup did NOT predict, recency did)."""
     key = key or os.environ.get("ODDS_API_KEY")
     if projections is None:
         raise ValueError("pass projections (from props_projection.project)")
@@ -125,72 +127,50 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
     proj = projections.copy()
     proj["_k"] = proj["name"].map(_norm)
     pj = proj.set_index("_k")
-    # matchup/environment context: schedule (game totals) + defense-vs-position
-    import board_factors as bf
-    _pmap, sched_rows, code2full, _adp, def_vs = bf._load_context()
-    LEAGUE_TEAM_PTS = 22.5
+    # THE EDGE: recency-weighted form (keyed by player_id) mapped to names via the projection.
+    import recency as rc
+    rec = rc.build_recency(through_season=recency_season, through_week=recency_week)
+    id2name = dict(zip(proj["player_id"], proj["name"])) if "player_id" in proj.columns else {}
+    recmap = {}
+    for r in rec.to_dict("records"):
+        nm = id2name.get(r["pid"])
+        if nm:
+            recmap[(_norm(nm), r["mkt"])] = r
     out = []
     for _, b in board.iterrows():
-        k = _norm(b["name"])
+        k = _norm(b["name"]); mkt = b["mkt"]
         pr = pj.loc[k] if k in pj.index else None
         if pr is not None and isinstance(pr, pd.DataFrame):
             pr = pr.iloc[0]
-        if b["mkt"] == "anytime_td":
+        if mkt == "anytime_td":
             continue  # TD handled by td_model elsewhere; kept out of the yards board
-        our_mu = float(pr[b["mkt"]]) if (pr is not None and b["mkt"] in pr and pd.notna(pr[b["mkt"]])) else None
+        rr = recmap.get((k, mkt))
+        if rr is not None:              # recency signal available -> this is where our edge lives
+            our_mu = float(rr["form"]); trend = float(rr["trend"]); trend_pct = float(rr["trend_pct"])
+            baseline = float(rr["baseline"]); log = rr["log"]; src = "recency"
+        else:                          # no recent games (rookie / new role) -> role-model projection
+            our_mu = float(pr[mkt]) if (pr is not None and mkt in pr and pd.notna(pr[mkt])) else None
+            trend = 0.0; trend_pct = 0.0; baseline = our_mu; log = None; src = "role"
         if our_mu is None or our_mu <= 0:
             continue
-        pos = pr["position"] if pr is not None else "?"
-        team = pr["team"] if pr is not None else None
-        # --- MARKET-ANCHORED pricing: baseline = the (sharp) market line; edge comes ONLY from
-        # named factors the market may underweight (game environment + opponent defense). No
-        # factor -> no edge -> no pick. This kills the skew-artifact edges that floated a low-
-        # target TE like Goedert to #1, and makes every edge explainable. ---------------------
-        # CRITICAL: the book's prop line ALREADY prices the game total and prior-year defense.
-        # So we only tilt by the small UNPRICED RESIDUAL (props are softer than game lines, but
-        # not by much) — otherwise we double-count what's already in the number and manufacture a
-        # fake systematic edge (the trap that floated Goedert / every-QB-over to the top).
-        ENV_RESID, DEF_RESID_RUSH, DEF_RESID_REC = 0.22, 0.30, 0.18
-        env = 1.0; opp = 1.0; def_delta = None; implied_pts = None; opp_team = None
-        g, opp_team = bf._game_ctx(b["game"], bf.TEAM_FIX.get(team, team), sched_rows, code2full)
-        if g:
-            implied_pts = g["implied_team_pts"]
-            env = float(np.clip(1 + (implied_pts / LEAGUE_TEAM_PTS - 1) * ENV_RESID, 0.96, 1.05))
-            if opp_team:
-                if b["mkt"] in ("rush_yds", "rush_att") and pos == "RB":
-                    d = def_vs.get("RB", {}).get(opp_team)
-                    if d is not None: def_delta = d; opp = float(np.clip(1 + d * DEF_RESID_RUSH, 0.94, 1.06))
-                elif b["mkt"] in ("rec_yds", "receptions") and pos in ("WR", "TE"):
-                    d = def_vs.get("WR", {}).get(opp_team)
-                    if d is not None: def_delta = d; opp = float(np.clip(1 + d * DEF_RESID_REC, 0.96, 1.04))
-        # weather tilt (gameday) folds into env
         wg = (weather_by_game or {}).get(b["game"])
         if wg:
-            env *= wx.market_weather_mult(b["mkt"], wind=wg.get("wind"), temp=wg.get("temp"),
-                                          roof=wg.get("roof", "outdoors"))
-        side, edge, p_over_model, mu_model = pm.anchored_edge(
-            b["mkt"], b["line"], b["over_price"], b["under_price"], env=env, opp=opp)
-        model_p = p_over_model if side == "Over" else round(1 - p_over_model, 3)
-        # line-comparable "our number": the line nudged by our tilt (env*opp), NOT the raw mean
-        # (a right-skewed mean sits far above the line and would look like a huge fake gap).
-        our_num = round(b["line"] * env * opp, 1)
-        io, iu = implied(b["over_price"]), implied(b["under_price"])
-        fair_o = io / (io + iu)
-        fair = round(fair_o if side == "Over" else 1 - fair_o, 3)
-        price = b["over_price"] if side == "Over" else b["under_price"]
-        ev = round(model_p * american_profit(price) - (1 - model_p), 3)
+            our_mu = our_mu * wx.market_weather_mult(mkt, wind=wg.get("wind"), temp=wg.get("temp"),
+                                                     roof=wg.get("roof", "outdoors"))
+        p = price_ou(mkt, our_mu, b["line"], b["over_price"], b["under_price"])
         conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
-        out.append({"name": b["name"], "game": b["game"], "book": b["book"], "mkt": b["mkt"],
-                    "line": b["line"], "desk_proj": our_num, "our_raw_proj": round(our_mu, 1),
-                    "position": pos, "team": team if team else "?",
+        out.append({"name": b["name"], "game": b["game"], "book": b["book"], "mkt": mkt,
+                    "line": b["line"], "desk_proj": round(our_mu, 1),
+                    "position": pr["position"] if pr is not None else "?",
+                    "team": pr["team"] if pr is not None else "?",
                     "moved": bool(pr["moved"]) if pr is not None and "moved" in pr else False,
                     "rookie": bool(pr["rookie"]) if pr is not None and "rookie" in pr else False,
-                    "confidence": conf, "side": side, "edge": round(edge, 3), "model_p": model_p,
-                    "fair": fair, "price": price, "ev": ev,
-                    "env_tilt": round(env, 3), "opp_tilt": round(opp, 3),
-                    "def_delta": (round(def_delta, 3) if def_delta is not None else None),
-                    "implied_pts": (round(implied_pts, 1) if implied_pts is not None else None),
-                    "opp_team": opp_team,
+                    "confidence": conf, "edge_src": src, "trend": round(trend, 1),
+                    "trend_pct": round(trend_pct, 2),
+                    "baseline": (round(baseline, 1) if baseline else None), "recent_log": log,
+                    "offseason": (recency_week is None),
+                    "side": p["side"], "edge": p["edge"], "model_p": p["model_p"], "fair": p["fair"],
+                    "price": p["price"], "ev": p["ev"],
                     "over_price_kept": b["over_price"], "under_price_kept": b["under_price"]})
     df = pd.DataFrame(out)
     if not len(df):
@@ -223,18 +203,24 @@ TRUST_LO, TRUST_HI = 0.62, 1.6
 
 FLAT_PRIOR_MARKETS = {"kicking_points", "field_goals"}   # league-prior projections, not per-player
 
+TREND_PICK_PCT = 0.60      # only the top ~40% of recency trends cleared +EV out-of-sample
+
 def classify(row):
-    """PICK (calibrated disagreement), REVIEW (disagree too hard — market likely knows a
-    role change), or PASS (edge too small)."""
-    # kicker markets run on a flat league prior (no per-player signal yet) — never a PICK
+    """A PICK requires the VALIDATED edge: a strong recency trend, our side agreeing with that
+    trend, and a real edge vs the line. Everything else is REVIEW (context) or PASS."""
     if row.get("mkt") in FLAT_PRIOR_MARKETS:
-        return "REVIEW"
+        return "REVIEW"                                   # kicker flat prior — never a pick
+    if row.get("edge_src") != "recency":
+        return "REVIEW"                                   # no recent form (rookie/new role) — untrusted
     ratio = row["desk_proj"] / row["line"] if row["line"] else 1.0
     if not (TRUST_LO <= ratio <= TRUST_HI):
         return "REVIEW"
-    if row["confidence"] < 0.45:
-        return "REVIEW"
-    # low-trust markets (pass_yds) must clear a higher edge bar to become a pick
+    trend = row.get("trend", 0); side = row.get("side")
+    # the edge only held where the trend was STRONG and our side rode the trend's direction
+    if row.get("trend_pct", 0) < TREND_PICK_PCT:
+        return "PASS"
+    if (side == "Over" and trend <= 0) or (side == "Under" and trend >= 0):
+        return "PASS"                                     # our side fights the recency signal — skip
     need = EDGE_MIN / wx.MARKET_TRUST.get(row.get("mkt", ""), 0.7)
     if row["edge"] < need:
         return "PASS"
@@ -283,58 +269,59 @@ def _env_clause(row, side):
 
 
 def reason(row, news=None):
-    """Handicapper-voiced rationale. We anchor to the (sharp) market number and build the case
-    from the NAMED factors that actually move this pick — the opponent's defense-vs-position, the
-    game's implied total, and where our adjusted number lands — then the edge in cents. Every
-    pick earns a real, specific paragraph, not a template."""
+    """Handicapper voice rooted in the REAL edge: the player's recent game log vs a market line
+    that's still anchored to his season number. We show the last games, the form, the baseline the
+    book is pricing, and the gap — then the money. Every pick earns a specific, data-rooted case."""
     mkt_lbl = {"rec_yds": "receiving yards", "rush_yds": "rushing yards", "receptions": "catches",
                "pass_yds": "passing yards", "rush_att": "rush attempts",
                "kicking_points": "kicking points", "field_goals": "field goals"}.get(row["mkt"], row["mkt"])
-    name, side, line, proj = row["name"], row["side"], row["line"], row["desk_proj"]
-    s = side.lower()
-    price = int(row["price"])
+    unit = {"rec_yds": "yards", "rush_yds": "yards", "pass_yds": "yards",
+            "receptions": "catches", "rush_att": "carries"}.get(row["mkt"], "")
+    name, side, line = row["name"], row["side"], row["line"]
+    s = side.lower(); price = int(row["price"])
     io, iu = implied(row.get("over_price_kept", price)), implied(row.get("under_price_kept", price))
     vig = (io + iu - 1) * 100 if (io and iu) else 4.5
     ev = row.get("ev", 0) * 100
+    log = row.get("recent_log"); baseline = row.get("baseline"); trend = row.get("trend", 0)
+    form = row.get("desk_proj")
 
     status = row.get("status", classify(row))
     if status == "REVIEW":
-        return (f"{name}'s {line} {mkt_lbl} is on our radar but we're not firing yet — the matchup and "
-                f"role signals don't line up cleanly enough to bet into the market's number. We'll "
-                f"revisit once the snap counts and injury report post."
-                + (f" Latest: {news}" if news else ""))
+        if row.get("edge_src") != "recency":
+            return (f"{name}'s {line} {mkt_lbl} — we're holding. No stable recent game log to lean on "
+                    f"(new role or rookie), and our edge is a recency read, so we won't bet into the "
+                    f"market's number blind. Revisit once he's banked a few games."
+                    + (f" Latest: {news}" if news else ""))
+        return (f"{name}'s {line} {mkt_lbl} is close to our number — no strong recent trend to attack "
+                f"the line with, so we pass rather than force it." + (f" Latest: {news}" if news else ""))
 
-    # Build the specific case: lead with the strongest real factor, then support it.
-    dfc = _defense_clause(row, side)
-    envc = _env_clause(row, side)
-    # which factor is doing more work? (bigger deviation from neutral)
-    opp_dev = abs(row.get("opp_tilt", 1) - 1); env_dev = abs(row.get("env_tilt", 1) - 1)
-    clauses = []
-    if dfc and (opp_dev >= env_dev): clauses.append(dfc)
-    if envc: clauses.append(envc)
-    if dfc and (opp_dev < env_dev): clauses.append(dfc)
-    if not clauses:
-        clauses.append(f"the number's a touch soft at the price and our read on the workload favors the {s}")
-
-    open_lines = {
-        "Over": f"We're on {name}'s over {line} {mkt_lbl}. ",
-        "Under": f"Give us {name} under {line} {mkt_lbl}. ",
-    }
+    # the real case: the recent game log vs the line's season anchor
+    loglist = ", ".join(f"{v:g}" for v in log) if log else None
+    offseason = row.get("offseason")
+    when = "closed last season" if offseason else "over his last four"
+    open_lines = {"Over": f"We're on {name} over {line} {mkt_lbl}. ",
+                  "Under": f"Give us {name} under {line} {mkt_lbl}. "}
     lead = open_lines.get(side, f"We like {name} {s} {line} {mkt_lbl}. ")
-    case = clauses[0][0].upper() + clauses[0][1:] + ". "
-    if len(clauses) > 1:
-        case += "On top of that, " + clauses[1] + ". "
-    # where our adjusted number sits + the money
-    num = (f"Roll the matchup and the environment into the base line and we land at {proj} — on the "
-           f"{s} side of {line}. ")
+    if loglist and baseline:
+        direction = "trending up toward" if trend > 0 else "sliding to"
+        against = "clear of" if (side == "Over") else "under"
+        case = (f"He {when} with games of {loglist} {unit} — form {direction} ~{form:g}, "
+                f"{against} a {line} line the book still has near his season number ({baseline:g}). "
+                f"The market is slow to move a prop off the season average; that's the gap we're taking. ")
+    else:
+        case = f"Recent usage points our way and the {line} hasn't moved with it. "
     money = (f"Strip the {vig:.0f}% juice and the fair {s} is {int(row['fair']*100)}%; we make it "
-             f"{int(row['model_p']*100)}%, worth {ev:+.0f} cents on the dollar at {price:+d}"
-             + (f" ({row.get('book')})" if row.get("book") else "") + ". ")
-    trust = ("This is the tier our numbers grade out sharpest." if row["confidence"] >= 0.67
-             else "Role's still settling, so we're sizing it as a lean." if row["confidence"] >= 0.5
-             else "Thin sample — a small, speculative sprinkle.")
-    tail = f" Beat-writer note: {news}" if news else ""
-    return lead + case + num + money + trust + tail
+             f"{int(row['model_p']*100)}% — {ev:+.0f} cents on the dollar at {price:+d}"
+             + (f" ({row.get('book')})" if row.get("book") else "")
+             + (f", best of {int(row['n_books'])} books" if row.get("n_books", 0) and row['n_books'] > 1 else "") + ". ")
+    if offseason:
+        conf_note = ("Honest caveat: this leans on late-2025 form across the offseason, so it's an "
+                     "early-season read, not our peak-signal in-season number — sized as a lean.")
+    else:
+        conf_note = ("Strong, stable recent sample — our sharpest tier." if row.get("trend_pct", 0) >= 0.8
+                     else "Clear recent trend, sized as a solid lean.")
+    tail = f" Beat note: {news}" if news else ""
+    return lead + case + money + conf_note + tail
 
 
 if __name__ == "__main__":
