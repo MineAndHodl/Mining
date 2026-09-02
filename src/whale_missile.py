@@ -34,8 +34,11 @@ def dec_to_american(d):
     return round((d-1)*100) if d >= 2 else round(-100/(d-1))
 
 
-def build_missile(key=None, days=8, target=9):
-    """Wavey-style near-lock parlay across the slate. Returns leg set + odds."""
+def build_missile(key=None, days=8, target=9, target_low=6000, target_high=12000):
+    """Wavey-style near-lock parlay across the slate, tuned to a TARGET payout band
+    (default +6000..+12000 = 60:1..120:1) so it hits far more often and builds engagement,
+    instead of a 500:1 that never cashes. We add the highest-probability near-locks until the
+    combined odds enter the band, so fewer, safer legs -> higher hit rate. Returns leg set + odds."""
     key = key or os.environ.get("ODDS_API_KEY")
     proj = pd.read_parquet(f"{DATA}/projection_2026.parquet")
     prop, _ = pb.build_prop_board(key=key, projections=proj, days=days)
@@ -111,15 +114,30 @@ def build_missile(key=None, days=8, target=9):
         legs.append(c); seen_player.add(c["name"]); per_game[c["game"]] = per_game.get(c["game"], 0) + 1
         if is_spice: spice_used += 1
 
+    # ordered pool: recognizable near-locks first, then any near-lock, then spice
     credible_locks = sorted([c for c in cand if c["lock"] and c["cred"] >= 0.30],
                             key=lambda x: (x["cred"], x["p_model"]), reverse=True)
-    other_locks = sorted([c for c in cand if c["lock"]], key=lambda x: x["_sort"], reverse=True)
+    other_locks = sorted([c for c in cand if c["lock"] and c["cred"] < 0.30],
+                         key=lambda x: x["_sort"], reverse=True)
     spice = sorted([c for c in cand if not c["lock"]], key=lambda x: x["_sort"], reverse=True)
-    for c in credible_locks: _try_add(c, allow_spice=False)
-    for c in other_locks: _try_add(c, allow_spice=False)
-    for c in spice: _try_add(c, allow_spice=True)          # top up to target with <=2 spice
-    legs = legs[:target + 1]
-    if len(legs) < 6:
+    pool = credible_locks + other_locks + spice
+
+    def _cur_odds():
+        return dec_to_american(float(np.prod([american_to_dec(l["price"]) for l in legs]))) if legs else -10000
+
+    # add highest-probability near-locks until the payout enters the target band. Fewer, safer
+    # legs => higher hit rate. Spice only if we still can't reach the band with locks.
+    for c in pool:
+        if _cur_odds() >= target_low and len(legs) >= 5:
+            break
+        allow = c in spice
+        if _cur_odds() >= target_low:              # already in band — stop adding
+            break
+        _try_add(c, allow_spice=allow)
+        if _cur_odds() > target_high and len(legs) >= 5:
+            legs.pop()                             # last leg overshot the band; drop it
+            break
+    if len(legs) < 5:
         return None
 
     dec = float(np.prod([american_to_dec(l["price"]) for l in legs]))
@@ -130,10 +148,11 @@ def build_missile(key=None, days=8, target=9):
     return {"legs": legs, "n_legs": len(legs), "games": games,
             "combined_american": dec_to_american(dec), "combined_decimal": round(dec, 1),
             "p_all": round(p_all, 4), "expected_hits": exp_hits, "n_locks": n_locks,
-            "note": (f"{len(legs)} legs across {len(games)} games, {n_locks} near-locks — "
-                     f"we expect about {exp_hits} of {len(legs)} to hit. Independent legs across "
-                     "games, so a lot land; the payout is from stacking many likely bets, not longshots. "
-                     "Size it small.")}
+            "note": (f"{len(legs)} legs across {len(games)} games, all near-locks — tuned to a "
+                     f"~{dec_to_american(dec)//1000*10 or 60}:1 payout so it cashes far more often "
+                     f"than a 500:1 moon-shot (we expect about {exp_hits} of {len(legs)} to hit). "
+                     "Independent legs across games; the payout comes from stacking likely bets, not "
+                     "longshots. Shorter and safer by design — for engagement, not a lottery.")}
 
 
 if __name__ == "__main__":

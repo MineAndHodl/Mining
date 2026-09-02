@@ -250,7 +250,9 @@ def test_whale_missile_discipline():
     if not m:
         check("missile present in board", False, "no whale_missile key"); return
     legs = m["legs"]
-    check("missile has 8-10 legs", 8 <= len(legs) <= 11, f"n={len(legs)}")
+    check("missile has 5-10 legs (odds-band tuned)", 5 <= len(legs) <= 10, f"n={len(legs)}")
+    check("missile payout in ~60-120:1 engagement band", 5000 <= m["combined_american"] <= 14000,
+          f"{m['combined_american']:+d}")
     lock_prices_ok = all(l["price"] <= -105 for l in legs if l.get("lock"))
     check("every lock is minus-money (market-agreed)", lock_prices_ok)
     n_lock = sum(1 for l in legs if l.get("lock"))

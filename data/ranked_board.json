@@ -1773,6 +1773,17 @@
     "_sort": 0.750375
    },
    {
+    "leg": "Breece Hall over 16.5 rec yds",
+    "price": -117,
+    "p_model": 0.696,
+    "type": "rec_yds",
+    "game": "New York Jets @ Tennessee Titans",
+    "name": "Breece Hall",
+    "lock": true,
+    "cred": 1.4,
+    "_sort": 0.836
+   },
+   {
     "leg": "Jaylen Waddle under 4.5 catches",
     "price": -114,
     "p_model": 0.618,
@@ -1782,68 +1793,22 @@
     "lock": true,
     "cred": 1.28,
     "_sort": 0.7458750000000001
-   },
-   {
-    "leg": "Courtland Sutton over 42.5 rec yds",
-    "price": -114,
-    "p_model": 0.639,
-    "type": "rec_yds",
-    "game": "Denver Broncos @ Kansas City Chiefs",
-    "name": "Courtland Sutton",
-    "lock": true,
-    "cred": 1.22,
-    "_sort": 0.76075
-   },
-   {
-    "leg": "DK Metcalf over 45.5 rec yds",
-    "price": -115,
-    "p_model": 0.63,
-    "type": "rec_yds",
-    "game": "Atlanta Falcons @ Pittsburgh Steelers",
-    "name": "DK Metcalf",
-    "lock": true,
-    "cred": 1.21,
-    "_sort": 0.750875
-   },
-   {
-    "leg": "Parker Washington under 52.5 rec yds",
-    "price": -113,
-    "p_model": 0.608,
-    "type": "rec_yds",
-    "game": "Cleveland Browns @ Jacksonville Jaguars",
-    "name": "Parker Washington",
-    "lock": true,
-    "cred": 1.17,
-    "_sort": 0.7245
-   },
-   {
-    "leg": "Bucky Irving over 13.5 rec yds",
-    "price": -113,
-    "p_model": 0.745,
-    "type": "rec_yds",
-    "game": "Tampa Bay Buccaneers @ Cincinnati Bengals",
-    "name": "Bucky Irving",
-    "lock": true,
-    "cred": 1.11,
-    "_sort": 0.856375
    }
   ],
-  "n_legs": 10,
+  "n_legs": 7,
   "games": [
-   "Atlanta Falcons @ Pittsburgh Steelers",
    "Buffalo Bills @ Houston Texans",
-   "Cleveland Browns @ Jacksonville Jaguars",
    "Dallas Cowboys @ New York Giants",
    "Denver Broncos @ Kansas City Chiefs",
-   "San Francisco 49ers @ Los Angeles Rams",
-   "Tampa Bay Buccaneers @ Cincinnati Bengals"
+   "New York Jets @ Tennessee Titans",
+   "San Francisco 49ers @ Los Angeles Rams"
   ],
-  "combined_american": 48577,
-  "combined_decimal": 486.8,
-  "p_all": 0.0098,
-  "expected_hits": 6.3,
-  "n_locks": 10,
-  "note": "10 legs across 7 games, 10 near-locks \u2014 we expect about 6.3 of 10 to hit. Independent legs across games, so a lot land; the payout is from stacking many likely bets, not longshots. Size it small."
+  "combined_american": 7140,
+  "combined_decimal": 72.4,
+  "p_all": 0.0374,
+  "expected_hits": 4.4,
+  "n_locks": 7,
+  "note": "7 legs across 5 games, all near-locks \u2014 tuned to a ~70:1 payout so it cashes far more often than a 500:1 moon-shot (we expect about 4.4 of 7 to hit). Independent legs across games; the payout comes from stacking likely bets, not longshots. Shorter and safer by design \u2014 for engagement, not a lottery."
  },
  "primetime_sgps": [
   {
@@ -1857,7 +1822,9 @@
      "mkt": "pass_yds",
      "line": 227.5,
      "price": -113,
-     "why": "QB spine \u2014 a passing/shootout game lifts every over here"
+     "why": "QB spine \u2014 a passing/shootout game lifts every over here",
+     "team": "SEA",
+     "pos": "QB"
     },
     {
      "leg": "Jaxon Smith-Njigba over 82.5 rec yds",
@@ -1865,7 +1832,9 @@
      "mkt": "rec_yds",
      "line": 82.5,
      "price": -112,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "SEA",
+     "pos": "WR"
     },
     {
      "leg": "Jaxon Smith-Njigba over 6.5 catches",
@@ -1873,7 +1842,9 @@
      "mkt": "receptions",
      "line": 6.5,
      "price": -109,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "SEA",
+     "pos": "WR"
     },
     {
      "leg": "Cooper Kupp over 32.5 rec yds",
@@ -1881,7 +1852,9 @@
      "mkt": "rec_yds",
      "line": 32.5,
      "price": -109,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "SEA",
+     "pos": "WR"
     },
     {
      "leg": "Cooper Kupp over 2.5 catches",
@@ -1889,7 +1862,9 @@
      "mkt": "receptions",
      "line": 2.5,
      "price": -156,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "SEA",
+     "pos": "WR"
     },
     {
      "leg": "Drake Maye over 226.5 pass yds",
@@ -1897,7 +1872,9 @@
      "mkt": "pass_yds",
      "line": 226.5,
      "price": -112,
-     "why": "QB spine \u2014 a passing/shootout game lifts every over here"
+     "why": "QB spine \u2014 a passing/shootout game lifts every over here",
+     "team": "NE",
+     "pos": "QB"
     },
     {
      "leg": "A.J. Brown over 61.5 rec yds",
@@ -1905,7 +1882,9 @@
      "mkt": "rec_yds",
      "line": 61.5,
      "price": -114,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "NE",
+     "pos": "WR"
     },
     {
      "leg": "A.J. Brown over 4.5 catches",
@@ -1913,7 +1892,9 @@
      "mkt": "receptions",
      "line": 4.5,
      "price": -148,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "NE",
+     "pos": "WR"
     },
     {
      "leg": "Hunter Henry over 33.5 rec yds",
@@ -1921,7 +1902,9 @@
      "mkt": "rec_yds",
      "line": 33.5,
      "price": -115,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "NE",
+     "pos": "TE"
     },
     {
      "leg": "Hunter Henry over 3.5 catches",
@@ -1929,13 +1912,19 @@
      "mkt": "receptions",
      "line": 3.5,
      "price": 119,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "NE",
+     "pos": "TE"
     }
    ],
    "n_legs": 10,
    "combined_american": 52378,
    "combined_decimal": 524.8,
-   "note": "10-leg same-game shootout stack at Draftkings. The legs are positively correlated (QB + his receivers + TDs all rise together in a high-scoring game), so the real joint chance beats the naive parlay math \u2014 that's the edge over a random SGP. Still a lotto: size it small."
+   "fair_american": 1619,
+   "correlation_lift": 30.52,
+   "true_joint_prob": 0.05817,
+   "naive_prob": 0.00191,
+   "note": "10-leg same-game shootout stack. The legs are positively correlated (QB + his receivers + TDs rise together), so the true chance of it hitting is 30.52x the naive parlay math. Our FAIR price is +1619 \u2014 bet it at Draftkings only if their SGP quote is LONGER than that (that's when the book under-prices the correlation). Size it small."
   },
   {
    "game": "San Francisco 49ers @ Los Angeles Rams",
@@ -1948,7 +1937,9 @@
      "mkt": "pass_yds",
      "line": 266.5,
      "price": -111,
-     "why": "QB spine \u2014 a passing/shootout game lifts every over here"
+     "why": "QB spine \u2014 a passing/shootout game lifts every over here",
+     "team": "LA",
+     "pos": "QB"
     },
     {
      "leg": "Puka Nacua over 90.5 rec yds",
@@ -1956,7 +1947,9 @@
      "mkt": "rec_yds",
      "line": 90.5,
      "price": -111,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "LA",
+     "pos": "WR"
     },
     {
      "leg": "Puka Nacua over 7.5 catches",
@@ -1964,7 +1957,9 @@
      "mkt": "receptions",
      "line": 7.5,
      "price": 108,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "LA",
+     "pos": "WR"
     },
     {
      "leg": "Davante Adams over 51.5 rec yds",
@@ -1972,7 +1967,9 @@
      "mkt": "rec_yds",
      "line": 51.5,
      "price": -112,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "LA",
+     "pos": "WR"
     },
     {
      "leg": "Davante Adams over 4.5 catches",
@@ -1980,7 +1977,9 @@
      "mkt": "receptions",
      "line": 4.5,
      "price": -104,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "LA",
+     "pos": "WR"
     },
     {
      "leg": "Brock Purdy over 243.5 pass yds",
@@ -1988,7 +1987,9 @@
      "mkt": "pass_yds",
      "line": 243.5,
      "price": -112,
-     "why": "QB spine \u2014 a passing/shootout game lifts every over here"
+     "why": "QB spine \u2014 a passing/shootout game lifts every over here",
+     "team": "SF",
+     "pos": "QB"
     },
     {
      "leg": "Mike Evans over 49.5 rec yds",
@@ -1996,7 +1997,9 @@
      "mkt": "rec_yds",
      "line": 49.5,
      "price": -110,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "SF",
+     "pos": "WR"
     },
     {
      "leg": "Mike Evans over 3.5 catches",
@@ -2004,7 +2007,9 @@
      "mkt": "receptions",
      "line": 3.5,
      "price": -128,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "SF",
+     "pos": "WR"
     },
     {
      "leg": "Christian McCaffrey over 37.5 rec yds",
@@ -2012,7 +2017,9 @@
      "mkt": "rec_yds",
      "line": 37.5,
      "price": -111,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "SF",
+     "pos": "RB"
     },
     {
      "leg": "Christian McCaffrey over 4.5 catches",
@@ -2020,13 +2027,19 @@
      "mkt": "receptions",
      "line": 4.5,
      "price": 105,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "SF",
+     "pos": "RB"
     }
    ],
    "n_legs": 10,
    "combined_american": 69897,
    "combined_decimal": 700.0,
-   "note": "10-leg same-game shootout stack at Draftkings. The legs are positively correlated (QB + his receivers + TDs all rise together in a high-scoring game), so the real joint chance beats the naive parlay math \u2014 that's the edge over a random SGP. Still a lotto: size it small."
+   "fair_american": 1847,
+   "correlation_lift": 35.96,
+   "true_joint_prob": 0.05137,
+   "naive_prob": 0.00143,
+   "note": "10-leg same-game shootout stack. The legs are positively correlated (QB + his receivers + TDs rise together), so the true chance of it hitting is 35.96x the naive parlay math. Our FAIR price is +1847 \u2014 bet it at Draftkings only if their SGP quote is LONGER than that (that's when the book under-prices the correlation). Size it small."
   },
   {
    "game": "Dallas Cowboys @ New York Giants",
@@ -2039,7 +2052,9 @@
      "mkt": "pass_yds",
      "line": 260.5,
      "price": -112,
-     "why": "QB spine \u2014 a passing/shootout game lifts every over here"
+     "why": "QB spine \u2014 a passing/shootout game lifts every over here",
+     "team": "DAL",
+     "pos": "QB"
     },
     {
      "leg": "CeeDee Lamb over 74.5 rec yds",
@@ -2047,7 +2062,9 @@
      "mkt": "rec_yds",
      "line": 74.5,
      "price": -111,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "DAL",
+     "pos": "WR"
     },
     {
      "leg": "CeeDee Lamb over 6.5 catches",
@@ -2055,7 +2072,9 @@
      "mkt": "receptions",
      "line": 6.5,
      "price": 117,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "DAL",
+     "pos": "WR"
     },
     {
      "leg": "George Pickens over 67.5 rec yds",
@@ -2063,7 +2082,9 @@
      "mkt": "rec_yds",
      "line": 67.5,
      "price": -114,
-     "why": "stacks with his QB (corr +0.16) \u2014 they hit together"
+     "why": "stacks with his QB (corr +0.16) \u2014 they hit together",
+     "team": "DAL",
+     "pos": "WR"
     },
     {
      "leg": "George Pickens over 5.5 catches",
@@ -2071,7 +2092,9 @@
      "mkt": "receptions",
      "line": 5.5,
      "price": 124,
-     "why": "same player as his yards leg \u2014 moves with it"
+     "why": "same player as his yards leg \u2014 moves with it",
+     "team": "DAL",
+     "pos": "WR"
     },
     {
      "leg": "Jaxson Dart over 214.5 pass yds",
@@ -2079,7 +2102,9 @@
      "mkt": "pass_yds",
      "line": 214.5,
      "price": -113,
-     "why": "QB spine \u2014 a passing/shootout game lifts every over here"
+     "why": "QB spine \u2014 a passing/shootout game lifts every over here",
+     "team": null,
+     "pos": null
     },
     {
      "leg": "Javonte Williams over 0.5 anytime TD",
@@ -2087,7 +2112,9 @@
      "mkt": "anytime_td",
      "line": 0.5,
      "price": -180,
-     "why": "anytime TD \u2014 ties to the same shootout script as the passing legs"
+     "why": "anytime TD \u2014 ties to the same shootout script as the passing legs",
+     "team": "DAL",
+     "pos": "RB"
     },
     {
      "leg": "Cam Skattebo over 0.5 anytime TD",
@@ -2095,7 +2122,9 @@
      "mkt": "anytime_td",
      "line": 0.5,
      "price": -105,
-     "why": "anytime TD \u2014 ties to the same shootout script as the passing legs"
+     "why": "anytime TD \u2014 ties to the same shootout script as the passing legs",
+     "team": "NYG",
+     "pos": "RB"
     },
     {
      "leg": "Malik Nabers over 0.5 anytime TD",
@@ -2103,13 +2132,19 @@
      "mkt": "anytime_td",
      "line": 0.5,
      "price": 145,
-     "why": "anytime TD \u2014 ties to the same shootout script as the passing legs"
+     "why": "anytime TD \u2014 ties to the same shootout script as the passing legs",
+     "team": "NYG",
+     "pos": "WR"
     }
    ],
    "n_legs": 9,
    "combined_american": 45948,
    "combined_decimal": 460.5,
-   "note": "9-leg same-game shootout stack at Draftkings. The legs are positively correlated (QB + his receivers + TDs all rise together in a high-scoring game), so the real joint chance beats the naive parlay math \u2014 that's the edge over a random SGP. Still a lotto: size it small."
+   "fair_american": 2866,
+   "correlation_lift": 15.53,
+   "true_joint_prob": 0.03372,
+   "naive_prob": 0.00217,
+   "note": "9-leg same-game shootout stack. The legs are positively correlated (QB + his receivers + TDs rise together), so the true chance of it hitting is 15.53x the naive parlay math. Our FAIR price is +2866 \u2014 bet it at Draftkings only if their SGP quote is LONGER than that (that's when the book under-prices the correlation). Size it small."
   }
  ]
 }

@@ -22,7 +22,12 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import prop_board as pb
 import td_board as tb
+import correlation_lab as cl
 from names import norm_name
+
+
+def implied(o):
+    return 100 / (o + 100) if o > 0 else abs(o) / (abs(o) + 100)
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
 PRIMETIME_HOURS_UTC = set(range(0, 5))    # ~7-11pm ET kickoffs land 00:00-05:00 UTC
@@ -87,8 +92,9 @@ def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_le
         key = (nm, mkt)
         if key in used or line is None or price is None:
             return False
+        pos, tm, _ = role(nm)
         legs.append({"leg": f"{nm} over {line:g} {_MLBL.get(mkt, mkt)}", "player": nm, "mkt": mkt,
-                     "line": float(line), "price": int(price), "why": why})
+                     "line": float(line), "price": int(price), "why": why, "team": tm, "pos": pos})
         used.add(key); return True
 
     passers = sorted(df[df.mkt == "pass_yds"]["name"].unique(),
@@ -134,13 +140,39 @@ def build_sgp_for_game(game_props, td_rows, proj, game_label, min_legs=8, max_le
     if len(legs) < min_legs:
         return None
     dec = float(np.prod([american_to_dec(l["price"]) for l in legs]))
+
+    # --- true joint probability + FAIR odds (the benchmark to beat DK's SGP quote) ----------
+    def relation(a, b):
+        if a["player"] == b["player"]:
+            return "same_player"
+        same = a["team"] is not None and a["team"] == b["team"]
+        aqb, bqb = a["mkt"] == "pass_yds", b["mkt"] == "pass_yds"
+        arec = a["mkt"] in ("rec_yds", "receptions") or (a["mkt"] == "anytime_td" and a["pos"] in ("WR", "TE", "RB"))
+        brec = b["mkt"] in ("rec_yds", "receptions") or (b["mkt"] == "anytime_td" and b["pos"] in ("WR", "TE", "RB"))
+        arush, brush = a["mkt"] == "rush_yds", b["mkt"] == "rush_yds"
+        if same:
+            if (aqb and brec) or (bqb and arec): return "qb_wr_same"
+            if arec and brec: return "wr_wr_same"
+            if (aqb and brush) or (bqb and arush): return "qb_rb_same"
+            return "wr_wr_same"
+        if aqb and bqb: return "opp_qbs"
+        if (aqb and brec) or (bqb and arec): return "qb_opp_wr"
+        return "unrelated"
+
+    fl = [{"p": implied(l["price"]), "price": l["price"],
+           "rel": {j: relation(l, legs[j]) for j in range(i)}} for i, l in enumerate(legs)]
+    fair = cl.fair_sgp(fl)
+
     return {"game": game_label, "book": SGP_BOOK, "theme": "shootout stack (positively correlated)",
             "legs": legs, "n_legs": len(legs), "combined_american": dec_to_american(dec),
             "combined_decimal": round(dec, 1),
-            "note": (f"{len(legs)}-leg same-game shootout stack at {SGP_BOOK.title()}. The legs are "
-                     "positively correlated (QB + his receivers + TDs all rise together in a "
-                     "high-scoring game), so the real joint chance beats the naive parlay math — "
-                     "that's the edge over a random SGP. Still a lotto: size it small.")}
+            "fair_american": fair["fair_american"], "correlation_lift": fair["correlation_lift"],
+            "true_joint_prob": fair["true_joint_prob"], "naive_prob": fair["naive_prob"],
+            "note": (f"{len(legs)}-leg same-game shootout stack. The legs are positively correlated "
+                     f"(QB + his receivers + TDs rise together), so the true chance of it hitting is "
+                     f"{fair['correlation_lift']}x the naive parlay math. Our FAIR price is "
+                     f"{fair['fair_american']:+d} — bet it at {SGP_BOOK.title()} only if their SGP quote "
+                     f"is LONGER than that (that's when the book under-prices the correlation). Size it small.")}
 
 
 _MLBL = {"rec_yds": "rec yds", "rush_yds": "rush yds", "receptions": "catches",

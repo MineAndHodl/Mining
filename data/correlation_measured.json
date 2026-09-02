@@ -1,0 +1,37 @@
+{
+ "qb_pass__wr1_rec": {
+  "corr": 0.696,
+  "n": 1632,
+  "scope": "same_team"
+ },
+ "qb_pass__wr2_rec": {
+  "corr": 0.753,
+  "n": 1632,
+  "scope": "same_team"
+ },
+ "wr1_rec__wr2_rec": {
+  "corr": 0.507,
+  "n": 1632,
+  "scope": "same_team"
+ },
+ "qb_pass__rb_rush": {
+  "corr": -0.085,
+  "n": 1632,
+  "scope": "same_team"
+ },
+ "wr1_rec__rb_rush": {
+  "corr": -0.004,
+  "n": 1632,
+  "scope": "same_team"
+ },
+ "opp_qb__opp_qb": {
+  "corr": 0.164,
+  "n": 816,
+  "scope": "opposing"
+ },
+ "qb_pass__opp_wr1": {
+  "corr": 0.125,
+  "n": 816,
+  "scope": "opposing"
+ }
+}
