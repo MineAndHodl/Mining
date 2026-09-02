@@ -34,14 +34,19 @@ def dec_to_american(d):
     return round((d-1)*100) if d >= 2 else round(-100/(d-1))
 
 
-def build_missile(key=None, days=8, target=10, target_low=3000, target_high=10000):
+def build_missile(key=None, days=14, target=10, target_low=3000, target_high=10000, prop=None):
     """Wavey-style near-lock parlay across the slate, tuned to a TARGET payout band
     (default +6000..+12000 = 60:1..120:1) so it hits far more often and builds engagement,
     instead of a 500:1 that never cashes. We add the highest-probability near-locks until the
-    combined odds enter the band, so fewer, safer legs -> higher hit rate. Returns leg set + odds."""
+    combined odds enter the band, so fewer, safer legs -> higher hit rate. Returns leg set + odds.
+
+    `prop`: an already-built prop board (from the caller) — reuse it to avoid a second full
+    API fetch. `days` default is 14 (the full early-season window; an 8-day default silently
+    missed most of a Week-1 slate that kicks off >8 days out)."""
     key = key or os.environ.get("ODDS_API_KEY")
     proj = pd.read_parquet(f"{DATA}/projection_2026.parquet")
-    prop, _ = pb.build_prop_board(key=key, projections=proj, days=days)
+    if prop is None:
+        prop, _ = pb.build_prop_board(key=key, projections=proj, days=days)
     # a near-lock parlay is about MARKET-likely legs on players with a real track record — never
     # a rookie the model overrates (no recent games). Keep only players who HAVE a recent log.
     if prop is not None and len(prop) and "edge_src" in prop.columns:

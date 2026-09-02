@@ -93,30 +93,51 @@ def _game_ctx(game, team_code, sched_rows, code2full):
     return None, None
 
 
+_TD_STATS = None
+def _load_td_stats():
+    global _TD_STATS
+    if _TD_STATS is None:
+        try:
+            t = pd.read_parquet(f"{DATA}/td_rates.parquet")
+            pos_rz = t.groupby("position")["rz_pg"].median().to_dict()
+            _TD_STATS = {}
+            for _, r in t.iterrows():
+                _TD_STATS[_norm_name(r.get("display_name", ""))] = {
+                    "rz_pg": float(r["rz_pg"]), "pos_rz_pg": float(pos_rz.get(r["position"], r["rz_pg"])),
+                    "td_pg": float(r["td_pg"]), "pos_td_per_rz": float(r["pos_td_per_rz"])}
+        except Exception:
+            _TD_STATS = {}
+    return _TD_STATS
+
+
 def attach_to_pick(pick, ctx):
-    """Compute + attach a scorecard to a single prop pick dict (mutates + returns it)."""
+    """Compute + attach a scorecard to a single prop pick dict (mutates + returns it).
+    Anytime-TD picks get a TD-SPECIFIC scale (red-zone role, finishing, scoring env, regression),
+    not the generic yardage factors — the levers have to fit the market."""
     proj_map, sched_rows, code2full, adp, def_vs = ctx
     key = _norm_name(pick.get("name", ""))
     pr = proj_map.get(key, {})
     team_code = TEAM_FIX.get(pr.get("team"), pr.get("team"))
     mkt = pick.get("cat", pick.get("mkt", ""))
-    p2 = {"side": pick.get("side", "Over"), "mkt": mkt,
-          "line": pick.get("line", 0), "our_num": pick.get("our_num"),
-          "_health": pick.get("_health")}
-
-    script = None; weather = None; matchup = None
     g, opp = _game_ctx(pick.get("game"), team_code, sched_rows, code2full)
+    script = {"team_spread": g["team_spread"], "implied_team_pts": g["implied_team_pts"]} if g else None
+
+    if mkt == "anytime_td":
+        td = _load_td_stats().get(key)
+        pick["scorecard"] = fsc.td_scorecard(pick, td=td, script=script, adp=adp.get(key))
+        return pick
+
+    p2 = {"side": pick.get("side", "Over"), "mkt": mkt,
+          "line": pick.get("line", 0), "our_num": pick.get("our_num"), "_health": pick.get("_health")}
+    weather = g["weather"] if g else None
+    matchup = None
     if g:
-        script = {"team_spread": g["team_spread"], "implied_team_pts": g["implied_team_pts"]}
-        weather = g["weather"]
         pos = pr.get("position")
         if opp and pos in ("RB",) and mkt in fsc.RUSH_MKTS:
             matchup = def_vs.get("RB", {}).get(opp)
         elif opp and pos in ("WR", "TE") and mkt in fsc.PASS_MKTS:
             matchup = def_vs.get("WR", {}).get(opp)
-    adp_val = adp.get(key)
-    sc = fsc.scorecard(p2, proj_row=pr, script=script, weather=weather,
-                       matchup=matchup, adp=adp_val)
+    sc = fsc.scorecard(p2, proj_row=pr, script=script, weather=weather, matchup=matchup, adp=adp.get(key))
     pick["scorecard"] = sc
     return pick
 

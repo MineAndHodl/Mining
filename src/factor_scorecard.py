@@ -53,6 +53,42 @@ def _own_vs_role(pr, mkt):
     return _clip((own - role) / max(role, 1.0))     # e.g. +30% -> +0.3
 
 
+TD_FACTORS = ["Red-Zone Role", "Finishing Rate", "Scoring Environment", "TD Regression", "Market Read"]
+TD_DESC = {
+    "Red-Zone Role": "his red-zone touches per game vs the position (chances to score)",
+    "Finishing Rate": "how often he turns red-zone chances into TDs",
+    "Scoring Environment": "his team's implied points — more team TDs, more shots at one",
+    "TD Regression": "is his TD rate due to rise (unlucky) or fall (over-scored)",
+    "Market Read": "the draft market's read on his role",
+}
+
+
+def td_scorecard(pick, td=None, script=None, adp=None):
+    """TD-SPECIFIC scale — the levers that actually drive scoring, not the yardage factors. td:
+    dict with rz_pg, pos_rz_pg, td_pg, pos_td_per_rz. All leans are for a 'Yes' (to-score) pick."""
+    td = td or {}
+    sc = {}
+    rz = td.get("rz_pg"); pos_rz = td.get("pos_rz_pg")
+    sc["Red-Zone Role"] = _clip(((rz - pos_rz) / pos_rz) / 0.6) if (rz and pos_rz) else None
+    # finishing: player's TD-per-RZ vs the position rate
+    ptr = (td.get("td_pg") / rz) if (td.get("td_pg") is not None and rz) else None
+    pos_tr = td.get("pos_td_per_rz")
+    sc["Finishing Rate"] = _clip(((ptr - pos_tr) / pos_tr) / 0.5) if (ptr is not None and pos_tr) else None
+    ip = script.get("implied_team_pts") if script else None
+    sc["Scoring Environment"] = _clip((ip - 22) / 8) if ip is not None else None
+    # regression: actual TD/gm vs expected (rz_pg * pos_td_per_rz). Over-scored -> due to fall.
+    exp = (rz * pos_tr) if (rz and pos_tr) else None
+    if exp and td.get("td_pg") is not None and exp > 0:
+        sc["TD Regression"] = _clip(-((td["td_pg"] - exp) / exp) / 0.6)
+    else:
+        sc["TD Regression"] = None
+    mr = None
+    if adp is not None and not (isinstance(adp, float) and adp != adp):
+        mr = _clip((80 - float(adp)) / 80.0)
+    sc["Market Read"] = mr
+    return {k: (round(float(v), 2) if v is not None else None) for k, v in sc.items()}
+
+
 def scorecard(pick, proj_row=None, script=None, weather=None, matchup=None,
               adp_role=None, adp=None, regression=None):
     """Continuous lean in [-1,1] for EVERY factor (0 = checked-neutral, None = n/a).

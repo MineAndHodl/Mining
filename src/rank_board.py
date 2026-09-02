@@ -18,6 +18,7 @@ CAT_LABEL = {"rec_yds": "Receiving Yards", "rush_yds": "Rushing Yards", "recepti
 
 EDGE_PEAK = 0.11        # edge beyond which a bigger gap is a stale-model red flag, not free money
 MIN_HITTABLE = 0.45     # a "best bet" must have at least this chance to win — no lottery tickets
+CAT_CAP = 3             # max picks from any single market on the best-bets board (diversity)
 
 def _desk_score(edge, model_p, mult=1.0):
     """Unified Desk Score = CONVICTION, not raw edge. Two components:
@@ -74,11 +75,21 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", "")})
     if td_board is not None and len(td_board):
         for _, r in td_board[td_board["edge"].notna()].iterrows():
+            mp = int((r.get("p_model") or 0) * 100); imp = int((r.get("p_implied") or 0) * 100)
+            edge = float(r.get("edge") or 0)
+            if edge >= 0.03:
+                rsn = (f"Model {mp}% to score vs {imp}% implied — we're higher, a genuine +value TD, "
+                       f"but a one-sided market, so a small add.")
+            elif mp >= 50:
+                rsn = (f"A likely scorer ({mp}%), but the market's already there ({imp}% implied) — "
+                       f"no Yes value; shown as a red-zone reference / SGP building block, not a bet.")
+            else:
+                rsn = (f"Model {mp}% vs {imp}% implied — no edge; reference only.")
             rows.append({"cat": "anytime_td", "score": td_score(r), "name": r["name"],
                          "game": r.get("game"), "line": 0.5, "side": "Yes",
                          "our_num": r.get("p_model"), "edge": r.get("edge"), "ev": None,
                          "model_p": r.get("p_model"), "price": r.get("price"), "book": "draftkings",
-                         "reason": f"Model {int((r.get('p_model') or 0)*100)}% to score vs {int((r.get('p_implied') or 0)*100)}% implied — a lottery add, not a core play."})
+                         "reason": rsn})
     allp = pd.DataFrame(rows)
     if len(allp):
         # per-category top N. Anytime-TD is a "who's most likely to score" view — sort it by
@@ -91,8 +102,31 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                 out["by_category"][cat] = sub.to_dict("records")
         # BEST BETS = best-across, but only genuinely hittable plays (no lottery longshots).
         # A +1000 anytime-TD is not a "best bet" — it lives in its own tab, not here.
-        hittable = allp[allp["model_p"].fillna(0.5) >= MIN_HITTABLE]
-        out["best_props"] = hittable.sort_values("score", ascending=False).head(top).to_dict("records")
+        # DIVERSITY: cap any one market at CAT_CAP so the board is a genuine best-of-the-slate
+        # across bet types, not a monotone stack of (say) passing unders. Same-thesis clustering
+        # is both a weak product AND correlated risk — if "Week-1 passing unders" is wrong, a
+        # stacked board fails together. We still never force a bad pick: everything here cleared
+        # MIN_HITTABLE and is ranked by conviction; the cap just spreads the slots.
+        hittable = allp[allp["model_p"].fillna(0.5) >= MIN_HITTABLE].sort_values(
+            "score", ascending=False)
+        picked, per_cat = [], {}
+        for r in hittable.to_dict("records"):
+            c = r["cat"]
+            if per_cat.get(c, 0) >= CAT_CAP:
+                continue
+            picked.append(r); per_cat[c] = per_cat.get(c, 0) + 1
+            if len(picked) >= top:
+                break
+        # if the cap left us short of `top` (thin slate), backfill with the next-best regardless
+        if len(picked) < top:
+            have = {(r["name"], r["cat"], r.get("line")) for r in picked}
+            for r in hittable.to_dict("records"):
+                if (r["name"], r["cat"], r.get("line")) in have:
+                    continue
+                picked.append(r)
+                if len(picked) >= top:
+                    break
+        out["best_props"] = picked
 
     # games (spreads/totals/ML) — already scored dicts with desk_conf
     if games:

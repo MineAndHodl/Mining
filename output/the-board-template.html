@@ -103,14 +103,15 @@ const HINTS={best:"Top plays across every category, ranked by conviction.",games
 let active="best";
 
 function scoreColor(s){return s>=85?"var(--gold)":s>=70?"var(--green)":s>=55?"var(--blue)":"var(--muted)";}
-function fmtEdge(e){return e==null?"":(typeof e==="string"?e:("+"+Math.round(e*100)+"% edge"));}
+function fmtEdge(e){if(e==null)return"";if(typeof e==="string")return e;const p=Math.round(e*100);return (p>=0?"+":"")+p+"% edge";}
 
 
 function renderCard(sc){
   if(!sc) return '';
-  const order=["Projected Usage","Recent Trend","Game Flow","Opponent Defense","Injury Picture","Weather","Play-Calling","Market Read","Regression"];
-  const populated=order.filter(f=>f in sc && sc[f]!==null&&sc[f]!==undefined).length;
-  if(populated<3) return '';   // don't show a wall of "n/a" — suppress a near-empty scorecard
+  // render the scorecard's OWN factors (TD picks carry TD-specific levers, not the yardage set)
+  const order=Object.keys(sc);
+  const populated=order.filter(f=>sc[f]!==null&&sc[f]!==undefined).length;
+  if(populated<2) return '';   // don't show a wall of "n/a" — suppress a near-empty scorecard
   const strength=a=>a>=0.55?'strong':(a>=0.22?'clear':'slight');
   const rows=order.filter(f=>f in sc).map(f=>{
     const raw=sc[f];

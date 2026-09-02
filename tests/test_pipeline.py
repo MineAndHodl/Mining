@@ -140,10 +140,12 @@ def test_crossbook_props():
     sh = dc.shop_prop_edges(pb, env_by_team={"g": 1.13})
     check("shops only bettable books (no pinnacle)", len(sh) and (sh["book"] != "pinnacle").all())
     if len(sh):
-        # Over side should be shopped to the book with best Over price (fanduel +110)
+        # NOTE: desk_card is the legacy market-anchored path (not in the production board).
+        # anchored_edge re-anchors to EACH book's own line, so it selects by edge, not raw
+        # price. True best-price line-shopping (keep the best payout AT our line) lives in the
+        # production prop_board path (groups by name/mkt/side/line, keeps the max-profit book).
         r = sh.iloc[0]
-        if r["side"] == "Over":
-            check("cross-book picks best Over price (fanduel)", r["book"] == "fanduel", f"book={r['book']}")
+        check("shopped pick is a bettable book with a real edge", r["book"] in ("draftkings", "fanduel") and r["edge"] > 0, f"book={r['book']} edge={r['edge']}")
     # gated market excluded
     pb2 = pd.DataFrame([{"game": "g", "book": "draftkings", "mkt": "rush_yds", "name": "Q",
                          "line": 40.5, "over_price": -110, "under_price": -110}])
@@ -283,9 +285,18 @@ def test_qc_fixes():
     conf = rb.prop_score({"edge": 0.09, "confidence": 0.7, "score_mult": 1.0})
     sus = rb.prop_score({"edge": 0.09, "confidence": 0.7, "score_mult": 0.5})
     check("C3: SUSPECT multiplier cuts score", sus < conf - 15, f"conf={conf} sus={sus}")
-    # C2: skew constant is positive for right-skewed yards, zero for symmetric pass_yds
-    check("C2: rec_yds skew const > 0", pm.SKEW_CONST["rec_yds"] > 0.05)
-    check("C2: pass_yds skew const == 0", pm.SKEW_CONST["pass_yds"] == 0.0)
+    # C2: CV is volume-dependent — a workhorse (high projected mean) is STEADIER than a
+    # committee back, so its cv is LOWER. A flat cv over-widened the gamma for high-volume
+    # players and manufactured phantom Under edges; cv_for fixes that.
+    check("C2: rush_yds cv falls with volume (workhorse steadier)",
+          pm.cv_for("rush_yds", 85) < pm.cv_for("rush_yds", 25),
+          f"hi={pm.cv_for('rush_yds',85):.2f} lo={pm.cv_for('rush_yds',25):.2f}")
+    check("C2: cv_for is monotone (brentq-safe in market_mean)",
+          pm.cv_for("rec_yds", 30) >= pm.cv_for("rec_yds", 55) >= pm.cv_for("rec_yds", 80))
+    # C2: with the correct workhorse cv, a mean modestly above the line is NOT a strong under —
+    # the coherence bug (project 78, bet under 74) is gone.
+    po = pm.p_over("rush_yds", 78.4, 74.5)
+    check("C2: mean>line gives P(over) near 0.5, not a phantom under", 0.44 <= po <= 0.52, f"p_over={po:.3f}")
 
 
 def test_primetime_sgp_structure():

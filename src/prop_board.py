@@ -314,6 +314,7 @@ def reason(row, news=None):
 
     # the case: the recent log PLUS the multi-factor drivers (recency, matchup, environment,
     # mean-reversion) that actually moved our number — the ensemble is the alpha.
+    log = list(log) if log is not None and len(log) else None
     loglist = ", ".join(f"{v:g}" for v in log) if log else None
     offseason = row.get("offseason")
     when = "closed last season" if offseason else "over his last four"

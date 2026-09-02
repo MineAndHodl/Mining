@@ -15,23 +15,41 @@ import pandas as pd
 from scipy.stats import gamma, norm
 
 SHRINK_GAMES = 5.0
-# per-market game-to-game coefficient of variation (from 2023-25 fit), used for the
-# distribution spread; yards are right-skewed (gamma), counts use normal approx.
-CV = {"rec_yds": 0.85, "rush_yds": 0.88, "pass_yds": 0.34, "receptions": 0.62, "rush_att": 0.45,
-      "pass_att": 0.20, "pass_cmp": 0.22, "kicking_points": 0.48, "field_goals": 0.55}
+# per-market WITHIN-PLAYER game-to-game coefficient of variation, measured from 2023-25 game
+# logs. CRITICAL: CV is VOLUME-DEPENDENT. A workhorse (74-yd line) is far steadier game-to-game
+# than a committee back — measured rush_yds CV is 0.83 for low-usage backs but only ~0.53 for
+# 70+-yd backs. A single flat CV over-widens the gamma for exactly the high-volume players who
+# get meaningful lines, dropping their median well below their mean and MANUFACTURING phantom
+# Under edges (our P(over) understated vs a de-vigged market). So CV_ANCHORS gives cv as a
+# smooth, monotone-decreasing function of the projected mean; markets we couldn't re-measure by
+# tier keep a flat value via a single-point anchor.
+CV_ANCHORS = {
+    "rush_yds":  [(20, 0.83), (57, 0.58), (85, 0.53)],
+    "rec_yds":   [(25, 0.89), (52, 0.67), (80, 0.57)],
+    "receptions":[(3.0, 0.58), (6.0, 0.46)],
+    "pass_yds":  [(150, 0.43), (300, 0.37)],
+    "rush_att":  [(10, 0.45)],
+    "pass_att":  [(30, 0.20)],
+    "pass_cmp":  [(20, 0.22)],
+    "kicking_points": [(7, 0.48)],
+    "field_goals":    [(1.5, 0.55)],
+}
 DIST = {"rec_yds": "gamma", "rush_yds": "gamma", "pass_yds": "normal", "receptions": "count",
         "rush_att": "count", "pass_att": "normal", "pass_cmp": "normal",
         "kicking_points": "normal", "field_goals": "count"}
-# Mean/median skew correction, computed from each market's DISTRIBUTION shape (not from a
-# slate's edges): a projection is a MEAN, but P(stat > mean) < 0.5 for right-skewed yards,
-# which silently tilts every skewed prop Under. SKEW_CONST = 0.5 - P(X > mean); we ADD it to
-# model_p_over so a fairly-priced player lands near the market, and a genuine market-wide
-# lean is preserved (unlike the old cross-sectional median hack, which erased real edges).
-SKEW_CONST = {"rec_yds": 0.113, "rush_yds": 0.117, "pass_yds": 0.0, "receptions": 0.052,
-              "rush_att": 0.063, "pass_att": 0.0, "pass_cmp": 0.0,
-              "kicking_points": 0.0, "field_goals": 0.04}
 MIN_GAMES = 6           # data-confidence floor to be eligible as a pick
 EDGE_MIN = 0.045        # model P(over/under) minus de-vigged implied, to flag
+
+
+def cv_for(mkt, mu):
+    """Volume-dependent coefficient of variation: cv falls as projected volume rises, because
+    high-usage players are steadier game-to-game. Linear interpolation between measured anchors,
+    flat outside the anchor range (so it stays monotone and brentq-safe inside market_mean)."""
+    anchors = CV_ANCHORS.get(mkt)
+    if not anchors:
+        return 0.5
+    xs = [a[0] for a in anchors]; ys = [a[1] for a in anchors]
+    return float(np.interp(mu, xs, ys))
 
 
 def implied(o):
@@ -61,7 +79,7 @@ def build_rates(prop_games: pd.DataFrame):
 def p_over(mkt, mean, line, env=1.0, opp=1.0):
     """P(stat > line) for a player with projected mean, scaled by env & opponent."""
     mu = max(mean * env * opp, 0.1)
-    cv = CV[mkt]
+    cv = cv_for(mkt, mu)
     d = DIST[mkt]
     if d == "gamma":
         k = 1.0 / (cv ** 2)                 # shape

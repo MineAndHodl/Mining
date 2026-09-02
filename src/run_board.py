@@ -86,7 +86,7 @@ def run(key=None, days=14, rebuild_games=False, cached=False):
         ranked["primetime_sgps"] = prev.get("primetime_sgps", [])
     else:
         try:
-            ranked["whale_missile"] = wm.build_missile(key=key, days=days)   # cross-slate near-locks
+            ranked["whale_missile"] = wm.build_missile(key=key, days=days, prop=board)  # reuse board (no 2nd API fetch)
         except Exception as e:
             print("whale missile skipped:", e)
         try:
