@@ -174,7 +174,7 @@ def grade_board(ranked, weeks_played=0):
     ranked["best_games"] = sorted(ranked.get("best_games", []) or [], key=lambda x: float(x.get("score") or 0), reverse=True)
     # official slate: recommended straight bets, best first, with a one-line "why" and units
     slate = sorted(rec, key=lambda x: float(x.get("score") or 0), reverse=True)
-    ranked["recommended"] = [{k: v for k, v in r.items() if k not in ("scorecard",)} for r in slate]
+    ranked["recommended"] = [dict(r) for r in slate]          # keep the scorecard: the slate IS the main tab
     ranked["grading"] = summary
     ranked["record_rule"] = RECORD_RULE
     # plain-language key with THIS week's realized averages per grade (so a grade is interpretable)

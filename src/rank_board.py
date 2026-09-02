@@ -178,7 +178,9 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "offseason": r.get("offseason"),
                          "inj_status": _nn(r.get("inj_status")), "inj_detail": _nn(r.get("inj_detail")),
                          "role_mult": _nn(r.get("role_mult")), "role_note": _nn(r.get("role_note")),
-                         "inj_lean": _nn(r.get("inj_lean")), "inj_note": _nn(r.get("inj_note"))})
+                         "inj_lean": _nn(r.get("inj_lean")), "inj_note": _nn(r.get("inj_note")),
+                         "intel_lean": _nn(r.get("intel_lean")), "intel_note": _nn(r.get("intel_note")),
+                         "intel_signals": r.get("intel_signals"), "intel_hard": _nn(r.get("intel_hard"))})
     if td_board is not None and len(td_board):
         for _, r in td_board[td_board["edge"].notna()].iterrows():
             mp = int((r.get("p_model") or 0) * 100); imp = int((r.get("p_implied") or 0) * 100)

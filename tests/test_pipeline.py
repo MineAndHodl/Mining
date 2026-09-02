@@ -342,13 +342,35 @@ def test_injury_layer():
     check("grade bands: 90 -> A+, 66 -> B+, 50 -> C", grading.grade_for(90) == "A+" and grading.grade_for(66) == "B+" and grading.grade_for(50) == "C")
 
 
+def test_player_intel():
+    """Beat intel: date-gated, hard facts gate, soft signals flip for the side, honest n/a."""
+    print("\n-- player intel: date gate, hard gate, lean --")
+    import player_intel as pi, datetime
+    W = (datetime.date(2026, 9, 1), datetime.date(2026, 9, 8))
+    stale = [{"date": "2025-12-20", "source": "espn", "title": "X ruled out with toe injury", "snippet": ""}]
+    c = pi.classify_items(stale, *W)
+    check("stale 'ruled out' from last season is excluded by the date gate", c["n_items"] == 0 and c["hard"] is None)
+    cur = [{"date": "2026-09-03", "source": "team", "title": "Coach: he will be featured early, heavy dose of the run game", "snippet": ""}]
+    c = pi.classify_items(cur, *W)
+    check("in-window coach-intent item fires a positive coach signal", c["signals"]["coach"] > 0 and c["composite"] > 0)
+    out = [{"date": "2026-09-04", "source": "beat", "title": "Team has ruled out RB for Sunday", "snippet": ""}]
+    check("credible 'ruled out' becomes a hard OUT gate", pi.classify_items(out, *W)["hard"] == "OUT")
+    lim = [{"date": "2026-09-04", "source": "beat", "title": "Returning WR will be on a pitch count", "snippet": ""}]
+    check("'pitch count' becomes a hard LIMITED gate", pi.classify_items(lim, *W)["hard"] == "LIMITED")
+    I = pi.PlayerIntel(2026, 1)
+    lo = I.lean("Drake London", "Over"); lu = I.lean("Drake London", "Under")
+    check("lean flips for the side (London: role+ supports Over, opposes Under)", lo is not None and lu is not None and lo > 0 and lu < 0, f"over={lo} under={lu}")
+    check("no in-window items and no read -> None (honest n/a)", I.lean("Someone Nobody", "Over") is None)
+    check("Week-1 intel file has dated, sourced items", all("date" in it and "source" in it for v in I.raw.values() if isinstance(v, dict) for it in v.get("items", [])))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--offline", action="store_true"); a = ap.parse_args()
     print("=" * 60, "\n  DESK PIPELINE TEST SUITE\n", "=" * 60)
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

@@ -109,6 +109,17 @@ The board is the product: every pick on it must be something a sharp would nod a
   earned on OUR noisy expanding-mean baseline (high sample means overstate, so shrink). The
   market's number is already shrunk; applying the term to it double-shrank every star to the
   Under (board 194 U / 71 O). Zeroed in market-baseline mode → 133/124, median edge 2.7%.
+- **Beat intel layer (`player_intel.py`, `data/player_intel_<season>_w<week>.json`):** per-slate
+  beat/pundit pass, every item dated + sourced and gated to the week (a 2023 injury story and a
+  2025 'ruled out' both surfaced in search and were correctly discarded). Hard facts (ruled
+  out → OUT; pitch count → LIMITED) gate the board; soft signals (health nuance, coach intent,
+  role news, situational) drive the Beat Intel lever + "Beat note" and are logged on the row
+  (intel_signals) for the grading loop to earn a weight — they do NOT move the projection yet.
+  Week-1 finding: intel leaned against 6 of 9 unders — partly real (Rice ramp-up → Worthy;
+  London's 56.6% share with Penix), partly the known optimism bias of camp coverage. Many 2026
+  staff changes surfaced (BAL Minter/Doyle, CLE Monken, ATL Stefanski, DET OC Petzing, LAC
+  McDaniel) — the coach-change flip matters this year. Automation blocked: Google News RSS
+  and ESPN RSS not reachable from the session; needs a news API key or the weekly in-session pass.
 - **Structural truths:** near-locks are minus-money and scarce (books balance ~50/50), so
   "8-10 near-locks at 100:1" is self-contradictory — the missile is an honest lotto of
   53-60% favorites. Week 1 is the weakest week (recency needs games across the offseason

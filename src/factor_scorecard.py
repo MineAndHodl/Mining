@@ -14,7 +14,7 @@ Plain names, no jargon, no circular "market value" factor (the edge IS the Desk 
 These reflect real model inputs — an honest window into the model, not separate alpha.
 """
 FACTORS = ["Projected Usage", "Recent Trend", "Game Flow", "Opponent Defense",
-           "Injury Picture", "Weather", "Play-Calling", "Market Read", "Regression"]
+           "Injury Picture", "Beat Intel", "Weather", "Play-Calling", "Market Read", "Regression"]
 
 DESC = {
     "Projected Usage": "how much volume we expect vs the line",
@@ -22,6 +22,7 @@ DESC = {
     "Game Flow": "does the game script (favorite runs, dog throws) help this stat",
     "Opponent Defense": "how the opposing defense holds up vs this position",
     "Injury Picture": "his status and any teammate absence that opens a role",
+    "Beat Intel": "what the beat writers say this week — health nuance, coach intent, role news (informs, not yet weighted)",
     "Weather": "wind/cold effect (suppresses passing, nudges rushing)",
     "Play-Calling": "how central he is to the offense (target/carry load)",
     "Market Read": "whether the draft market's role read agrees with ours",
@@ -204,6 +205,11 @@ def scorecard(pick, proj_row=None, script=None, weather=None, matchup=None,
         sc["Injury Picture"] = float(inj)
     else:
         sc["Injury Picture"] = _for_side(inj, side)
+
+    # --- Beat Intel: the player-specific read (already flipped for the side upstream) ---
+    bi = pick.get("intel_lean")
+    if isinstance(bi, float) and bi != bi: bi = None
+    sc["Beat Intel"] = (round(float(bi), 2) if bi is not None else None)
 
     # --- Weather: pass down, rush up; dome/roof = genuine 0; unknown outdoor = None ---
     wx = None

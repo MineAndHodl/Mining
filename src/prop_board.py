@@ -93,6 +93,19 @@ def fetch_props(key, event_ids, books=BOOKS):
 from names import norm_name as _norm
 
 
+def pi_week(recency_week):
+    """Upcoming NFL week for the intel file: the first week whose games are still ahead."""
+    try:
+        import datetime
+        sch = pd.read_parquet(os.path.join(os.path.dirname(__file__), "..", "data", "schedules.parquet"))
+        sch = sch[sch.season == sch.season.max()]
+        today = datetime.date.today().isoformat()
+        ahead = sch[sch.gameday >= today] if "gameday" in sch.columns else sch
+        return int(ahead.week.min()) if len(ahead) else 1
+    except Exception:
+        return 1
+
+
 def price_ou(mkt, mu, line, over_price, under_price):
     """Model P(over) at OUR projection mu vs the de-vigged market. Returns dict."""
     p_over = pm.p_over(mkt, mu, line)
@@ -151,6 +164,14 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         INJ = il.InjuryLayer(season=int(recency_season) + (1 if recency_week is None else 0))
     except Exception as _e:
         INJ = None; print("injury layer unavailable:", _e)
+    # PLAYER INTEL: beat/pundit read per player (the model is the prior, the player is the bet).
+    # Hard facts gate now; soft signals inform the reader/trust and are logged to earn a weight.
+    try:
+        import player_intel as pi
+        INTEL = pi.PlayerIntel(season=int(recency_season) + (1 if recency_week is None else 0),
+                               week=pi_week(recency_week))
+    except Exception as _e:
+        INTEL = None; print("player intel unavailable:", _e)
     out = []
     for _, b in board.iterrows():
         k = _norm(b["name"]); mkt = b["mkt"]
@@ -162,6 +183,9 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         own_inj = INJ.status(b["name"]) if INJ else None
         if own_inj and own_inj.get("status") == "Out":
             continue                                       # listed Out: never on the board
+        intel = INTEL.get(b["name"]) if INTEL else None
+        if intel and intel.get("hard") == "OUT":
+            continue                                       # beat-reported out before the official report
         rr = recmap.get((k, mkt))
         pos = pr["position"] if pr is not None else "?"
         team = pr["team"] if pr is not None else None
@@ -229,6 +253,7 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         if own_inj and own_inj.get("status") == "Doubtful": conf *= 0.5       # mostly don't play (scratch rail)
         elif own_inj and own_inj.get("status") == "Questionable": conf *= 0.92 # measured: no performance drop; scratch risk only
         inj_lean, inj_note = (INJ.injury_lean(b["name"], mkt) if INJ else (None, None))
+        if intel and intel.get("hard") == "LIMITED": conf *= 0.6   # pitch count / eased in: a fact, cuts trust
         out.append({"name": b["name"], "game": b["game"], "book": b["book"], "mkt": mkt,
                     "line": b["line"], "desk_proj": round(our_mu, 1),
                     "position": pos, "team": team if team else "?",
@@ -243,7 +268,10 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
                     "over_price_kept": b["over_price"], "under_price_kept": b["under_price"],
                     "inj_status": (own_inj or {}).get("status"), "inj_detail": (own_inj or {}).get("injury"),
                     "role_mult": role_mult, "role_note": role_note,
-                    "inj_lean": inj_lean, "inj_note": inj_note})
+                    "inj_lean": inj_lean, "inj_note": inj_note,
+                    "intel_lean": (INTEL.lean(b["name"], p["side"]) if INTEL else None),
+                    "intel_note": (INTEL.note(b["name"]) if INTEL else None),
+                    "intel_signals": (intel or {}).get("signals"), "intel_hard": (intel or {}).get("hard")})
     df = pd.DataFrame(out)
     if not len(df):
         return df, rem
@@ -406,7 +434,8 @@ def reason(row, news=None):
                     f"(measured), so this is a scratch risk, not a performance discount — confirm he's active before betting."
                     if st == "Questionable" else
                     f" Injury caveat: he's listed {st} ({det}) — Doubtful players mostly sit; treat as a scratch risk and confirm active.")
-    tail = f" Beat note: {news}" if news else ""
+    news = news or row.get("intel_note")
+    tail = f" Beat note: {news}" if (news and isinstance(news, str)) else ""
     return lead + case + money + conf_note + inj_line + tail
 
 

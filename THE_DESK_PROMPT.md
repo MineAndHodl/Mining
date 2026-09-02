@@ -66,6 +66,15 @@ violating one of these. Do not violate them.
    goal-line share, vultures and coach tendency; yardage gets form, matchup, game flow).
 10. **Only send what you recommend, and only count what you send.** Breadth lives in the
     category tabs; the slate is the recommendation. Grades make the score legible.
+11. **The model is the prior; the player is the bet; beat intel is the update (Alex).** The
+    model generalizes on purpose — priors, coefficients, role tiers — and that is the base
+    rate. A prop is one player's Sunday, and what decides it is often not in any table: more
+    hurt than the report says, the coach just said he's featuring him, a new OC, a QB change.
+    Every slate pick gets a beat/pundit pass (dated, sourced, gated to the week). Hard facts
+    (ruled out, pitch count) gate the board now; soft signals (health nuance, coach intent,
+    role news) drive the Beat Intel lever and the paragraph and are LOGGED so the grading loop
+    can earn their weight — they do not move the number until it does. Camp-season coverage
+    is uniformly optimistic; read it as "no bad news," not "good news," until proven.
 
 ## 3. What is already proven — carry forward, do not rederive
 
@@ -170,7 +179,9 @@ baseline, volume-CV pricing, 8-book line shop) → `td_board` (pooled + xTD blen
 
 Do these in order. Each one is done only when it meets §8.
 
-1. **Injury feed + role multiplier.** Wire `load_injuries` and `load_depth_charts`. Own
+1. **Injury feed + role multiplier — DONE** (cascade k*=.87; Questionable = scratch risk).
+   **Beat intel weekly pass — LIVE** (in-session until a news API key exists; signals logged).
+   Original spec: wire `load_injuries` and `load_depth_charts`. Own
    status: Out → not a pick; Doubtful → strong penalty; Questionable → trust penalty. Teammate
    absence → measured vacated-opportunity redistribution applied to the projection (targets →
    WR2/WR3/TE/RB; carries → RB2; zone shares for xTD; QB volume shift). Measure the
