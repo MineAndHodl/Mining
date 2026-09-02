@@ -57,6 +57,73 @@ def td_score(row):
     return _desk_score(row.get("edge"), row.get("p_model"), anchor=TD_ANCHOR)
 
 
+def _fnum(x):
+    try:
+        v = float(x); return None if v != v else v
+    except Exception:
+        return None
+
+
+def _td_reason(r, mp, imp, edge):
+    """Handicapper paragraph for an anytime-TD pick, spoken from the DECOMPOSED xTD model:
+    the role (goal-line / red-zone share), the vulture, the coach's goal-line tendency, last
+    season's TDs vs what the role should have produced, and the environment — then the price."""
+    name = r.get("name", "He"); pos = r.get("position") or ""
+    is_back = pos in ("RB", "FB")
+    gl = _fnum(r.get("gl_share")); rzt = _fnum(r.get("rz_tgt_share")); vult = _fnum(r.get("vulture_share"))
+    cpr = _fnum(r.get("coach_gl_pass_rate")); tl = _fnum(r.get("tds_last")); xt = _fnum(r.get("xtd"))
+    g = _fnum(r.get("games")); lam = _fnum(r.get("lam_xtd"))
+    bits = []
+    # role
+    if is_back and gl is not None:
+        if gl >= 0.70: bits.append(f"he owns the goal line — about {int(gl*100)}% of his team's carries inside the 5 last season")
+        elif gl >= 0.50: bits.append(f"he's the lead goal-line back (~{int(gl*100)}% of the inside-the-5 carries)")
+        else: bits.append(f"his goal-line role is shared (~{int(gl*100)}% of the inside-the-5 carries)")
+    elif rzt is not None:
+        if rzt >= 0.28: bits.append(f"he's the red-zone target — roughly {int(rzt*100)}% of his team's throws inside the 20 went his way")
+        elif rzt >= 0.15: bits.append(f"he earns a real red-zone target share (~{int(rzt*100)}%)")
+        else: bits.append(f"his red-zone target share is modest (~{int(rzt*100)}%)")
+    # vulture — and, for a back whose goal line is shared, the volume that still carries him
+    if is_back and vult is not None and vult >= 0.40:
+        bits.append(f"the caveat: ~{int(vult*100)}% of the goal-line work leaks to a backup, which is what caps a back's TD equity")
+        zs = [_fnum(r.get(k)) for k in ("IN10_rush_share", "RZ_rush_share")]
+        zs = [z for z in zs if z is not None]
+        opn = _fnum(r.get("OPEN_rush_opps"))
+        if zs and np.mean(zs) >= 0.35:
+            vol = f"he still handles ~{int(np.mean(zs)*100)}% of the carries inside the 20"
+            if opn and opn >= 6: vol += f" on top of ~{opn:.0f} open-field carries a game"
+            bits.append(vol + " — volume creates chances even when the plunge is shared")
+    # coach tendency
+    if cpr is not None:
+        if is_back and cpr <= 0.35: bits.append(f"the coach runs it in at the goal line (only ~{int(cpr*100)}% pass inside the 5) — exactly what a back wants")
+        elif is_back and cpr >= 0.50: bits.append(f"one drag: this coach throws at the goal line (~{int(cpr*100)}% pass inside the 5), which siphons plunges")
+        elif (not is_back) and cpr >= 0.48: bits.append(f"the coach throws at the goal line (~{int(cpr*100)}% pass inside the 5) — that feeds the pass-catchers")
+        elif (not is_back) and cpr <= 0.33: bits.append(f"one drag: this coach runs it in at the goal line (~{int(cpr*100)}% pass), which takes scoring chances away from the receivers")
+    # regression vs role
+    if tl is not None and xt is not None and g:
+        exp = xt * g
+        if exp > 0.5:
+            diff = (tl - exp) / exp
+            if diff >= 0.30: bits.append(f"he scored {int(tl)} last season against a role that should produce about {exp:.0f} — he ran hot, so we lean on the role, not the box score")
+            elif diff <= -0.30: bits.append(f"he scored only {int(tl)} last season on a role that should produce about {exp:.0f} — that's a bounce-back profile, not a broken one")
+    body = "; ".join(bits)
+    lead = f"{name} to score. "
+    if lam is not None:
+        lead += f"Our expected-TD number for this game is {lam:.2f}, which makes him ~{mp}% to find the end zone. "
+    else:
+        lead += f"We make him ~{mp}% to find the end zone. "
+    case = (body[0].upper() + body[1:] + ". ") if body else ""
+    if edge >= 0.03:
+        price = (f"The market has him at {imp}% implied; we're higher, so there's real Yes value here — "
+                 f"but anytime-TD is a one-sided, fat-margin market, so it's sized as a small add.")
+    elif mp >= 50:
+        price = (f"He's a likely scorer, but the market already prices that ({imp}% implied) — no Yes value at this number; "
+                 f"we show him as a red-zone reference and an SGP building block, not a straight bet.")
+    else:
+        price = f"Against {imp}% implied there's no edge — reference only."
+    return lead + case + price
+
+
 def game_score(desk_conf):
     """Games use Desk Confidence (6.0-9.6) mapped onto the same 0-100 scale."""
     return round((float(desk_conf) - 6.0) / 3.6 * 60 + 40, 1)   # 6.0->40, 9.6->100
@@ -87,14 +154,7 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
         for _, r in td_board[td_board["edge"].notna()].iterrows():
             mp = int((r.get("p_model") or 0) * 100); imp = int((r.get("p_implied") or 0) * 100)
             edge = float(r.get("edge") or 0)
-            if edge >= 0.03:
-                rsn = (f"Model {mp}% to score vs {imp}% implied — we're higher, a genuine +value TD, "
-                       f"but a one-sided market, so a small add.")
-            elif mp >= 50:
-                rsn = (f"A likely scorer ({mp}%), but the market's already there ({imp}% implied) — "
-                       f"no Yes value; shown as a red-zone reference / SGP building block, not a bet.")
-            else:
-                rsn = (f"Model {mp}% vs {imp}% implied — no edge; reference only.")
+            rsn = _td_reason(r, mp, imp, edge)
             rows.append({"cat": "anytime_td", "score": td_score(r), "name": r["name"],
                          "game": r.get("game"), "line": 0.5, "side": "Yes",
                          "our_num": r.get("p_model"), "edge": r.get("edge"), "ev": None,

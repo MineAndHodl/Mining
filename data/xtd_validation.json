@@ -1,0 +1,35 @@
+{
+ "summary": "Decomposed xTD (zone x type: team plays x coach pass-rate x player share x conversion) vs old pooled TD model. Week-1 (prior-season-only) = dead heat; in-season rolling = xTD wins clearly in both seasons.",
+ "week1_fair_calibrated_2024to2025": {
+  "xtd_brier": 0.167,
+  "old_brier": 0.1673,
+  "blend_brier": 0.1665,
+  "blend_w_xtd": 0.55,
+  "note": "recalibrate on 2023->24, evaluate 2024->25. Equal: both models draw from the same stale prior (GL role only 29% sticky YoY)."
+ },
+ "in_season_rolling": {
+  "2025": {
+   "xtd_brier": 0.1664,
+   "old_brier": 0.1702,
+   "xtd_logloss": 0.5168,
+   "old_logloss": 0.525,
+   "n": 3650
+  },
+  "2024": {
+   "xtd_brier": 0.1687,
+   "old_brier": 0.1735,
+   "xtd_logloss": 0.5213,
+   "old_logloss": 0.5395,
+   "n": 3642
+  },
+  "note": "this season's weeks 1..k-1 predict week k, weeks 4-18. xTD ~2-3% better Brier, replicated. The edge is RESPONSIVENESS to current-season role/tendency changes."
+ },
+ "calibration_fit": {
+  "xtd_a": 0.084,
+  "xtd_b": 0.812,
+  "old_a": 0.063,
+  "old_b": 0.964,
+  "note": "raw Poisson xTD is over-dispersed (low bucket under-predicts 8% vs 16% realized, top bucket over-predicts); linear recal compresses."
+ },
+ "decision": "ADOPT xTD as the TD model with calibration. Week 1: blend w_xtd=0.55 with old (equal, hedge). Ramp w_xtd toward ~0.85 by week 5 as current-season shares accrue (where it dominates)."
+}

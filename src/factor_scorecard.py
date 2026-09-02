@@ -53,38 +53,77 @@ def _own_vs_role(pr, mkt):
     return _clip((own - role) / max(role, 1.0))     # e.g. +30% -> +0.3
 
 
-TD_FACTORS = ["Red-Zone Role", "Finishing Rate", "Scoring Environment", "TD Regression", "Market Read"]
+TD_FACTORS = ["Red-Zone Role", "Vulture Risk", "Coach Tendency", "Finishing Rate",
+              "Scoring Environment", "TD Regression", "Market Read"]
 TD_DESC = {
-    "Red-Zone Role": "his red-zone touches per game vs the position (chances to score)",
-    "Finishing Rate": "how often he turns red-zone chances into TDs",
+    "Red-Zone Role": "his share of the scoring-zone work of his type (goal-line carries for a back, red-zone targets for a pass-catcher)",
+    "Vulture Risk": "how much of his team's goal-line carrying goes to someone else (a backup who steals the plunge)",
+    "Coach Tendency": "does the coach's goal-line play-calling (run vs pass) favor his way of scoring",
+    "Finishing Rate": "how often he turns a scoring-zone chance into a TD, vs the position",
     "Scoring Environment": "his team's implied points — more team TDs, more shots at one",
-    "TD Regression": "is his TD rate due to rise (unlucky) or fall (over-scored)",
-    "Market Read": "the draft market's read on his role",
+    "TD Regression": "last season's TDs vs what his role should have produced — due to rise (unlucky) or fall (ran hot)",
+    "Market Read": "the market's read on his role",
 }
+
+LEAD_BACK_GL_SHARE = 0.55     # measured: the lead back gets ~55% of goal-line carries
+TYP_RZ_TGT_SHARE = 0.18       # a real red-zone target earner
 
 
 def td_scorecard(pick, td=None, script=None, adp=None):
-    """TD-SPECIFIC scale — the levers that actually drive scoring, not the yardage factors. td:
-    dict with rz_pg, pos_rz_pg, td_pg, pos_td_per_rz. All leans are for a 'Yes' (to-score) pick."""
+    """TD-SPECIFIC scale built from the DECOMPOSED xTD model (xtd_model.py): the levers that
+    actually create touchdowns — goal-line/red-zone share, vulture leakage, coach run-vs-pass at
+    the goal line, finishing, environment, and last-season regression. td: a row from the xTD
+    table (gl_share, rz_tgt_share, vulture_share, coach_gl_pass_rate, conv_rush_gl, conv_tgt_rz,
+    tds_last, xtd, games, position, pos priors). All leans are for a 'Yes' (to-score) pick."""
     td = td or {}
     sc = {}
-    rz = td.get("rz_pg"); pos_rz = td.get("pos_rz_pg")
-    sc["Red-Zone Role"] = _clip(((rz - pos_rz) / pos_rz) / 0.6) if (rz and pos_rz) else None
-    # finishing: player's TD-per-RZ vs the position rate
-    ptr = (td.get("td_pg") / rz) if (td.get("td_pg") is not None and rz) else None
-    pos_tr = td.get("pos_td_per_rz")
-    sc["Finishing Rate"] = _clip(((ptr - pos_tr) / pos_tr) / 0.5) if (ptr is not None and pos_tr) else None
+    pos = td.get("position")
+    is_back = pos in ("RB", "FB")
+    gl = td.get("gl_share"); rzt = td.get("rz_tgt_share"); rz20 = td.get("rz20_rush_share")
+    # --- Red-Zone Role: his cut of the scoring-zone work of HIS type. For a back that is his
+    # FULL inside-the-20 carry role (volume creates TD chances across all three zones); the
+    # goal-line plunge specifically is judged separately by Vulture Risk — so a high-volume back
+    # with a shared goal line reads honestly as "real role, shared plunge", not as a contradiction.
+    if is_back and (rz20 is not None or gl is not None):
+        role = rz20 if rz20 is not None else gl
+        sc["Red-Zone Role"] = _clip((role - 0.40) / 0.30)                  # .40 neutral, .70 -> +1
+    elif rzt is not None:
+        sc["Red-Zone Role"] = _clip((rzt - TYP_RZ_TGT_SHARE) / 0.18)      # .18 neutral, .36 -> +1
+    else:
+        sc["Red-Zone Role"] = None
+    # --- Vulture Risk (backs only): goal-line carries leaking to someone else works AGAINST him
+    v = td.get("vulture_share")
+    sc["Vulture Risk"] = _clip(-(v - (1 - LEAD_BACK_GL_SHARE)) / 0.30) if (is_back and v is not None) else None
+    # --- Coach Tendency: goal-line pass rate. Backs want a run-it-in coach; catchers the opposite.
+    cpr = td.get("coach_gl_pass_rate")
+    if cpr is not None:
+        lean = (0.42 - cpr) / 0.15                                        # league GL pass ~.42
+        sc["Coach Tendency"] = _clip(lean if is_back else -lean)
+    else:
+        sc["Coach Tendency"] = None
+    # --- Finishing Rate: his conversion vs the position prior for that zone/type
+    conv = td.get("conv_rush_gl") if is_back else td.get("conv_tgt_rz")
+    prior = td.get("pos_conv_rush_gl") if is_back else td.get("pos_conv_tgt_rz")
+    sc["Finishing Rate"] = _clip(((conv - prior) / prior) / 0.4) if (conv is not None and prior) else None
+    # --- Scoring Environment
     ip = script.get("implied_team_pts") if script else None
     sc["Scoring Environment"] = _clip((ip - 22) / 8) if ip is not None else None
-    # regression: actual TD/gm vs expected (rz_pg * pos_td_per_rz). Over-scored -> due to fall.
-    exp = (rz * pos_tr) if (rz and pos_tr) else None
-    if exp and td.get("td_pg") is not None and exp > 0:
-        sc["TD Regression"] = _clip(-((td["td_pg"] - exp) / exp) / 0.6)
+    # --- TD Regression: last season's TDs vs what the role says he should have scored
+    tl = td.get("tds_last"); xt = td.get("xtd"); g = td.get("games")
+    if tl is not None and xt is not None and g:
+        exp = float(xt) * float(g)
+        if exp > 0.5:
+            sc["TD Regression"] = _clip(-((float(tl) - exp) / exp) / 0.5)  # over-scored -> due to fall
+        else:
+            sc["TD Regression"] = None
     else:
         sc["TD Regression"] = None
+    # --- Market Read
     mr = None
     if adp is not None and not (isinstance(adp, float) and adp != adp):
         mr = _clip((80 - float(adp)) / 80.0)
+    elif g and float(g) >= 12:
+        mr = 0.3                                                          # established role
     sc["Market Read"] = mr
     return {k: (round(float(v), 2) if v is not None else None) for k, v in sc.items()}
 

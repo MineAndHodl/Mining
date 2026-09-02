@@ -95,16 +95,29 @@ def _game_ctx(game, team_code, sched_rows, code2full):
 
 _TD_STATS = None
 def _load_td_stats():
+    """Per-player rows from the DECOMPOSED xTD table (xtd_2026.parquet): goal-line share,
+    red-zone target share, vulture leakage, coach goal-line pass rate, conversion vs position,
+    last-season TDs vs expected. Position-level conversion priors attached for 'Finishing'."""
     global _TD_STATS
     if _TD_STATS is None:
         try:
-            t = pd.read_parquet(f"{DATA}/td_rates.parquet")
-            pos_rz = t.groupby("position")["rz_pg"].median().to_dict()
+            t = pd.read_parquet(f"{DATA}/xtd_2026.parquet")
+            backs = t[t.position.isin(["RB", "FB"])]
+            catchers = t[t.position.isin(["WR", "TE"])]
+            pri_rush = float(backs["conv_rush_gl"].median()) if len(backs) else None
+            pri_tgt = float(catchers["conv_tgt_rz"].median()) if len(catchers) else None
             _TD_STATS = {}
-            for _, r in t.iterrows():
-                _TD_STATS[_norm_name(r.get("display_name", ""))] = {
-                    "rz_pg": float(r["rz_pg"]), "pos_rz_pg": float(pos_rz.get(r["position"], r["rz_pg"])),
-                    "td_pg": float(r["td_pg"]), "pos_td_per_rz": float(r["pos_td_per_rz"])}
+            for r in t.to_dict("records"):
+                k = _norm_name(r.get("name", ""))
+                row = {c: (None if (r.get(c) is None or (isinstance(r.get(c), float) and pd.isna(r.get(c)))) else r.get(c))
+                       for c in ("position", "gl_share", "rz_tgt_share", "vulture_share", "coach_gl_pass_rate",
+                                 "conv_rush_gl", "conv_tgt_rz", "tds_last", "xtd", "games")}
+                row["pos_conv_rush_gl"] = pri_rush; row["pos_conv_tgt_rz"] = pri_tgt
+                # a back's full inside-the-20 carry role (volume), distinct from the goal-line plunge
+                zs = [r.get(f"{z}_rush_share") for z in ("GL", "IN10", "RZ")]
+                zs = [float(v) for v in zs if v is not None and not (isinstance(v, float) and pd.isna(v))]
+                row["rz20_rush_share"] = round(sum(zs) / len(zs), 3) if zs else None
+                _TD_STATS[k] = row
         except Exception:
             _TD_STATS = {}
     return _TD_STATS
