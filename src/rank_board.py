@@ -70,6 +70,7 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "game": r.get("game"), "line": r.get("line"), "side": r.get("side"),
                          "our_num": r.get("desk_proj"), "edge": r.get("edge"), "ev": r.get("ev"),
                          "price": r.get("price"), "book": r.get("book"),
+                         "n_books": r.get("n_books"), "shop_adv": r.get("shop_adv"),
                          "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),
                          "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", "")})
     if td_board is not None and len(td_board):

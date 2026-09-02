@@ -12,7 +12,7 @@ bad weather shifts offenses run-ward). Indoors/dome → no adjustment.
 
 def pass_weather_mult(wind=None, temp=None, roof="outdoors"):
     """Multiplier on a pass-based projection given game weather. 1.0 = neutral/indoors."""
-    if roof in ("dome", "closed"):
+    if roof in ("dome", "closed", "indoors"):
         return 1.0
     m = 1.0
     if wind is not None:

@@ -266,6 +266,7 @@ def project(season, team_vol_season=None):
     out["rush_yds"] = wt * own_rush_yds.fillna(role_rush_yds) + (1 - wt) * role_rush_yds
     out["rush_att"] = out["proj_carries_pg"]   # rush attempts projection = projected carries/game
     out["role_rec_yds"] = role_rec_yds; out["own_rec_yds"] = own_rec_yds
+    out["pass_yds"] = 0.0                        # non-QBs don't pass; QBs appended below
 
     # confidence: high for established stable players (projection beats naive, unbiased);
     # low for movers/rookies (high variance — pick only on a large line divergence).
@@ -279,7 +280,36 @@ def project(season, team_vol_season=None):
     out["confidence"] = out.apply(conf, axis=1)
     out["tier"] = pd.cut(out["confidence"], [-1, 0.34, 0.66, 1.01],
                          labels=["role-est (high var)", "medium", "stable"])
-    return out.reset_index().sort_values("rec_yds", ascending=False)
+    out = out.reset_index()
+
+    # ---- QBs: append passing-yards projections (they're not in the share-based volume loop) --
+    qbros = ros[ros["position"] == "QB"].copy()
+    heff = hist.set_index("player_id")
+    league_qb = hist[(hist.position == "QB") & (hist.passyd_pg > 150)]["passyd_pg"].median()
+    league_qb = float(league_qb) if pd.notna(league_qb) else 230.0
+    qrows = []
+    for _, r in qbros.iterrows():
+        pid = r["player_id"]
+        own = heff.at[pid, "passyd_pg"] if pid in heff.index else np.nan
+        hg = float(heff.at[pid, "hist_games"]) if pid in heff.index else 0.0
+        moved = bool(pid in heff.index and pd.notna(heff.at[pid, "last_team"]) and heff.at[pid, "last_team"] != r["team"])
+        rookie = pid in rookies
+        w = w_own(hg, moved)
+        py = w * (own if pd.notna(own) else league_qb) + (1 - w) * league_qb
+        qrows.append({"player_id": pid, "name": r["name"], "position": "QB", "team": r["team"],
+                      "moved": moved, "hist_games": hg, "rookie": rookie,
+                      "proj_targets_pg": 0.0, "proj_carries_pg": 0.0, "pass_yds": max(py, 0.0),
+                      "rec_yds": 0.0, "receptions": 0.0, "rush_yds": 0.0, "rush_att": 0.0})
+    qdf = pd.DataFrame(qrows)
+    # keep only each team's QB1 (highest projected passing) — backups have ~no props
+    if len(qdf):
+        qdf = qdf.sort_values("pass_yds", ascending=False).drop_duplicates("team")
+        qdf["confidence"] = [0.20 if (rk or hg < 3) else round(min(hg / 24.0, 1.0) * (0.6 if mv else 1.0), 2)
+                             for rk, hg, mv in zip(qdf["rookie"], qdf["hist_games"], qdf["moved"])]
+        qdf["tier"] = pd.cut(qdf["confidence"], [-1, 0.34, 0.66, 1.01],
+                             labels=["role-est (high var)", "medium", "stable"])
+        out = pd.concat([out, qdf], ignore_index=True)
+    return out.sort_values("rec_yds", ascending=False)
 
 
 if __name__ == "__main__":

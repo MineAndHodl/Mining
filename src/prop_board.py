@@ -28,7 +28,9 @@ MARKET_MAP = {"player_reception_yds": "rec_yds", "player_receptions": "reception
               "player_rush_yds": "rush_yds", "player_pass_yds": "pass_yds",
               "player_rush_attempts": "rush_att", "player_pass_attempts": "pass_att",
               "player_pass_completions": "pass_cmp"}
-BOOKS = "draftkings,fanduel,betmgm"
+# shop across all major bettable US books, not just three — line-shopping is guaranteed
+# better-than-field value, and cross-book dispersion is where the real prop edge lives.
+BOOKS = "draftkings,fanduel,betmgm,fanatics,betrivers,williamhill_us,espnbet,hardrockbet"
 EDGE_MIN = 0.04
 
 
@@ -135,9 +137,10 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
             mu = mu * wx.market_weather_mult(b["mkt"], wind=wg.get("wind"), temp=wg.get("temp"),
                                              roof=wg.get("roof", "outdoors"))
         p = price_ou(b["mkt"], mu, b["line"], b["over_price"], b["under_price"])
-        # confidence weighted by how projectable this market is (rec_yds trusted, pass_yds not)
-        base_conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
-        conf = base_conf * wx.MARKET_TRUST.get(b["mkt"], 0.7)
+        # confidence = DATA certainty (role/sample) only. Market projectability is applied ONCE,
+        # as the higher edge bar in classify() — not also here (that double-penalized low-trust
+        # markets: once in the score, again in the pick gate).
+        conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
         out.append({"name": b["name"], "game": b["game"], "book": b["book"], "mkt": b["mkt"],
                     "line": b["line"], "desk_proj": round(mu, 1),
                     "position": pr["position"] if pr is not None else "?",
@@ -169,8 +172,25 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         df.loc[m, "ev"] = (df.loc[m, "model_p"] * df.loc[m, "price"].map(american_profit)
                            - (1 - df.loc[m, "model_p"])).round(3)
         df.loc[m, "skew_offset"] = round(offset, 3)
-    # best book per (player, market, side): max edge
+    # --- line shopping (at the SAME line): how many books offer our pick, and how much our
+    # best price beats the field. The max-edge row is already the best line+price combo, so we
+    # keep it and attach the shopping context at that exact line (never trade a better line for
+    # a juicier price on a worse one). ------------------------------------------------------
+    shop = []
+    for (nm, mk, sd, ln), g in df.groupby(["name", "mkt", "side", "line"]):
+        profits = [american_profit(float(p)) for p in g["price"]]
+        best_i = int(np.argmax(profits))
+        adv = max(profits) - float(np.median(profits))       # our best payout vs field median, cents/$
+        shop.append({"name": nm, "mkt": mk, "side": sd, "line": ln,
+                     "n_books": int(g["book"].nunique()), "shop_adv": round(adv, 3),
+                     "best_price": int(g["price"].iloc[best_i]), "book_best": g["book"].iloc[best_i]})
+    shopdf = pd.DataFrame(shop)
     df = df.sort_values("edge", ascending=False).drop_duplicates(["name", "mkt", "side"])
+    if len(shopdf):
+        df = df.merge(shopdf, on=["name", "mkt", "side", "line"], how="left")
+        df["price"] = df["best_price"].fillna(df["price"]).astype(int)   # best price AT our line
+        df["book"] = df["book_best"].fillna(df["book"])
+        df["ev"] = (df["model_p"] * df["price"].map(american_profit) - (1 - df["model_p"])).round(3)
     return df, rem
 
 
