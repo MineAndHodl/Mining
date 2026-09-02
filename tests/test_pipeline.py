@@ -314,13 +314,40 @@ def test_primetime_sgp_structure():
         check(f"SGP {s['game'][:18]} single book", "book" in s and s["book"])
 
 
+def test_injury_layer():
+    """Injury feed + measured role cascade (THE_DESK_PROMPT work order 1), proven on 2025 wk10."""
+    print("\n-- injury layer: own status + role cascade --")
+    import injury_layer as il, grading, factor_scorecard as fsc
+    L = il.InjuryLayer(2025, week=10)
+    st = L.status("Bucky Irving")
+    check("Out player detected from the report", bool(st) and st["status"] == "Out", str(st))
+    m, note = L.role_multiplier("Kenny Gainwell", "rush_yds")
+    check("RB2 volume rises when RB1 is out (measured cascade)", m > 1.3, f"x{m}")
+    check("cascade note names the absent player", bool(note) and "Irving" in note)
+    m2, _ = L.role_multiplier("Stefon Diggs", "rec_yds")
+    check("WR2 targets rise when WR1 is out", m2 > 1.1, f"x{m2}")
+    mq, _ = L.role_multiplier("Jayden Daniels", "pass_yds")
+    check("no QB downgrade for a WR1 absence (measured: yards do not drop)", mq == 1.0, f"x{mq}")
+    lean, _ = L.injury_lean("Kenny Gainwell", "rush_yds")
+    check("Injury Picture lean positive for the beneficiary", lean is not None and lean > 0.5, str(lean))
+    sc = fsc.scorecard({"side": "Under", "mkt": "rec_yds", "line": 50.5, "our_num": 40, "inj_lean": -0.4}, proj_row={"hist_games": 40})
+    check("Questionable penalty hurts either side (not flipped for the under)", sc["Injury Picture"] == -0.4, str(sc["Injury Picture"]))
+    empty = il.InjuryLayer(2026)
+    check("2026 loader returns cleanly before reports post", isinstance(empty.report, pd.DataFrame))
+    lean26, _ = empty.injury_lean("Derrick Henry", "rush_yds")
+    check("no report -> honest n/a, not a fake lean", lean26 is None)
+    # grading: game edge parses onto the prop scale
+    check("game edge '+1.5 pts' -> ~4.5% prob edge", abs(grading.parse_game_edge("+1.5 pts") - 0.045) < 1e-9)
+    check("grade bands: 90 -> A+, 66 -> B+, 50 -> C", grading.grade_for(90) == "A+" and grading.grade_for(66) == "B+" and grading.grade_for(50) == "C")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--offline", action="store_true"); a = ap.parse_args()
     print("=" * 60, "\n  DESK PIPELINE TEST SUITE\n", "=" * 60)
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

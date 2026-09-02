@@ -186,16 +186,24 @@ def scorecard(pick, proj_row=None, script=None, weather=None, matchup=None,
             od = _clip(matchup / 0.20) * 0.7   # softer weight for the less-validated pass read
     sc["Opponent Defense"] = _for_side(od, side)
 
-    # --- Injury Picture: his own status + any opportunity opened by a teammate absence ---
-    inj = None
-    h = pick.get("_health")
-    if h:
-        st = h.get("status")
-        if st in ("Out", "Doubtful"): inj = -1.0
-        elif st == "Questionable": inj = -0.4
-        elif h.get("opportunity"): inj = 0.6
-        else: inj = 0.0                        # checked, healthy, no vacated role
-    sc["Injury Picture"] = _for_side(inj, side)
+    # --- Injury Picture: his own status (negative) OR opportunity from a teammate's absence
+    # (positive, via the measured role cascade). None only when no report exists yet. ---
+    inj = pick.get("inj_lean")
+    if isinstance(inj, float) and inj != inj:      # NaN from a JSON/parquet round-trip = no report
+        inj = None
+    if inj is None:
+        h = pick.get("_health")
+        if h:
+            st = h.get("status")
+            if st in ("Out", "Doubtful"): inj = -1.0
+            elif st == "Questionable": inj = -0.4
+            elif h.get("opportunity"): inj = 0.6
+            else: inj = 0.0                    # checked, healthy, no vacated role
+    # own-status penalties hurt EITHER side (he may not play / play limited): don't flip those
+    if inj is not None and inj < 0:
+        sc["Injury Picture"] = float(inj)
+    else:
+        sc["Injury Picture"] = _for_side(inj, side)
 
     # --- Weather: pass down, rush up; dome/roof = genuine 0; unknown outdoor = None ---
     wx = None

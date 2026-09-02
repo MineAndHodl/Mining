@@ -141,7 +141,8 @@ def attach_to_pick(pick, ctx):
         return pick
 
     p2 = {"side": pick.get("side", "Over"), "mkt": mkt,
-          "line": pick.get("line", 0), "our_num": pick.get("our_num"), "_health": pick.get("_health")}
+          "line": pick.get("line", 0), "our_num": pick.get("our_num"), "_health": pick.get("_health"),
+          "inj_lean": pick.get("inj_lean")}
     weather = g["weather"] if g else None
     matchup = None
     if g:

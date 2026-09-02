@@ -1,0 +1,61 @@
+{
+ "WR1": {
+  "n_team_seasons": 36,
+  "team_volume_ratio": 1.014,
+  "pickup": {
+   "QB1": 0.0,
+   "QB2": 0.0,
+   "RB1": 0.021,
+   "RB2": 0.077,
+   "RB3": 0.028,
+   "RB4": 0.0,
+   "TE1": 0.069,
+   "TE2": 0.052,
+   "TE3": 0.006,
+   "WR2": 0.199,
+   "WR3": 0.129,
+   "WR4": 0.189,
+   "WR5": 0.128,
+   "WR6": 0.183,
+   "WR7": 0.072
+  }
+ },
+ "TE1": {
+  "n_team_seasons": 9,
+  "team_volume_ratio": 0.903,
+  "pickup": {
+   "RB3": -0.03,
+   "WR1": 0.206,
+   "WR2": 0.531
+  }
+ },
+ "RB1": {
+  "n_team_seasons": 37,
+  "team_volume_ratio": 0.961,
+  "pickup": {
+   "QB1": -0.014,
+   "QB2": 0.012,
+   "RB2": 0.545,
+   "RB3": 0.322,
+   "RB4": 0.055,
+   "TE1": 0.0,
+   "TE2": 0.0,
+   "TE3": 0.0,
+   "TE4": 0.0,
+   "WR1": 0.001,
+   "WR2": -0.009,
+   "WR3": -0.004,
+   "WR4": 0.0,
+   "WR5": 0.0,
+   "WR6": 0.0,
+   "WR7": 0.0
+  }
+ },
+ "_notes": {
+  "method": "2023-25 pbp x injury reports: team-games where the season's top-share player (WR1 tgt>=.18, RB1 car>=.35, TE1) was Out/Doubtful. pickup = (beneficiary share absent - present) / vacated share, median by role.",
+  "WR1_out_qb_pass_yds_ratio": 1.132,
+  "WR1_out_qb_note": "COUNTERINTUITIVE: team QB pass yards RISE ~13% (median, n=34) when the WR1 sits, and team target volume is unchanged (x1.01). Likely game-script confounding (injury-hit teams trail and throw). Application: NO QB downgrade for a WR1 absence; redistribute targets to the other pass-catchers.",
+  "deep_roles": "WR4+ medians are noisy artifacts of tiny baselines; pooled at ~0.10 in application.",
+  "TE1_out": "n=9, thin; applied at half weight."
+ }
+}

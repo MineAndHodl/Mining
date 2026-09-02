@@ -107,6 +107,12 @@ def run(key=None, days=14, rebuild_games=False, cached=False):
     # 6) freshness stamp + write + rebuild page
     import datetime
     ranked["generated_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%b %d, %Y %H:%M UTC")
+    def _clean(x):                      # NaN -> null everywhere (DataFrame round-trips re-NaN None)
+        if isinstance(x, dict): return {k: _clean(v) for k, v in x.items()}
+        if isinstance(x, list): return [_clean(v) for v in x]
+        if isinstance(x, float) and x != x: return None
+        return x
+    ranked = _clean(ranked)
     json.dump(ranked, open(f"{DATA}/ranked_board.json", "w"), indent=1)
     bbp.build()
     print(f"board rebuilt: {len(ranked.get('best_props', []))} best props, "

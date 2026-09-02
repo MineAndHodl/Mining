@@ -74,6 +74,11 @@ def td_score(row):
     return _desk_score(row.get("edge"), row.get("p_model"), anchor=TD_ANCHOR)
 
 
+def _nn(x):
+    """NaN -> None so the page gets null, not a NaN literal."""
+    return None if (isinstance(x, float) and x != x) else x
+
+
 def _fnum(x):
     try:
         v = float(x); return None if v != v else v
@@ -123,6 +128,9 @@ def _td_reason(r, mp, imp, edge):
             diff = (tl - exp) / exp
             if diff >= 0.30: bits.append(f"he scored {int(tl)} last season against a role that should produce about {exp:.0f} — he ran hot, so we lean on the role, not the box score")
             elif diff <= -0.30: bits.append(f"he scored only {int(tl)} last season on a role that should produce about {exp:.0f} — that's a bounce-back profile, not a broken one")
+    rn = r.get("role_note")
+    if isinstance(rn, str) and rn:
+        bits.append(f"injury angle: {rn}")
     body = "; ".join(bits)
     lead = f"{name} to score. "
     if lam is not None:
@@ -167,7 +175,10 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),
                          "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", ""),
                          "contrib": r.get("contrib"), "confidence": r.get("confidence"),
-                         "offseason": r.get("offseason")})
+                         "offseason": r.get("offseason"),
+                         "inj_status": _nn(r.get("inj_status")), "inj_detail": _nn(r.get("inj_detail")),
+                         "role_mult": _nn(r.get("role_mult")), "role_note": _nn(r.get("role_note")),
+                         "inj_lean": _nn(r.get("inj_lean")), "inj_note": _nn(r.get("inj_note"))})
     if td_board is not None and len(td_board):
         for _, r in td_board[td_board["edge"].notna()].iterrows():
             mp = int((r.get("p_model") or 0) * 100); imp = int((r.get("p_implied") or 0) * 100)

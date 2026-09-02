@@ -143,6 +143,14 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
     except Exception:
         model = {"features": [], "base_med": {}, "weights": {}}
     _pmap, sched_rows, code2full, _adp, def_vs = bf._load_context()
+    # INJURY LAYER: own status (Out -> never a pick) + the measured role cascade (a teammate's
+    # absence vacates opportunity that redistributes). Loads cleanly even before the week's
+    # report is posted.
+    try:
+        import injury_layer as il
+        INJ = il.InjuryLayer(season=int(recency_season) + (1 if recency_week is None else 0))
+    except Exception as _e:
+        INJ = None; print("injury layer unavailable:", _e)
     out = []
     for _, b in board.iterrows():
         k = _norm(b["name"]); mkt = b["mkt"]
@@ -151,6 +159,9 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
             pr = pr.iloc[0]
         if mkt == "anytime_td":
             continue
+        own_inj = INJ.status(b["name"]) if INJ else None
+        if own_inj and own_inj.get("status") == "Out":
+            continue                                       # listed Out: never on the board
         rr = recmap.get((k, mkt))
         pos = pr["position"] if pr is not None else "?"
         team = pr["team"] if pr is not None else None
@@ -203,8 +214,16 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
         if wg:
             our_mu = our_mu * wx.market_weather_mult(mkt, wind=wg.get("wind"), temp=wg.get("temp"),
                                                      roof=wg.get("roof", "outdoors"))
+        # role cascade: a teammate's absence redistributes volume to him (measured coefficients)
+        role_mult, role_note = (INJ.role_multiplier(b["name"], mkt) if INJ else (1.0, None))
+        if role_mult != 1.0:
+            our_mu = our_mu * role_mult
         p = price_ou(mkt, our_mu, b["line"], b["over_price"], b["under_price"])
         conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
+        # own status shy of Out: Doubtful/Questionable erode trust (the scorecard shows it too)
+        if own_inj and own_inj.get("status") == "Doubtful": conf *= 0.5
+        elif own_inj and own_inj.get("status") == "Questionable": conf *= 0.8
+        inj_lean, inj_note = (INJ.injury_lean(b["name"], mkt) if INJ else (None, None))
         out.append({"name": b["name"], "game": b["game"], "book": b["book"], "mkt": mkt,
                     "line": b["line"], "desk_proj": round(our_mu, 1),
                     "position": pos, "team": team if team else "?",
@@ -216,7 +235,10 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
                     "market_num": round(pm.market_mean(mkt, b["line"], p["fair_over"]), 1),
                     "side": p["side"], "edge": p["edge"], "model_p": p["model_p"], "fair": p["fair"],
                     "price": p["price"], "ev": p["ev"],
-                    "over_price_kept": b["over_price"], "under_price_kept": b["under_price"]})
+                    "over_price_kept": b["over_price"], "under_price_kept": b["under_price"],
+                    "inj_status": (own_inj or {}).get("status"), "inj_detail": (own_inj or {}).get("injury"),
+                    "role_mult": role_mult, "role_note": role_note,
+                    "inj_lean": inj_lean, "inj_note": inj_note})
     df = pd.DataFrame(out)
     if not len(df):
         return df, rem
@@ -368,8 +390,17 @@ def reason(row, news=None):
              + (f", best of {int(row['n_books'])} books" if row.get("n_books", 0) and row['n_books'] > 1 else "") + ". ")
     conf_note = ("Honest caveat: this leans on late-2025 form across the offseason — an early-season "
                  "read, sized as a lean." if offseason else "Multi-factor signal, sized to conviction.")
+    # injury context: the role cascade (a teammate out feeds him) or his own status
+    inj_line = ""
+    rn = row.get("role_note"); st = row.get("inj_status")
+    if rn and isinstance(rn, str):
+        inj_line = f" Injury angle: {rn}."
+    elif st in ("Doubtful", "Questionable"):
+        det = row.get("inj_detail") or "injury"
+        inj_line = (f" Injury caveat: he's listed {st} ({det}) — we've cut our trust accordingly; "
+                    f"confirm he's active before betting.")
     tail = f" Beat note: {news}" if news else ""
-    return lead + case + money + conf_note + tail
+    return lead + case + money + conf_note + inj_line + tail
 
 
 if __name__ == "__main__":

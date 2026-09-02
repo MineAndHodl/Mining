@@ -1,5 +1,7 @@
 # The Desk — project brain
 
+**The full operating prompt is `THE_DESK_PROMPT.md` — read it first; this file is the short form.**
+
 Read this first, every session. It is the accumulated clarity of a long iterative build:
 what we're doing, how we work, what's been proven, what every variable is for, and what's
 still owed. Treat the *findings* as settled (don't rederive them) and the *principles* as
@@ -82,6 +84,14 @@ The board is the product: every pick on it must be something a sharp would nod a
   Record rule: only recommended straight bets count; parlays are a separate lotto-lane record.
   Games grade on the same scale (~1 pt spread value ~= 3% win prob) — the most efficient
   market, so few games clear B+.
+- **Injury layer (`injury_layer.py`, `role_multiplier.py`, `role_multiplier.json`):** own status
+  from the weekly report (Out → never a pick; Doubtful/Questionable → trust cut, slider negative
+  on either side) PLUS the measured role cascade from 2023-25 pbp: **RB1 out → RB2 +.55 / RB3
+  +.32 of the vacated carry share** (n=37); **WR1 out → targets spread** (WR2 +.20, WR3 +.13,
+  TE1 +.07, backs +.08; n=36) and **the QB's passing yards RISE ~13%** (game-script confounding)
+  — so NO QB downgrade for a WR1 absence. Applied to projected volume, xTD zone shares, the
+  Injury Picture slider and the paragraph. 2026 loader falls back to the nflverse release CSV
+  and returns empty cleanly until reports post.
 - **Structural truths:** near-locks are minus-money and scarce (books balance ~50/50), so
   "8-10 near-locks at 100:1" is self-contradictory — the missile is an honest lotto of
   53-60% favorites. Week 1 is the weakest week (recency needs games across the offseason
@@ -102,18 +112,18 @@ correlation measurements, DK SGP calibration quotes.
 ### Yardage / count props (rec_yds, rush_yds, pass_yds, receptions, attempts)
 - WIRED (earned weights): recent form (last-3, last-1 vs baseline) · prior-year matchup
   (weak) · game total · home/away · mean-reversion (baseline vs market median).
-- WIRED (scorecard/rationale): game script from spread (dog throws, favorite runs) ·
+- WIRED (scorecard/rationale): **injury own-status gate + measured role cascade** · game script from spread (dog throws, favorite runs) ·
   weather (roof/wind/temp) · play-calling load (targets, carries) · market role read
   (ADP; NFL-track-record fallback) · opponent defense incl. QB pass-defense proxy.
-- EARN: team pace / plays per game (pbp) · coach pass rate / PROE (stable in-season) ·
+- EARN: team pace / plays per game (pbp) · coach pass rate / PROE (stable in-season) · QB-change effect (depth) ·
   opponent EPA allowed by pass/rush (team_game_epa) · target share, air yards, aDOT (pbp) ·
   red-zone vs open-field split of a player's volume (pbp) · officials' crew pace/penalty
   tendencies (game_crew_stats) · line movement & book disagreement (hist_open_close, 8-book
   dispersion, CLV engine) · rest / bye / travel (schedule) · QB change (depth snapshot) ·
   division / primetime situational flags · score-differential-conditional usage (garbage
   time, from WP).
-- NEED: injuries / inactives feed (blank on every pick today) · snap counts (nflverse
-  snap_counts) · targets per route run · practice reports.
+- NEED: snap counts (nflverse snap_counts) · targets per route run · practice reports beyond
+  the injury report · game-day inactives (the report is Wed-Fri; inactives drop 90 min pre-kick).
 
 ### Anytime TD
 - WIRED (xTD): expected team plays per zone (GL 1-5 / IN10 / RZ 11-20 / OPEN) · coach
@@ -152,7 +162,7 @@ Research/validation: `multifactor.py`, `recency.py`, `xtd_model.py`, `xtd_valida
 `correlation_lab.py`, `clv_engine.py`. Tests: `python3 tests/test_pipeline.py` (must be green).
 
 ## Still owed
-- **Forward grading loop** (the biggest missing foundation): log every pick's number and
+- **Forward grading loop** (the biggest missing foundation — next up): log every pick's number and
   factor contributions, grade vs close and outcome, re-learn weights. Turns a static model
   into one that improves. Offered repeatedly; not yet greenlit.
 - Injuries/inactives feed; snap counts. Then the EARN features above, one at a time, each

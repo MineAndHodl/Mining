@@ -120,21 +120,36 @@ def build_td_board(key=None, max_games=None, days=8):
         xdf = build_xtd_table()
         w = xm.blend_weight(current_season_weeks_played())
         xmap = {r["_k"]: r for r in xdf.to_dict("records")}
+        # injury layer: Out -> off the board; a teammate's absence lifts his scoring-zone share
+        try:
+            import injury_layer as il
+            INJ = il.InjuryLayer(season=2026)
+        except Exception:
+            INJ = None
         p_x_list, lam_x_list, fac = [], [], {c: [] for c in XTD_FACTOR_COLS}
+        keep_mask, role_notes = [], []
         for _, b in out.iterrows():
+            st = INJ.status(b["name"]) if INJ else None
+            if st and st.get("status") == "Out":
+                keep_mask.append(False)
+            else:
+                keep_mask.append(True)
             r = xmap.get(norm_name(b["name"]))
             if r is None or b.get("p_model") is None:
-                p_x_list.append(None); lam_x_list.append(None)
+                p_x_list.append(None); lam_x_list.append(None); role_notes.append(None)
                 for c in XTD_FACTOR_COLS: fac[c].append(None)
                 continue
             team = r["team"]; mult = env_mult.get(team, 1.0)
-            lam_x = float(r["xtd"]) * mult
+            rmult, rnote = (INJ.role_multiplier(b["name"], "anytime_td") if INJ else (1.0, None))
+            role_notes.append(rnote)
+            lam_x = float(r["xtd"]) * mult * rmult
             p_x = float(xm.p_atd(lam_x))
             p_x_list.append(round(p_x, 3)); lam_x_list.append(round(lam_x, 3))
             for c in XTD_FACTOR_COLS: fac[c].append(r.get(c))
-        out["p_xtd"] = p_x_list; out["lam_xtd"] = lam_x_list
-        out["p_old"] = out["p_model"]
+        out["p_xtd"] = p_x_list; out["lam_xtd"] = lam_x_list; out["role_note"] = role_notes
         for c in XTD_FACTOR_COLS: out[c] = fac[c]
+        out = out[pd.Series(keep_mask, index=out.index)].copy()   # drop players listed Out
+        out["p_old"] = out["p_model"]
         blended = []
         for _, b in out.iterrows():
             if b.get("p_xtd") is None or pd.isna(b.get("p_xtd")):
