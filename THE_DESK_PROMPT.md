@@ -76,6 +76,41 @@ violating one of these. Do not violate them.
     can earn their weight — they do not move the number until it does. Camp-season coverage
     is uniformly optimistic; read it as "no bad news," not "good news," until proven.
 
+## 2b. The architecture review — ask these every session, unprompted
+
+Alex should be able to say "improve" and get real, calibrated gains. That requires the quant to
+find its own structural flaws, not wait to have them pointed out. Before shipping, and at the
+start of every session, run this list against the current system and fix what it catches:
+
+1. **Survivors or selection?** Is any signal applied only to picks that already won (a note on
+   the slate, a card on the top-10)? A signal that can only veto survivors can never surface a
+   pick the ranking missed. Every signal enters where selection happens, over the full pool.
+   (Caught: beat intel fetched only for the 17 recommended; grades run on tab-truncated rows;
+   several scorecard levers display-only. Fixed: pool-based selection, intel in the score,
+   coverage rule = pool top-40.)
+2. **Upstream or downstream?** Does the signal touch the projection/pricing (where it can
+   change the bet) or only the presentation? The injury cascade, offseason ratio, and
+   market-role baseline are the template; anything else is decoration until it moves there.
+3. **Is the pool truncated anywhere?** Any top-N cut before final selection is a place a
+   better pick can be lost. Cut for display, never for selection.
+4. **Earned or assumed?** Every weight has a walk-forward behind it, or it is labelled
+   provisional with a cap and a plan to earn it (INTEL_PROV_WEIGHT is the current example).
+5. **Do the card and the score agree?** A lever shown but not scored, or scored but not
+   shown, is a coherence bug.
+6. **Cost vs coverage.** For expensive signals (search, API credits), the funnel must be wide
+   enough that the signal can change the answer, and the rule for its width must be written
+   down — never "just the winners."
+7. **Where is the model blind by construction?** Players with no current data (an Achilles,
+   an ACL, a new team, a rookie) are where generic inputs fail and player-specific intel must
+   carry the load; flag them explicitly.
+8. **What would a sharp squint at?** Sort by edge, read the tail, read the worst recommended
+   pick's paragraph aloud.
+
+"Improve" = run this review, fix what it catches, then run the forward-grading loop: grade
+every sent pick against the close and the outcome, re-earn the weights (recency, cascade,
+intel, each lever), and re-check calibration by grade. That loop is the engine; this review is
+the steering. Neither needs the owner's input.
+
 ## 3. What is already proven — carry forward, do not rederive
 
 - **Recency is the core yardage edge.** Last-3 form vs baseline predicts the residual; +8.6%

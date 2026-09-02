@@ -364,13 +364,25 @@ def test_player_intel():
     check("Week-1 intel file has dated, sourced items", all("date" in it and "source" in it for v in I.raw.values() if isinstance(v, dict) for it in v.get("items", [])))
 
 
+def test_selection_over_pool():
+    """Selection runs over the full pool, and a soft signal can reorder near the margin."""
+    print("\n-- selection over the pool; intel in the score --")
+    import rank_board as rb, grading, json
+    base = {"edge": 0.06, "model_p": 0.58, "confidence": 1.0, "n_books": 2, "score_mult": 1.0}
+    s0 = rb.prop_score(base); s1 = rb.prop_score({**base, "intel_lean": 1.0}); s2 = rb.prop_score({**base, "intel_lean": -1.0})
+    check("intel lean moves the score (provisional, capped)", s1 > s0 > s2 and (s1 - s0) <= rb.INTEL_PROV_WEIGHT + 1e-9, f"{s2} < {s0} < {s1}")
+    d = json.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    check("board records the pool it selected from", d.get("pool_summary", {}).get("n", 0) > 50)
+    check("slate rows carry scorecards (main tab has sliders)", all((r.get("scorecard") or {}) for r in d.get("recommended", []) if not r.get("kind")))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--offline", action="store_true"); a = ap.parse_args()
     print("=" * 60, "\n  DESK PIPELINE TEST SUITE\n", "=" * 60)
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

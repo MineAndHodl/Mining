@@ -19,6 +19,7 @@ CAT_LABEL = {"rec_yds": "Receiving Yards", "rush_yds": "Rushing Yards", "recepti
 EDGE_PEAK = 0.11        # edge beyond which a bigger gap is a stale-model red flag, not free money
 MIN_HITTABLE = 0.45     # a "best bet" must have at least this chance to win — no lottery tickets
 CAT_CAP = 3             # max picks from any single market on the best-bets board (diversity)
+INTEL_PROV_WEIGHT = 4.0 # provisional Desk-Score points for a full-strength beat-intel lean (to be earned)
 
 def _desk_score(edge, model_p, mult=1.0, anchor=0.52):
     """Unified Desk Score = CONVICTION, not raw edge. Two components:
@@ -54,6 +55,13 @@ def _trust(row):
         t += (float(conf) - 0.7) * 22.0                  # 1.0 -> +6.6, 0.7 -> 0, 0.46 -> -5, 0.33 -> -8
     if nb is not None and not (isinstance(nb, float) and nb != nb):
         nb = int(nb); t += (-3.0 if nb <= 1 else (0.0 if nb == 2 else 3.0))
+    # Beat intel: PROVISIONAL weight. A prior, not an earned weight — capped small so it can
+    # reorder picks near the margin (the point of gathering it) without pretending we know its
+    # value. The forward-grading loop raises it, lowers it, or kills it. Hard gates (OUT/LIMITED)
+    # already act upstream at pricing.
+    bi = row.get("intel_lean")
+    if bi is not None and not (isinstance(bi, float) and bi != bi):
+        t += float(np.clip(bi, -1, 1)) * INTEL_PROV_WEIGHT
     return t
 
 
@@ -232,6 +240,10 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                 if len(picked) >= top:
                     break
         out["best_props"] = picked
+        # THE POOL: every scored candidate (not the tab-truncated top-10s). Selection — grades,
+        # rails, intel gates, the slate — must run over this, or a signal applied downstream
+        # can only veto survivors, never surface a pick the ranking missed.
+        out["pool"] = allp.sort_values("score", ascending=False).to_dict("records")
 
     # games (spreads/totals/ML) — already scored dicts with desk_conf
     if games:

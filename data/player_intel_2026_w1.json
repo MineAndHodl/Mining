@@ -1,82 +1,355 @@
 {
- "_window": {"start": "2026-08-15", "end": "2026-09-14"},
- "_method": "In-session beat pass (targeted web search + article read per slate player), date-gated to the window. 'read' = human-quality classification that overrides keyword rules. Soft signals inform the Beat Intel lever and paragraph; they do NOT move the projection until the forward-grading loop earns their weight. Hard facts (OUT/LIMITED) gate now.",
+ "_window": {
+  "start": "2026-08-15",
+  "end": "2026-09-14"
+ },
+ "_method": "In-session beat pass (targeted web search + article read per slate player), date-gated to the window. 'read' = human-quality classification that overrides keyword rules. Soft signals inform the Beat Intel lever and paragraph; they do NOT move the projection until the forward-grading loop earns their weight. Hard facts (OUT/LIMITED) gate now. Coverage rule: the pool's top-40 by pre-intel score (not the final slate), so intel can promote or demote near the recommendation floor.",
  "Rhamondre Stevenson": {
-  "items": [{"date": "2026-08-15", "source": "Yahoo Sports", "title": "Stevenson is the clear lead back; staff showed its preference in the playoffs (57% snap share vs Henderson 31%); 5.9 yds/touch; no injury concerns", "url": "https://sports.yahoo.com/articles/rhamondre-stevenson-fantasy-outlook-2026-130007120.html"}],
-  "read": {"health": 0.2, "coach": 0.5, "role": 0.4, "situational": 0.0,
-           "note": "Beat consensus has him as the clear lead back — the staff showed it in the playoffs (57% snap share vs Henderson's 31%) and he was 3rd in the league at 5.9 yards per touch; no health concerns (Yahoo, Aug 15). Henderson's explosiveness is the one long-term threat to the split."}
+  "items": [
+   {
+    "date": "2026-08-15",
+    "source": "Yahoo Sports",
+    "title": "Stevenson is the clear lead back; staff showed its preference in the playoffs (57% snap share vs Henderson 31%); 5.9 yds/touch; no injury concerns",
+    "url": "https://sports.yahoo.com/articles/rhamondre-stevenson-fantasy-outlook-2026-130007120.html"
+   }
+  ],
+  "read": {
+   "health": 0.2,
+   "coach": 0.5,
+   "role": 0.4,
+   "situational": 0.0,
+   "note": "Beat consensus has him as the clear lead back \u2014 the staff showed it in the playoffs (57% snap share vs Henderson's 31%) and he was 3rd in the league at 5.9 yards per touch; no health concerns (Yahoo, Aug 15). Henderson's explosiveness is the one long-term threat to the split."
+  }
  },
  "Deshaun Watson": {
-  "items": [{"date": "2026-08-25", "source": "NFL.com", "title": "Browns name Watson Week 1 starter over Shedeur Sanders; HC Todd Monken: 'gave us the best chance to move the ball'; 'not a week-to-week decision'; returned in preseason without noted restrictions after 2024 Achilles + two surgeries, missed all of 2025", "url": "https://www.nfl.com/news/browns-deshaun-watson-starting-qb-week-1-2026-season"}],
-  "read": {"health": -0.2, "coach": 0.2, "role": 0.3, "situational": -0.2,
-           "note": "Named the Week 1 starter by new HC Todd Monken ('not a week-to-week decision'), but this is a QB who missed all of 2025 after a 2024 Achilles tear and two surgeries — the beat notes no preseason restrictions, yet there is zero current-season data on him and a road opener in a new system (NFL.com, Aug 25). The model's recency read on him is stale by construction; the intel argues for caution, which is the side we're on."}
+  "items": [
+   {
+    "date": "2026-08-25",
+    "source": "NFL.com",
+    "title": "Browns name Watson Week 1 starter over Shedeur Sanders; HC Todd Monken: 'gave us the best chance to move the ball'; 'not a week-to-week decision'; returned in preseason without noted restrictions after 2024 Achilles + two surgeries, missed all of 2025",
+    "url": "https://www.nfl.com/news/browns-deshaun-watson-starting-qb-week-1-2026-season"
+   }
+  ],
+  "read": {
+   "health": -0.2,
+   "coach": 0.2,
+   "role": 0.3,
+   "situational": -0.2,
+   "note": "Named the Week 1 starter by new HC Todd Monken ('not a week-to-week decision'), but this is a QB who missed all of 2025 after a 2024 Achilles tear and two surgeries \u2014 the beat notes no preseason restrictions, yet there is zero current-season data on him and a road opener in a new system (NFL.com, Aug 25). The model's recency read on him is stale by construction; the intel argues for caution, which is the side we're on."
+  }
  },
  "Rashid Shaheed": {
-  "items": [{"date": "2026-08-12", "source": "Heavy / Bleacher Report", "title": "Shaheed challenging Kupp for WR2; signed 3-yr/$51M in March signaling expanded plans; full offseason with Darnold; 55-yd TD connection in camp; 15 catches in 9 games after mid-2025 arrival", "url": "https://heavy.com/sports/nfl/seattle-seahawks/seahawks-cooper-kupp-rashid-shaheed-wr2/"}],
-  "read": {"health": 0.0, "coach": 0.3, "role": 0.4, "situational": 0.1,
-           "note": "Mixed for an Under on catches: Seattle paid him (3-yr/$51M in March) and he's pushing Kupp for WR2 after a full offseason with Darnold — that says expanded role. But his archetype is the deep shot (1.7 catches a game last year, a 55-yard TD in camp), and deep threats pile up yards, not receptions (Heavy, Aug 12). The intel leans against the under; the archetype leans with it."}
+  "items": [
+   {
+    "date": "2026-08-12",
+    "source": "Heavy / Bleacher Report",
+    "title": "Shaheed challenging Kupp for WR2; signed 3-yr/$51M in March signaling expanded plans; full offseason with Darnold; 55-yd TD connection in camp; 15 catches in 9 games after mid-2025 arrival",
+    "url": "https://heavy.com/sports/nfl/seattle-seahawks/seahawks-cooper-kupp-rashid-shaheed-wr2/"
+   }
+  ],
+  "read": {
+   "health": 0.0,
+   "coach": 0.3,
+   "role": 0.4,
+   "situational": 0.1,
+   "note": "Mixed for an Under on catches: Seattle paid him (3-yr/$51M in March) and he's pushing Kupp for WR2 after a full offseason with Darnold \u2014 that says expanded role. But his archetype is the deep shot (1.7 catches a game last year, a 55-yard TD in camp), and deep threats pile up yards, not receptions (Heavy, Aug 12). The intel leans against the under; the archetype leans with it."
+  }
  },
  "Parker Washington": {
-  "items": [{"date": "2026-08-05", "source": "Yahoo / Big Cat Country", "title": "'Literally unguardable' in 1-on-1s, tough red-zone catches; HC Liam Coen: 'I texted Parker... he was like, I'm ready to kill'; earliest to the facility; projects WR2 with primary-target capability, plays slot/X/outside", "url": "https://sports.yahoo.com/articles/jaguars-wr-washington-looks-unguardable-203945387.html"},
-            {"date": "2026-08-20", "source": "CBS Sports", "title": "Brian Thomas Jr. exits practice with shoulder injury, coach says 'just precautionary'", "url": "https://www.cbssports.com/nfl/news/jaguars-wr-brian-thomas-jr-exits-practice-with-shoulder-injury-coach-says-just-precautionary"}],
-  "read": {"health": 0.2, "coach": 0.6, "role": 0.4, "situational": 0.0,
-           "note": "The clearest 'coach loves him' read on the slate: Liam Coen quoted twice, beat writers calling him 'literally unguardable' in camp, projected WR2 with primary-target upside and slot/X/outside versatility (Yahoo, Aug 5). Brian Thomas Jr.'s precautionary shoulder exit only pushes more his way if it lingers."}
+  "items": [
+   {
+    "date": "2026-08-05",
+    "source": "Yahoo / Big Cat Country",
+    "title": "'Literally unguardable' in 1-on-1s, tough red-zone catches; HC Liam Coen: 'I texted Parker... he was like, I'm ready to kill'; earliest to the facility; projects WR2 with primary-target capability, plays slot/X/outside",
+    "url": "https://sports.yahoo.com/articles/jaguars-wr-washington-looks-unguardable-203945387.html"
+   },
+   {
+    "date": "2026-08-20",
+    "source": "CBS Sports",
+    "title": "Brian Thomas Jr. exits practice with shoulder injury, coach says 'just precautionary'",
+    "url": "https://www.cbssports.com/nfl/news/jaguars-wr-brian-thomas-jr-exits-practice-with-shoulder-injury-coach-says-just-precautionary"
+   }
+  ],
+  "read": {
+   "health": 0.2,
+   "coach": 0.6,
+   "role": 0.4,
+   "situational": 0.0,
+   "note": "The clearest 'coach loves him' read on the slate: Liam Coen quoted twice, beat writers calling him 'literally unguardable' in camp, projected WR2 with primary-target upside and slot/X/outside versatility (Yahoo, Aug 5). Brian Thomas Jr.'s precautionary shoulder exit only pushes more his way if it lingers."
+  }
  },
  "Xavier Worthy": {
-  "items": [{"date": "2026-08-04", "source": "Yahoo Sports", "title": "Shoulder sprain in camp, downplayed, expected back within days; a coach: 'looks so fast', envisions screens and crossing routes; Rashee Rice on an extended ramp-up after a knee procedure, only recently in full team drills", "url": "https://sports.yahoo.com/articles/chiefs-star-xavier-worthy-training-170813795.html"}],
-  "read": {"health": 0.1, "coach": 0.3, "role": 0.3, "situational": 0.0,
-           "note": "Leans against our Under on catches: the early-August shoulder sprain was downplayed and is a month old, Rashee Rice is on an extended ramp-up after a knee procedure (targets cascade toward Worthy if Rice is limited), and the staff envisions him on screens and crossers — the high-catch-rate routes that pile up receptions (Yahoo, Aug 4)."}
+  "items": [
+   {
+    "date": "2026-08-04",
+    "source": "Yahoo Sports",
+    "title": "Shoulder sprain in camp, downplayed, expected back within days; a coach: 'looks so fast', envisions screens and crossing routes; Rashee Rice on an extended ramp-up after a knee procedure, only recently in full team drills",
+    "url": "https://sports.yahoo.com/articles/chiefs-star-xavier-worthy-training-170813795.html"
+   }
+  ],
+  "read": {
+   "health": 0.1,
+   "coach": 0.3,
+   "role": 0.3,
+   "situational": 0.0,
+   "note": "Leans against our Under on catches: the early-August shoulder sprain was downplayed and is a month old, Rashee Rice is on an extended ramp-up after a knee procedure (targets cascade toward Worthy if Rice is limited), and the staff envisions him on screens and crossers \u2014 the high-catch-rate routes that pile up receptions (Yahoo, Aug 4)."
+  }
  },
  "Garrett Wilson": {
-  "items": [{"date": "2026-08-07", "source": "newyorkjets.com", "title": "Camp practice report: Geno Smith-Garrett Wilson connection; one-handed TD grab; chemistry building", "url": "https://www.newyorkjets.com/news/jets-training-camp-practice-report-geno-smith-garrett-wilson-connection-08-07-2026"}],
-  "read": {"health": 0.2, "coach": 0.3, "role": 0.4, "situational": 0.0,
-           "note": "Leans against our Under on catches: the Jets' camp reports are all Geno Smith-to-Wilson chemistry and highlight grabs — a clear WR1 with a new, accurate quarterback (Jets.com, Aug 7). Nothing in the beat suggests a reduced role."}
+  "items": [
+   {
+    "date": "2026-08-07",
+    "source": "newyorkjets.com",
+    "title": "Camp practice report: Geno Smith-Garrett Wilson connection; one-handed TD grab; chemistry building",
+    "url": "https://www.newyorkjets.com/news/jets-training-camp-practice-report-geno-smith-garrett-wilson-connection-08-07-2026"
+   }
+  ],
+  "read": {
+   "health": 0.2,
+   "coach": 0.3,
+   "role": 0.4,
+   "situational": 0.0,
+   "note": "Leans against our Under on catches: the Jets' camp reports are all Geno Smith-to-Wilson chemistry and highlight grabs \u2014 a clear WR1 with a new, accurate quarterback (Jets.com, Aug 7). Nothing in the beat suggests a reduced role."
+  }
  },
  "Jonathan Taylor": {
-  "items": [{"date": "2026-08-26", "source": "colts.com", "title": "Starters to play 8-12 preseason snaps minus Daniel Jones and Jonathan Taylor (rested); Steichen on Taylor's impact", "url": "https://www.colts.com/news/colts-hopeful-alec-pierce-returns-to-practice-this-week-starters-minus-daniel-jones-jonathan-taylor-to-play-8-12-plays-in-preseason-finale-vs-detroit-lions"}],
-  "read": {"health": 0.2, "coach": 0.3, "role": 0.2, "situational": 0.0,
-           "note": "Healthy — he sat the preseason finale as star rest alongside Daniel Jones, not injury, and Steichen's camp availability was about his impact (Colts.com, Aug 26). Mildly against our Under; the case for it is the Ravens' front, not anything about Taylor."}
+  "items": [
+   {
+    "date": "2026-08-26",
+    "source": "colts.com",
+    "title": "Starters to play 8-12 preseason snaps minus Daniel Jones and Jonathan Taylor (rested); Steichen on Taylor's impact",
+    "url": "https://www.colts.com/news/colts-hopeful-alec-pierce-returns-to-practice-this-week-starters-minus-daniel-jones-jonathan-taylor-to-play-8-12-plays-in-preseason-finale-vs-detroit-lions"
+   }
+  ],
+  "read": {
+   "health": 0.2,
+   "coach": 0.3,
+   "role": 0.2,
+   "situational": 0.0,
+   "note": "Healthy \u2014 he sat the preseason finale as star rest alongside Daniel Jones, not injury, and Steichen's camp availability was about his impact (Colts.com, Aug 26). Mildly against our Under; the case for it is the Ravens' front, not anything about Taylor."
+  }
  },
  "James Cook": {
   "items": [],
-  "read": {"health": 0.0, "coach": 0.0, "role": 0.0, "situational": 0.0,
-           "note": "No confirmed in-window beat items — the search surfaced last summer's contract-dispute stories (he signed in Aug 2025), which are stale and excluded. Treat as no intel this week."}
+  "read": {
+   "health": 0.0,
+   "coach": 0.0,
+   "role": 0.0,
+   "situational": 0.0,
+   "note": "No confirmed in-window beat items \u2014 the search surfaced last summer's contract-dispute stories (he signed in Aug 2025), which are stale and excluded. Treat as no intel this week."
+  }
  },
  "Derrick Henry": {
-  "items": [{"date": "2026-08-26", "source": "baltimoreravens.com", "title": "Lamar Jackson healthy and ready for Sept 13 opener; first-year OC Declan Doyle's new system; HC Jesse Minter; Zay Flowers sat with a minor injury (caution ahead of Week 1)", "url": "https://www.baltimoreravens.com/news/lamar-jackson-feels-ready-for-season-in-new-system-trey-hendrickson-top-form-ravens-commanders-joint-practice-jakobi-lane-odell-beckham-jr-deandre-hopkins"}],
-  "read": {"health": 0.2, "coach": 0.0, "role": 0.1, "situational": 0.0,
-           "note": "No Henry health notes, which for a 32-year-old back is good news, and Lamar is healthy. The real variable is structural: a new head coach (Jesse Minter) and a first-year OC (Declan Doyle) running a new system, so the goal-line and run-game tendencies we measured on last year's staff carry less weight (Ravens.com, Aug 26). Zay Flowers nursing a minor injury would tilt the offense further toward the run."}
+  "items": [
+   {
+    "date": "2026-08-26",
+    "source": "baltimoreravens.com",
+    "title": "Lamar Jackson healthy and ready for Sept 13 opener; first-year OC Declan Doyle's new system; HC Jesse Minter; Zay Flowers sat with a minor injury (caution ahead of Week 1)",
+    "url": "https://www.baltimoreravens.com/news/lamar-jackson-feels-ready-for-season-in-new-system-trey-hendrickson-top-form-ravens-commanders-joint-practice-jakobi-lane-odell-beckham-jr-deandre-hopkins"
+   }
+  ],
+  "read": {
+   "health": 0.2,
+   "coach": 0.0,
+   "role": 0.1,
+   "situational": 0.0,
+   "note": "No Henry health notes, which for a 32-year-old back is good news, and Lamar is healthy. The real variable is structural: a new head coach (Jesse Minter) and a first-year OC (Declan Doyle) running a new system, so the goal-line and run-game tendencies we measured on last year's staff carry less weight (Ravens.com, Aug 26). Zay Flowers nursing a minor injury would tilt the offense further toward the run."
+  }
  },
  "Jared Goff": {
-  "items": [{"date": "2026-08-20", "source": "detroitlions.com", "title": "Goff talks the new offense under OC Petzing and Jameson Williams' development", "url": "https://www.detroitlions.com/news/goff-talks-new-offense-under-petzing-williams-development-more"}],
-  "read": {"health": 0.0, "coach": 0.0, "role": 0.0, "situational": 0.0,
-           "note": "Healthy and settled, but Detroit has a new offensive coordinator (Petzing), so the pass-rate tendency behind this Over is a new staff's, not the one we measured (Lions.com, Aug 20). A 2023 St. Brown/Williams injury story surfaced in search and was discarded as stale."}
+  "items": [
+   {
+    "date": "2026-08-20",
+    "source": "detroitlions.com",
+    "title": "Goff talks the new offense under OC Petzing and Jameson Williams' development",
+    "url": "https://www.detroitlions.com/news/goff-talks-new-offense-under-petzing-williams-development-more"
+   }
+  ],
+  "read": {
+   "health": 0.0,
+   "coach": 0.0,
+   "role": 0.0,
+   "situational": 0.0,
+   "note": "Healthy and settled, but Detroit has a new offensive coordinator (Petzing), so the pass-rate tendency behind this Over is a new staff's, not the one we measured (Lions.com, Aug 20). A 2023 St. Brown/Williams injury story surfaced in search and was discarded as stale."
+  }
  },
  "Justin Herbert": {
-  "items": [{"date": "2026-08-22", "source": "chargers.com", "title": "Herbert hits Quentin Johnston for a 65-yard TD in the preseason finale; Mike McDaniel's scheme in 2026", "url": "https://www.chargers.com/news/justin-herbert-quentin-johnston-touchdown-mike-mcdaniel-2026"}],
-  "read": {"health": 0.2, "coach": 0.5, "role": 0.2, "situational": 0.0,
-           "note": "The Chargers are running Mike McDaniel's scheme this year — a pass-friendly, tempo offense — and Herbert looked sharp through camp, hitting Johnston for a 65-yard score in the preseason finale (Chargers.com, Aug 22). Supports the Over; the scheme change also means our measured Chargers tendencies are last staff's."}
+  "items": [
+   {
+    "date": "2026-08-22",
+    "source": "chargers.com",
+    "title": "Herbert hits Quentin Johnston for a 65-yard TD in the preseason finale; Mike McDaniel's scheme in 2026",
+    "url": "https://www.chargers.com/news/justin-herbert-quentin-johnston-touchdown-mike-mcdaniel-2026"
+   }
+  ],
+  "read": {
+   "health": 0.2,
+   "coach": 0.5,
+   "role": 0.2,
+   "situational": 0.0,
+   "note": "The Chargers are running Mike McDaniel's scheme this year \u2014 a pass-friendly, tempo offense \u2014 and Herbert looked sharp through camp, hitting Johnston for a 65-yard score in the preseason finale (Chargers.com, Aug 22). Supports the Over; the scheme change also means our measured Chargers tendencies are last staff's."
+  }
  },
  "Quentin Johnston": {
-  "items": [{"date": "2026-08-22", "source": "chargers.com", "title": "65-yard TD from Herbert in the preseason finale; McDaniel scheme", "url": "https://www.chargers.com/news/justin-herbert-quentin-johnston-touchdown-mike-mcdaniel-2026"}],
-  "read": {"health": 0.1, "coach": 0.4, "role": 0.3, "situational": 0.0,
-           "note": "Featured on the preseason finale's biggest play — a 65-yard touchdown from Herbert — in a McDaniel scheme built to push the ball downfield (Chargers.com, Aug 22). Supports the Over on yards; an old 'questionable' item surfaced in search and was discarded as undated."}
+  "items": [
+   {
+    "date": "2026-08-22",
+    "source": "chargers.com",
+    "title": "65-yard TD from Herbert in the preseason finale; McDaniel scheme",
+    "url": "https://www.chargers.com/news/justin-herbert-quentin-johnston-touchdown-mike-mcdaniel-2026"
+   }
+  ],
+  "read": {
+   "health": 0.1,
+   "coach": 0.4,
+   "role": 0.3,
+   "situational": 0.0,
+   "note": "Featured on the preseason finale's biggest play \u2014 a 65-yard touchdown from Herbert \u2014 in a McDaniel scheme built to push the ball downfield (Chargers.com, Aug 22). Supports the Over on yards; an old 'questionable' item surfaced in search and was discarded as undated."
+  }
  },
  "Jayden Daniels": {
-  "items": [{"date": "2026-08-15", "source": "Covers", "title": "Fully cleared, no limitations in joint practices; expected Week 1 starter; sat preseason opener by design; prior: sprained knee Wk 2 2025, severe dislocated elbow Wk 9 2025", "url": "https://www.covers.com/nfl/will-jayden-daniels-play-tonight-aug-14-2026-injury-update"}],
-  "read": {"health": 0.4, "coach": 0.0, "role": 0.2, "situational": 0.0,
-           "note": "Fully cleared with no limitations and the expected Week 1 starter (Covers, Aug 15) — but his last real game was Week 9 of 2025 (dislocated elbow), so our recency read on him is stale by construction. A healthy Daniels leans against an Under on yards; the case for it is a road trip to Philadelphia and his legs taking yards out of the air."}
+  "items": [
+   {
+    "date": "2026-08-15",
+    "source": "Covers",
+    "title": "Fully cleared, no limitations in joint practices; expected Week 1 starter; sat preseason opener by design; prior: sprained knee Wk 2 2025, severe dislocated elbow Wk 9 2025",
+    "url": "https://www.covers.com/nfl/will-jayden-daniels-play-tonight-aug-14-2026-injury-update"
+   }
+  ],
+  "read": {
+   "health": 0.4,
+   "coach": 0.0,
+   "role": 0.2,
+   "situational": 0.0,
+   "note": "Fully cleared with no limitations and the expected Week 1 starter (Covers, Aug 15) \u2014 but his last real game was Week 9 of 2025 (dislocated elbow), so our recency read on him is stale by construction. A healthy Daniels leans against an Under on yards; the case for it is a road trip to Philadelphia and his legs taking yards out of the air."
+  }
  },
  "Drake London": {
-  "items": [{"date": "2026-08-27", "source": "Last Word On Sports", "title": "Penix positioned to potentially start Week 1 (sat the preseason finale; HC Kevin Stefanski: 'keeping it day-to-day'); with Penix last year London had a 56.6% target share over nine games; no injury concerns", "url": "https://lastwordonsports.com/nfl/2026/08/27/falcons-qb-news-great-drake-london-2026-fantasy-outlook/"}],
-  "read": {"health": 0.2, "coach": 0.2, "role": 0.6, "situational": 0.1,
-           "note": "The strongest read against a pick on the slate: with Penix under center last year London commanded a 56.6% target share, and Penix is trending toward starting while new HC Kevin Stefanski keeps it 'day-to-day' (LWOS, Aug 27). If Penix starts, an Under on yards is fighting a monster target share; if Tua's quick-release game starts instead, the under has a case. This pick is a QB-status call — confirm the starter before betting."}
+  "items": [
+   {
+    "date": "2026-08-27",
+    "source": "Last Word On Sports",
+    "title": "Penix positioned to potentially start Week 1 (sat the preseason finale; HC Kevin Stefanski: 'keeping it day-to-day'); with Penix last year London had a 56.6% target share over nine games; no injury concerns",
+    "url": "https://lastwordonsports.com/nfl/2026/08/27/falcons-qb-news-great-drake-london-2026-fantasy-outlook/"
+   }
+  ],
+  "read": {
+   "health": 0.2,
+   "coach": 0.2,
+   "role": 0.6,
+   "situational": 0.1,
+   "note": "The strongest read against a pick on the slate: with Penix under center last year London commanded a 56.6% target share, and Penix is trending toward starting while new HC Kevin Stefanski keeps it 'day-to-day' (LWOS, Aug 27). If Penix starts, an Under on yards is fighting a monster target share; if Tua's quick-release game starts instead, the under has a case. This pick is a QB-status call \u2014 confirm the starter before betting."
+  }
  },
  "Kyren Williams": {
-  "items": [{"date": "2026-08-10", "source": "CBS Sports / therams.com", "title": "Kyren impressing in camp, 'honed in on training to be a running back'; Blake Corum 'agile and explosive' on the final camp day; McVay/Corum pressers", "url": "https://www.cbssports.com/fantasy/football/news/rams-kyren-williams-impressing-at-training-camp/"}],
-  "read": {"health": 0.1, "coach": 0.1, "role": -0.2, "situational": 0.0,
-           "note": "Camp reports have him sharp, but Blake Corum drew 'agile and explosive' notices on the final day and McVay keeps talking him up — a rising committee partner (Rams.com/CBS, Aug 10). That pressure is mostly on carries; for a receiving-yards Over at a low line, it's a minor drag."}
+  "items": [
+   {
+    "date": "2026-08-10",
+    "source": "CBS Sports / therams.com",
+    "title": "Kyren impressing in camp, 'honed in on training to be a running back'; Blake Corum 'agile and explosive' on the final camp day; McVay/Corum pressers",
+    "url": "https://www.cbssports.com/fantasy/football/news/rams-kyren-williams-impressing-at-training-camp/"
+   }
+  ],
+  "read": {
+   "health": 0.1,
+   "coach": 0.1,
+   "role": -0.2,
+   "situational": 0.0,
+   "note": "Camp reports have him sharp, but Blake Corum drew 'agile and explosive' notices on the final day and McVay keeps talking him up \u2014 a rising committee partner (Rams.com/CBS, Aug 10). That pressure is mostly on carries; for a receiving-yards Over at a low line, it's a minor drag."
+  }
  },
- "Baker Mayfield": {"items": [], "read": {"health": 0.0, "coach": 0.0, "role": 0.0, "situational": 0.0, "note": "Not searched this pass (QB rushing micro-prop) — no intel."}},
- "Geno Smith": {"items": [], "read": {"health": 0.0, "coach": 0.0, "role": 0.0, "situational": 0.0, "note": "Not searched this pass (QB rushing micro-prop); the Jets' camp reports confirm he's the starter."}}
+ "Baker Mayfield": {
+  "items": [],
+  "read": {
+   "health": 0.0,
+   "coach": 0.0,
+   "role": 0.0,
+   "situational": 0.0,
+   "note": "Not searched this pass (QB rushing micro-prop) \u2014 no intel."
+  }
+ },
+ "Geno Smith": {
+  "items": [],
+  "read": {
+   "health": 0.0,
+   "coach": 0.0,
+   "role": 0.0,
+   "situational": 0.0,
+   "note": "Not searched this pass (QB rushing micro-prop); the Jets' camp reports confirm he's the starter."
+  }
+ },
+ "CeeDee Lamb": {
+  "items": [
+   {
+    "date": "2026-08-27",
+    "source": "Yardbarker",
+    "title": "Camp closes: Lamb fully active, three TDs with Prescott in the final practice; Pickens-Prescott chemistry 'one of the more intriguing storylines of camp'",
+    "url": "https://www.yardbarker.com/nfl/articles/dak_prescott_ceedee_lamb_and_george_pickens_give_cowboys_fans_plenty_to_remember_as_training_camp_ends/s1_17815_44225398"
+   }
+  ],
+  "read": {
+   "health": 0.2,
+   "coach": 0.0,
+   "role": -0.2,
+   "situational": 0.0,
+   "note": "Fully healthy and sharp at the end of camp, but the storyline in Dallas is Prescott-to-Pickens chemistry \u2014 a genuine WR1B taking targets at the top (Yardbarker, Aug 27). Mildly supports an Under on his catches/yards; nothing here argues for a monster volume week."
+  }
+ },
+ "Zay Flowers": {
+  "items": [
+   {
+    "date": "2026-08-28",
+    "source": "CBS Sports (Zenitz)",
+    "title": "Flowers has missed practice time with a lower-body injury; expected back in full next week and 'good to go' for Week 1 vs the Colts, per sources",
+    "url": "https://x.com/mzenitz/status/2094773236466639237"
+   },
+   {
+    "date": "2026-08-26",
+    "source": "baltimoreravens.com",
+    "title": "Flowers sat practice with a minor injury; team being cautious ahead of Week 1",
+    "url": "https://www.baltimoreravens.com/news/lamar-jackson-feels-ready-for-season-in-new-system-trey-hendrickson-top-form-ravens-commanders-joint-practice-jakobi-lane-odell-beckham-jr-deandre-hopkins"
+   }
+  ],
+  "read": {
+   "health": -0.4,
+   "coach": 0.0,
+   "role": 0.0,
+   "situational": 0.0,
+   "note": "The 'more hurt than he says' case: a lower-body injury cost him practice time in late August; the beat expects him back in full and 'good to go' for Week 1, but he was not practicing fully as of Aug 28 (CBS/Zenitz; Ravens.com, Aug 26). Real caution on an Over \u2014 confirm a full practice week before betting."
+  }
+ },
+ "Malik Nabers": {
+  "items": [
+   {
+    "date": "2026-09-01",
+    "source": "CBS Sports",
+    "title": "Returning from ACL + meniscus (Week 4 last season) and a second scar-tissue procedure; in team drills since mid-August; has NOT committed to Week 1 vs Dallas; availability pending medical clearance",
+    "url": "https://www.cbssports.com/nfl/news/malik-nabers-injury-status-giants-wr-shares-honest-assessment-of-progress-week-1-availability/"
+   }
+  ],
+  "read": {
+   "health": -0.6,
+   "coach": 0.0,
+   "role": 0.0,
+   "situational": 0.0,
+   "note": "Back from an ACL and meniscus tear plus a second scar-tissue procedure; in team drills but not committed to Week 1 as of Sept 1, pending clearance (CBS). If he plays, a compromised first game supports an Under on catches; if he doesn't, the bet voids \u2014 a scratch risk, confirm active."
+  }
+ },
+ "George Pickens": {
+  "items": [
+   {
+    "date": "2026-08-27",
+    "source": "Yardbarker",
+    "title": "Pickens winning contested situations throughout camp; Prescott-Pickens chemistry a top camp storyline",
+    "url": "https://www.yardbarker.com/nfl/articles/dak_prescott_ceedee_lamb_and_george_pickens_give_cowboys_fans_plenty_to_remember_as_training_camp_ends/s1_17815_44225398"
+   }
+  ],
+  "read": {
+   "health": 0.2,
+   "coach": 0.3,
+   "role": 0.3,
+   "situational": 0.0,
+   "note": "The Dallas camp storyline was Prescott-to-Pickens chemistry, with Pickens winning contested balls all summer (Yardbarker, Aug 27). Leans against an Under on his catches."
+  }
+ }
 }

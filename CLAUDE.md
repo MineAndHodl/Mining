@@ -36,7 +36,11 @@ The board is the product: every pick on it must be something a sharp would nod a
    SGPs, and the credit bill at once. Trace every fix through every tab before shipping.
 7. **Own the QC as an adversary, every run.** Don't wait for the owner to catch it. What's
    the worst pick on this board and why is it here? Which slider is blank and is that honest?
-8. **Every pick gets a handicapper paragraph** rooted in its own data (recent games, the
+8. **Run the architecture review every session, unprompted** (THE_DESK_PROMPT §2b): survivors
+   vs selection; upstream vs downstream; truncated pools; earned vs assumed; card/score
+   agreement; cost vs coverage; where the model is blind by construction. Selection runs over
+   the FULL pool with every signal in the score; expensive signals get a written coverage rule.
+9. **Every pick gets a handicapper paragraph** rooted in its own data (recent games, the
    role, the coach, the opponent, the environment, the price) and a scorecard whose sliders
    agree with the words. Honest caveats stay in (early-season reads, one-sided markets).
 

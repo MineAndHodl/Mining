@@ -77,19 +77,25 @@ def run(key=None, days=14, rebuild_games=False, cached=False):
     if games is not None:
         ranked["best_games"] = games          # preserve prior games unless rebuilding
 
-    # 4) factor scorecards (fixed game-flow sign, unified name join)
-    bf.attach_all(ranked)
-
-    # 4b) grades + rails + the official recommended slate (only recommended bets are "sent"
-    #     and counted; games unified onto the same conviction scale). See grading.py.
+    # 4) grades + rails + the official recommended slate, selected over the FULL POOL (every
+    #    scored candidate), with intel gates/leans already in the score. See grading.py.
     import grading, td_board as _tb
     weeks = _tb.current_season_weeks_played()
     grading.grade_board(ranked, weeks_played=weeks)
+    pool = ranked.pop("pool", [])
+    ranked["pool_summary"] = {"n": len(pool), "n_recommended_from_pool": sum(1 for r in pool if r.get("recommended")),
+                              "promoted_from_outside_tabs": [f"{r.get('name')} {r.get('cat')} {r.get('side')} {r.get('line')}"
+                                                             for r in ranked.get("recommended", [])
+                                                             if not any(r.get("name") == x.get("name") and r.get("cat") == x.get("cat")
+                                                                        for lst in ranked["by_category"].values() for x in lst)]}
+
+    # 5) factor scorecards on everything shown (tabs + the slate)
+    bf.attach_all(ranked)
     gs = ranked.get("grading", {})
     print(f"grades: {gs.get('grade_counts')} | recommended {gs.get('n_recommended')} "
           f"({gs.get('units_recommended')}u) | season cap {gs.get('season_cap')}")
 
-    # 5) two parlay lanes (in cached mode, reuse the prior parlays — offline re-rank)
+    # 6) two parlay lanes (in cached mode, reuse the prior parlays — offline re-rank)
     if cached:
         ranked["whale_missile"] = prev.get("whale_missile")
         ranked["primetime_sgps"] = prev.get("primetime_sgps", [])

@@ -169,6 +169,8 @@ def attach_all(ranked, ctx=None):
             attach_to_pick(pk, ctx)
     for pk in ranked.get("best_props", []):
         attach_to_pick(pk, ctx)
+    for pk in ranked.get("recommended", []) or []:
+        if not pk.get("scorecard"): attach_to_pick(pk, ctx)
     return ranked
 
 

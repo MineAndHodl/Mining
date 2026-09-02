@@ -154,9 +154,10 @@ def grade_board(ranked, weeks_played=0):
         g["edge_pct"] = round(e, 3); g["model_p"] = round(0.5 + e, 3)
         g["score_legacy"] = g.get("score")
         g["score"] = _desk_score(e, 0.5 + e)
-    # unique straight bets across tabs
+    # unique straight bets across the FULL POOL (every scored candidate) + games — not just the
+    # tab-truncated rows. A pick ranked 11th in its market can still make the slate if it earns it.
     uniq = {}
-    tabs = [ranked.get("best_props", [])] + list((ranked.get("by_category") or {}).values()) + [ranked.get("best_games", []) or []]
+    tabs = [ranked.get("pool", [])] + [ranked.get("best_props", [])] + list((ranked.get("by_category") or {}).values()) + [ranked.get("best_games", []) or []]
     for lst in tabs:
         for r in lst:
             k = _key(r)
@@ -166,7 +167,8 @@ def grade_board(ranked, weeks_played=0):
     graded = {_key(r): r for r in rows}
     for lst in tabs:
         for r in lst:
-            g = graded[_key(r)]
+            g = graded.get(_key(r))
+            if g is None: continue
             for f in ("grade", "grade_sized", "units", "recommended", "rail", "thesis", "cap_note"):
                 r[f] = g.get(f)
             if r.get("kind"):
