@@ -97,6 +97,18 @@ The board is the product: every pick on it must be something a sharp would nod a
   nearly 1:1 into yards, applied at 0.84; without it beneficiaries are under-projected by ~8
   yds. Questionable players who play produce like healthy ones (median ratio .845 vs .849) —
   NO performance discount, only a scratch-risk flag and a small trust cut.
+- **Five seasons of play-by-play (2021-25) — `ingest_pbp.py`, `history_compare.py`:** 176k
+  plays with epa/air-yards/YAC/score-state/WP (the substrate for the EARN backlog). Tested 3 vs
+  5 seasons walk-forward on 2025: **multifactor WINS with 5** (strong-trend sign-hit .594 →
+  .619, residual MAE down) → adopted, weights re-fit; **xTD a dead heat** (Brier .1662 both);
+  CV tiers, offseason form ratio and the role cascade **replicate almost exactly** (RB2 .545 →
+  .567 on 63 vs 37 team-seasons; WR2 .199 both) and the deeper sample fixed a 9-sample TE1
+  fluke. Cascade weight re-earned at k*=.87. `prop_player_games.parquet` is now the 5-season
+  table (3-season kept as `_3y`).
+- **Mean-reversion must be ZERO under the Week-1 market baseline.** The base_c weight was
+  earned on OUR noisy expanding-mean baseline (high sample means overstate, so shrink). The
+  market's number is already shrunk; applying the term to it double-shrank every star to the
+  Under (board 194 U / 71 O). Zeroed in market-baseline mode → 133/124, median edge 2.7%.
 - **Structural truths:** near-locks are minus-money and scarce (books balance ~50/50), so
   "8-10 near-locks at 100:1" is self-contradictory — the missile is an honest lotto of
   53-60% favorites. Week 1 is the weakest week (recency needs games across the offseason
@@ -108,7 +120,8 @@ Status: **WIRED** = in the model or scorecard now · **EARN** = data is here, fe
 in the model — add it and let walk-forward earn its weight · **NEED** = data source to add.
 
 **Data we hold:** nflverse play-by-play 2023-25 (`data/pbp_2023_2025.parquet`: zone,
-play type, rusher/receiver/passer, TD flags, down/distance, score diff, WP, drive), player
+play type, rusher/receiver/passer, TD flags, epa, yards, air yards, YAC, down/distance, score
+diff, WP, clock, drive, xpass/PROE inputs), 5-season player-game table, player
 stats, schedules (spread, total, coach, roof, wind, temp, rest), players (position), 2026
 depth snapshot, FFC ADP, Odds API (8 books: props, alt lines, game lines), def_vs_rb/wr,
 team_game_epa, game_crew_stats (officials), hist_open_close (line history), CLV backtests,

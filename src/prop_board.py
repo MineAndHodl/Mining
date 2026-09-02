@@ -198,7 +198,12 @@ def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, 
                 io_, iu_ = implied(b["over_price"]), implied(b["under_price"])
                 fair_o_ = io_ / (io_ + iu_) if (io_ + iu_) else 0.5
                 role_base = float(pm.market_mean(mkt, b["line"], fair_o_))
-                feats["base_c"] = role_base - model.get("base_med", {}).get(mkt, role_base)
+                # The mean-reversion weight was EARNED on our own baseline — a noisy sample mean
+                # that overstates high values and deserves shrinking. The market's number is
+                # already a shrunk estimate; regressing it again double-shrinks and pushed 73% of
+                # the Week-1 board to Unders (every star "due to fall"). With a market baseline,
+                # mean-reversion is zero — the market has already done it.
+                feats["base_c"] = 0.0
             resid = mf.predict_residual(mkt, feats, model)
             our_mu = max(role_base + resid, 0.1)
             trend = round(float(rr["last3"]) - baseline, 1)

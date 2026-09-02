@@ -59,8 +59,8 @@ def player_game_usage(pbp):
     return u, team, py
 
 
-def measure(seasons=(2023, 2024, 2025)):
-    pbp = pd.read_parquet(f"{DATA}/pbp_2023_2025.parquet")
+def measure(seasons=(2021, 2022, 2023, 2024, 2025)):
+    pbp = pd.read_parquet(f"{DATA}/pbp_2021_2025.parquet")
     players = pd.read_parquet(f"{DATA}/players_cache.parquet")
     pos = dict(zip(players.gsis_id, players.position))
     inj = load_injuries(seasons)

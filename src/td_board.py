@@ -93,7 +93,7 @@ def build_xtd_table(target_season=2026, refresh=False):
 def current_season_weeks_played(target_season=2026):
     """How many weeks of THIS season's play-by-play we have (drives the xTD blend weight)."""
     try:
-        pbp = pd.read_parquet(f"{DATA}/pbp_2023_2025.parquet", columns=["season", "week"])
+        pbp = pd.read_parquet(f"{DATA}/pbp_2021_2025.parquet", columns=["season", "week"])
         cur = pbp[pbp.season == target_season]
         return int(cur["week"].max()) if len(cur) else 0
     except Exception:

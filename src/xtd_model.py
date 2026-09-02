@@ -49,7 +49,7 @@ COACH_CHANGE_SHRINK = 0.6     # new coach: pull RZ pass tendency this far toward
 
 # --------------------------------------------------------------------------- data
 def load_pbp():
-    return pd.read_parquet(f"{DATA}/pbp_2023_2025.parquet")
+    return pd.read_parquet(f"{DATA}/pbp_2021_2025.parquet")
 
 
 _PLAYERS = None

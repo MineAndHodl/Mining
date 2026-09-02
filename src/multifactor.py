@@ -90,8 +90,8 @@ RAW_FEATURES = ["form3", "form1", "def_delta", "total_c", "home", "base_c"]
 # form window spans the offseason) as a fraction of the in-season slope. Recent form still
 # predicts across the gap, but at roughly half strength — and worst for rush/pass. Applied to
 # form3/form1 at predict time whenever the recent log is last season's (recency_week is None).
-#   in-season slope: rec .235 rush .353 pass .394 rec'ns .317 | opening: .153 .141 .140 .168
-OFFSEASON_FORM_RATIO = {"rec_yds": 0.65, "rush_yds": 0.40, "pass_yds": 0.35, "receptions": 0.53}
+#   3y: rec .65 rush .40 pass .35 rec'ns .53 -> replicated on 5 seasons (2021-25): .60 .43 .41 .54
+OFFSEASON_FORM_RATIO = {"rec_yds": 0.60, "rush_yds": 0.43, "pass_yds": 0.41, "receptions": 0.54}   # 5-season fit (history_compare.json)
 OFFSEASON_FORM_DEFAULT = 0.50
 
 

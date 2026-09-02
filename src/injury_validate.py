@@ -28,7 +28,7 @@ STAT_FOR = {"RB": "rush_yds", "WR": "rec_yds", "TE": "rec_yds"}
 
 
 def build_rows(seasons=(2024, 2025), min_week=4):
-    pbp = pd.read_parquet(f"{DATA}/pbp_2023_2025.parquet")
+    pbp = pd.read_parquet(f"{DATA}/pbp_2021_2025.parquet")
     players = pd.read_parquet(f"{DATA}/players_cache.parquet")
     pos = dict(zip(players.gsis_id, players.position))
     pg = pd.read_parquet(f"{DATA}/prop_player_games.parquet")

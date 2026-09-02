@@ -1,0 +1,124 @@
+{
+ "multifactor": {
+  "3y": {
+   "strong_sign_hit": 0.594,
+   "resid_mae": 26.149,
+   "n_strong": 3937
+  },
+  "5y": {
+   "strong_sign_hit": 0.6186,
+   "resid_mae": 26.029,
+   "n_strong": 4167
+  },
+  "verdict": "5y WINS"
+ },
+ "xtd": {
+  "3y": {
+   "brier": 0.1662,
+   "n": 4247
+  },
+  "5y": {
+   "brier": 0.1662,
+   "n": 4247
+  },
+  "verdict": "3y holds"
+ },
+ "cv_tiers": {
+  "3y": {
+   "rush_yds[15,45)": 0.83,
+   "rush_yds[45,70)": 0.58,
+   "rush_yds[70,999)": 0.53,
+   "rec_yds[15,40)": 0.89,
+   "rec_yds[40,65)": 0.67,
+   "rec_yds[65,999)": 0.57
+  },
+  "5y": {
+   "rush_yds[15,45)": 0.84,
+   "rush_yds[45,70)": 0.62,
+   "rush_yds[70,999)": 0.51,
+   "rec_yds[15,40)": 0.9,
+   "rec_yds[40,65)": 0.68,
+   "rec_yds[65,999)": 0.57
+  }
+ },
+ "offseason_ratio": {
+  "3y": {
+   "rec_yds": 0.65,
+   "rush_yds": 0.4,
+   "pass_yds": 0.35,
+   "receptions": 0.53
+  },
+  "5y": {
+   "rec_yds": 0.6,
+   "rush_yds": 0.43,
+   "pass_yds": 0.41,
+   "receptions": 0.54
+  }
+ },
+ "role_cascade": {
+  "3y": {
+   "WR1": {
+    "n": 36,
+    "RB2": 0.077,
+    "RB3": 0.028,
+    "WR2": 0.199,
+    "WR3": 0.129,
+    "TE1": 0.069
+   },
+   "TE1": {
+    "n": 9,
+    "RB2": null,
+    "RB3": -0.03,
+    "WR2": 0.531,
+    "WR3": null,
+    "TE1": null
+   },
+   "RB1": {
+    "n": 37,
+    "RB2": 0.545,
+    "RB3": 0.322,
+    "WR2": -0.009,
+    "WR3": -0.004,
+    "TE1": 0.0
+   }
+  },
+  "5y": {
+   "WR1": {
+    "n": 54,
+    "RB2": 0.068,
+    "RB3": 0.023,
+    "WR2": 0.199,
+    "WR3": 0.123,
+    "TE1": 0.05
+   },
+   "TE1": {
+    "n": 15,
+    "RB2": null,
+    "RB3": -0.03,
+    "WR2": 0.077,
+    "WR3": 0.127,
+    "TE1": null
+   },
+   "RB1": {
+    "n": 63,
+    "RB2": 0.567,
+    "RB3": 0.32,
+    "WR2": -0.008,
+    "WR3": -0.004,
+    "TE1": 0.0
+   }
+  }
+ },
+ "correlations": {
+  "3y": {
+   "qb_wr": NaN,
+   "wr_wr": NaN,
+   "n_pairs": 16189
+  },
+  "5y": {
+   "qb_wr": NaN,
+   "wr_wr": NaN,
+   "n_pairs": 26696
+  }
+ }
+}

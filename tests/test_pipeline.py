@@ -332,7 +332,7 @@ def test_injury_layer():
     check("Injury Picture lean positive for the beneficiary", lean is not None and lean > 0.5, str(lean))
     sc = fsc.scorecard({"side": "Under", "mkt": "rec_yds", "line": 50.5, "our_num": 40, "inj_lean": -0.15}, proj_row={"hist_games": 40})
     check("Questionable lean hurts either side (not flipped for the under)", sc["Injury Picture"] == -0.15, str(sc["Injury Picture"]))
-    check("cascade applied at the EARNED weight (0.84), not full", il.ROLE_CASCADE_WEIGHT == 0.84 and m < 1.75, f"x{m}")
+    check("cascade applied at the EARNED weight (0.84), not full", il.ROLE_CASCADE_WEIGHT == 0.87 and m < 1.75, f"x{m}")
     empty = il.InjuryLayer(2026)
     check("2026 loader returns cleanly before reports post", isinstance(empty.report, pd.DataFrame))
     lean26, _ = empty.injury_lean("Derrick Henry", "rush_yds")

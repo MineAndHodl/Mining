@@ -32,7 +32,7 @@ TEAM_FIX = {"LAR": "LA", "OAK": "LV", "SD": "LAC", "STL": "LA", "WSH": "WAS"}
 #   Questionable: players who PLAY post a median actual/baseline of .845 vs healthy .849 — no
 #     performance discount. It is a scratch-risk flag ("confirm active"), so a mild lean and a
 #     small trust cut only. Doubtful mostly don't play -> hard rail (not a performance claim).
-ROLE_CASCADE_WEIGHT = 0.84
+ROLE_CASCADE_WEIGHT = 0.87   # re-earned on the 5-season coefficients (was .84 on 3y)
 STATUS_PENALTY = {"Out": None, "Doubtful": -1.0, "Questionable": -0.15}
 MKT_TYPE = {"rec_yds": "targets", "receptions": "targets", "rush_yds": "carries", "rush_att": "carries",
             "pass_yds": "pass", "anytime_td": "mixed"}
@@ -60,7 +60,7 @@ class InjuryLayer:
 
     def _roles_from_last_season(self):
         """Rank each team's WRs/TEs/RBs by last-season share; apply 2026 team overrides."""
-        pbp = pd.read_parquet(f"{DATA}/pbp_2023_2025.parquet")
+        pbp = pd.read_parquet(f"{DATA}/pbp_2021_2025.parquet")
         pbp = pbp[pbp.season == pbp.season.max()]
         players = pd.read_parquet(f"{DATA}/players_cache.parquet")
         pos = dict(zip(players.gsis_id, players.position)); nm = dict(zip(players.gsis_id, players.display_name))

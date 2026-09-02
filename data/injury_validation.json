@@ -1,15 +1,15 @@
 {
  "role_cascade": {
-  "n": 583,
-  "k_star": 0.838,
-  "pred_bump_mean": 5.93,
-  "real_bump_mean": 8.04
+  "n": 582,
+  "k_star": 0.874,
+  "pred_bump_mean": 5.56,
+  "real_bump_mean": 8.1
  },
  "own_status": {
   "Healthy": {
-   "n": 5050,
-   "median_ratio": 0.849,
-   "mean_ratio": 1.037
+   "n": 5055,
+   "median_ratio": 0.851,
+   "mean_ratio": 1.038
   },
   "Questionable": {
    "n": 302,
