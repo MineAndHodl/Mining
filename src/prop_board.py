@@ -128,31 +128,35 @@ def price_ou(mkt, mu, line, over_price, under_price):
 RAW_LINES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "_raw_prop_lines.parquet")
 
 
-def fetch_prop_board(key=None, days=14, max_games=None):
+def fetch_prop_board(key=None, days=14, max_games=None, raw_path=None):
     """Fetch every posted prop line from every book (raw, unpriced) and cache it so the board
-    can be RE-PRICED for free after any model change (mirrors td_board's fetch/price split)."""
+    can be RE-PRICED for free after any model change (mirrors td_board's fetch/price split).
+    `days` may be fractional (a kickoff window of 150 minutes = 150/1440)."""
     key = key or os.environ.get("ODDS_API_KEY")
     events = fetch_events(key, days=days)
     ids = [e["id"] for e in events][:max_games] if max_games else [e["id"] for e in events]
+    if not ids:
+        return pd.DataFrame(), None
     board, rem = fetch_props(key, ids)
     try:
-        if len(board): board.to_parquet(RAW_LINES, index=False)
+        if len(board): board.to_parquet(raw_path or RAW_LINES, index=False)
     except Exception as e:
         print("raw prop lines not cached:", e)
     return board, rem
 
 
 def build_prop_board(key=None, projections=None, td_rates=None, max_games=None, weather_by_game=None,
-                     days=14, recency_season=2025, recency_week=None, cached=False):
+                     days=14, recency_season=2025, recency_week=None, cached=False, raw_path=None):
     """Returns the full priced prop board. The EDGE is recency: our recent-form number vs the
     market line (validated +8-13% ROI out-of-sample; matchup did NOT predict, recency did).
     cached=True re-prices the last fetched raw lines (no credits)."""
     if projections is None:
         raise ValueError("pass projections (from props_projection.project)")
-    if cached and os.path.exists(RAW_LINES):
-        board, rem = pd.read_parquet(RAW_LINES), "cached"
+    rp = raw_path or RAW_LINES
+    if cached and os.path.exists(rp):
+        board, rem = pd.read_parquet(rp), "cached"
     else:
-        board, rem = fetch_prop_board(key=key, days=days, max_games=max_games)
+        board, rem = fetch_prop_board(key=key, days=days, max_games=max_games, raw_path=raw_path)
     if not len(board):
         return pd.DataFrame(), rem
     return price_prop_board(board, projections, weather_by_game=weather_by_game,
@@ -286,9 +290,10 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
         if our_mu is None or our_mu <= 0:
             continue
         wg = (weather_by_game or {}).get(b["game"])
+        wx_mult = 1.0
         if wg:
-            our_mu = our_mu * wx.market_weather_mult(mkt, wind=wg.get("wind"), temp=wg.get("temp"),
-                                                     roof=wg.get("roof", "outdoors"))
+            wx_mult = wx.market_weather_mult(mkt, wind=wg.get("wind"), temp=wg.get("temp"), roof=wg.get("roof", "outdoors"))
+            our_mu = our_mu * wx_mult
         # role cascade: a teammate's absence redistributes volume to him (measured coefficients)
         role_mult, role_note = (INJ.role_multiplier(b["name"], mkt) if INJ else (1.0, None))
         if role_mult != 1.0:
@@ -317,7 +322,9 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                     "inj_lean": inj_lean, "inj_note": inj_note,
                     "intel_lean": (INTEL.lean(b["name"], p["side"]) if INTEL else None),
                     "intel_note": (INTEL.note(b["name"]) if INTEL else None),
-                    "intel_signals": (intel or {}).get("signals"), "intel_hard": (intel or {}).get("hard")})
+                    "intel_signals": (intel or {}).get("signals"), "intel_hard": (intel or {}).get("hard"),
+                    "wx_mult": round(float(wx_mult), 3), "wx_wind": (wg or {}).get("wind"), "wx_temp": (wg or {}).get("temp"),
+                    "wx_roof": (wg or {}).get("roof")})
     df = pd.DataFrame(out)
     if not len(df):
         return df
@@ -467,6 +474,16 @@ def reason(row, news=None):
              f"{int(row['model_p']*100)}% — {ev:+.0f} cents on the dollar at {price:+d}"
              + (f" ({row.get('book')})" if row.get("book") else "")
              + (f", best of {int(row['n_books'])} books" if row.get("n_books", 0) and row['n_books'] > 1 else "") + ". ")
+    # kickoff weather, only when it moved the number (wind above ~8 mph or cold, outdoors)
+    wxm = row.get("wx_mult")
+    if wxm is not None and wxm == wxm and abs(float(wxm) - 1.0) >= 0.02 and row.get("wx_roof") not in ("dome", "closed", "indoors"):
+        wnd = row.get("wx_wind"); tmp = row.get("wx_temp")
+        wbits = []
+        if wnd is not None and wnd == wnd and float(wnd) >= 8: wbits.append(f"{float(wnd):.0f} mph wind")
+        if tmp is not None and tmp == tmp and float(tmp) < 55: wbits.append(f"{float(tmp):.0f}°F")
+        if wbits:
+            case += (f"Kickoff forecast: {', '.join(wbits)} — that {'trims' if wxm < 1 else 'lifts'} our number "
+                     f"{abs(float(wxm) - 1) * 100:.0f}% ({'passing suffers in wind and cold' if wxm < 1 else 'offenses lean on the run'}). ")
     conf_note = ("Honest caveat: this leans on late-2025 form across the offseason — an early-season "
                  "read, sized as a lean." if offseason else "Multi-factor signal, sized to conviction.")
     # injury context: the role cascade (a teammate out feeds him) or his own status

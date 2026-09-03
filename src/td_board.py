@@ -35,7 +35,7 @@ TD_MAX_MARKET_RATIO = 1.5     # early season: our p more than 1.5x the consensus
 EARLY_WEEKS = 3
 
 
-def fetch_td_and_env(key, days=8, max_games=None):
+def fetch_td_and_env(key, days=8, max_games=None, raw_paths=None):
     """Anytime-TD prices from ALL major books (line-shopped: best price per player, with the
     consensus for trust), plus each game's spread/total (DK, else any). TD prices vary a lot
     across books — shopping is pure price edge with zero model risk."""
@@ -77,27 +77,30 @@ def fetch_td_and_env(key, days=8, max_games=None):
         if home and total and spread_home is not None:
             env[(gid, home, away)] = {"spread_home": spread_home, "total": total, "home": home, "away": away}
     board = pd.DataFrame(td_rows)
-    save_raw_prices(board, env)
+    save_raw_prices(board, env, paths=raw_paths)
     return board, env, rem
 
 
 RAW_PRICES = f"{DATA}/_raw_td_prices.parquet"; RAW_ENV = f"{DATA}/_td_env.json"
 
 
-def save_raw_prices(board, env):
+def save_raw_prices(board, env, paths=None):
     """Cache the fetched prices + game environment so the board can be RE-PRICED for free
-    (model changes must never cost API credits)."""
+    (model changes must never cost API credits). `paths` = (prices_parquet, env_json) override
+    for kickoff-window runs so they never clobber the week's caches."""
+    pp, ep = paths or (RAW_PRICES, RAW_ENV)
     try:
-        if len(board): board.to_parquet(RAW_PRICES, index=False)
-        json.dump([{"gid": k[0], "home": k[1], "away": k[2], **v} for k, v in env.items()], open(RAW_ENV, "w"))
+        if len(board): board.to_parquet(pp, index=False)
+        json.dump([{"gid": k[0], "home": k[1], "away": k[2], **v} for k, v in env.items()], open(ep, "w"))
     except Exception as e:
         print("raw TD cache not saved:", e)
 
 
-def load_raw_prices():
-    board = pd.read_parquet(RAW_PRICES)
+def load_raw_prices(paths=None):
+    pp, ep = paths or (RAW_PRICES, RAW_ENV)
+    board = pd.read_parquet(pp)
     env = {(e["gid"], e["home"], e["away"]): {"spread_home": e["spread_home"], "total": e["total"], "home": e["home"], "away": e["away"]}
-           for e in json.load(open(RAW_ENV))}
+           for e in json.load(open(ep))}
     return board, env
 
 
@@ -154,15 +157,16 @@ def current_season_weeks_played(target_season=2026):
         return 0
 
 
-def build_td_board(key=None, max_games=None, days=8, cached=False):
+def build_td_board(key=None, max_games=None, days=8, cached=False, raw_paths=None):
     """cached=True re-prices the last fetched prices/environment (no credits)."""
     key = key or os.environ.get("ODDS_API_KEY")
     rates = pd.read_parquet(f"{DATA}/td_rates.parquet")
     baseline = json.load(open(f"{DATA}/team_td_baseline.json"))
-    if cached and os.path.exists(RAW_PRICES) and os.path.exists(RAW_ENV):
-        board, env = load_raw_prices(); rem = "cached"
+    pp, ep = raw_paths or (RAW_PRICES, RAW_ENV)
+    if cached and os.path.exists(pp) and os.path.exists(ep):
+        board, env = load_raw_prices(raw_paths); rem = "cached"
     else:
-        board, env, rem = fetch_td_and_env(key, days=days, max_games=max_games)
+        board, env, rem = fetch_td_and_env(key, days=days, max_games=max_games, raw_paths=raw_paths)
     if not len(board):
         return pd.DataFrame(), rem
     # env multiplier per team from each game's live spread/total

@@ -116,7 +116,7 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 <script>
 const D = /*DATA*/{};
 const CATLABEL={rec_yds:"Receiving Yds",rush_yds:"Rushing Yds",receptions:"Receptions",anytime_td:"Anytime TD",pass_yds:"Passing Yds",rush_att:"Rush Att"};
-const VIEWS=[["best","🎫 The Card"],["games","🏈 Games"],["stack","🧱 Sunday Stack"],["tdstack","🎯 Touchdown Tax"],["record","📒 Record"]];
+const VIEWS=[["best","🎫 The Card"],["games","🏈 Games"],["stack","🧱 Sunday Stack"],["tdstack","🎯 Touchdown Tax"],["lastcall","⏱ Last Call"],["record","📒 Record"]];
 if((D.primetime_sgps||[]).length) VIEWS.push(["sgp","🏟️ Primetime SGP"]);
 Object.keys(D.by_category||{}).forEach(c=>VIEWS.push([c,CATLABEL[c]||c]));
 const HINTS={best:"Top plays across every category, ranked by conviction.",games:"Spreads, totals & moneylines — best value on the slate."};
@@ -234,6 +234,17 @@ function render(){
       <div class="pscore"><div class="v" style="color:var(--gold)">${(m.combined_american>0?'+':'')+m.combined_american}</div><div class="l">Payout</div></div></div>`+
       m.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta"><span class="grade" style="font-size:14px;color:${GCOL[l.grade]||'var(--dim)'}">${l.grade||''}</span><span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">model ${Math.round((l.model_p||0)*100)}%</span> <span class="num" style="color:var(--dim)">${l.game||''}</span></div></div><div class="pscore"></div></div>`).join('')+
       `<div class="note" style="margin-top:12px">${m.note||''}</div>`;
+    return;
+  }
+  if(active==="lastcall"){
+    hint.textContent="LAST CALL — the kickoff window. Roughly 75 minutes before each slate we re-price only the games about to kick with the official inactives, the kickoff forecast and every opened number's move: VOIDS (player out), LATE SWAPS (a backup priced off the measured cascade before the books catch up), STALE numbers (one book lagging the market on our side), and which Card picks are STILL LIVE. Its own record.";
+    const lc=D.last_call;
+    if(!lc||!lc.items){L.innerHTML='<div class="empty">No kickoff window open right now. Last Call runs before Thursday night, the Sunday 1:00 and 4:25 slates, Sunday night and Monday night — check back inside the last 90 minutes.</div>';return;}
+    const TC={"VOID":"var(--bad)","VOID?":"var(--bad)","LATE SWAP":"var(--green)","STALE":"var(--gold)","STILL LIVE":"var(--green)","CLOSED":"var(--muted)","MOVED AGAINST":"var(--amber)","WEATHER":"var(--blue)"};
+    const games=(lc.games||[]).map(g=>`<span class="chip mk">${g.game}${g.kickoff_utc?' · '+g.kickoff_utc.slice(11,16)+'Z':''}${g.weather?' · '+g.weather:''}</span>`).join(' ');
+    L.innerHTML=`<div class="count">${lc.stamp.slice(0,16).replace('T',' ')} UTC · ${(lc.games||[]).length} games in the window</div><div style="margin:8px 0 12px">${games}</div>`+
+      (lc.items.length?lc.items.map((it,i)=>{const price=it.price!=null?((it.price>0?'+':'')+it.price):'';
+        return `<div class="play" style="cursor:default"><div class="rank" style="color:${TC[it.type]||'var(--muted)'}">${i+1}</div><div class="pmain"><div class="nm"><span style="color:${TC[it.type]||'var(--muted)'};font-weight:800">${it.type}</span> ${it.name||''} <span style="color:var(--muted);font-weight:600">${it.side||''} ${it.line!=null&&it.type!=='WEATHER'?it.line:''}</span></div><div class="meta"><span class="chip mk">${CATLABEL[it.cat]||it.cat||it.game||''}</span>${it.grade?`<span class="grade" style="font-size:13px;color:${GCOL[it.grade]||'var(--dim)'}">${it.grade}</span>`:''}<span class="num">${price} ${it.book||''}</span>${it.model_p!=null?`<span class="num" style="color:var(--muted)">${Math.round(it.model_p*100)}% to hit</span>`:''}</div><div class="note" style="margin-top:6px">${it.note||''}</div></div><div class="pscore"></div></div>`;}).join(''):'<div class="empty">Nothing actionable in this window: no voids, no late swaps, no stale numbers.</div>');
     return;
   }
   if(active==="record"){

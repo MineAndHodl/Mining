@@ -56,6 +56,7 @@ the run), **REJECTED** (tested, lost), **BLOCKED** (needs something only Alex ca
 | Wordle/Poeltl player-guess game unlocking a free pick | NOT STARTED | Alex: model first, games later |
 | Degen/meme naming | PARTIAL | The Card, Sunday Stack, Touchdown Tax (his), Primetime Lotto; "whale missile" retired by his own flip |
 | Board readable on mobile | LIVE | hosted artifact, slimmed payload |
+| Last-minute edge as a category ("Last Call": inactives, stale numbers, still-live picks, kickoff weather, ~75-90 min before each slate) | LIVE (2026-09-03) | `last_call.py` + kickoff-window jobs; own record (late swap / stale) |
 | Bet across DK + FanDuel + BetMGM only | GAP | the board's "best price" spans 8 books (Fanatics/BetRivers/Caesars/ESPN/Hard Rock). Small to-do: show best-at-your-books beside best-anywhere |
 
 ## 2. Model and data
@@ -74,7 +75,7 @@ the run), **REJECTED** (tested, lost), **BLOCKED** (needs something only Alex ca
 | Early numbers that move our way = the real "beat the close" product | PARTIAL → LIVE from Week 1 | Tuesday is the early number; the ledger opened/close capture + Monday CLV grading now measure it |
 | Fantasy ADP as an input | LIVE | FFC ADP → Market Read (ESPN blocked) |
 | ff_opportunity expected stats / lucky-vs-due flags | DEAD | `enrich.py` superseded by recency + mean-reversion; TD regression lives in xTD |
-| Weather on passing props | PARTIAL | `weather.py` validated, but the weekly run never passes weather (no forecast source; schedule wind/temp are post-hoc). NEED: a forecast API for the Sunday pass |
+| Weather on passing props | LIVE (2026-09-03) | `weather_feed.py` (Open-Meteo, free) feeds the validated `weather.py` multiplier on every live run; the paragraph and the Weather lever show it |
 | Autonomous daily research bot | LIVE (re-pointed today) | one hypothesis/day through the repo's own walk-forward harnesses; proposes a branch, never promotes |
 | Weekly self-update engine + model registry (74 params) | DEAD / STALE | registry contradicts the current model (e.g. the "skew Under" it monitors was a bug we removed). Archive it; CLAUDE.md + validation JSONs are the truth |
 | "Improve" alone should yield real gains | PARTIAL | §2b architecture review + the grading loop (built today). Weights get re-earned after 3+ graded weeks |

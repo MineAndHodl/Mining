@@ -19,3 +19,6 @@ data/weather_games.parquet
 data/game_crew_stats.parquet
 __pycache__/
 output/_*.png
+data/*_window.parquet
+data/_td_env_window.json
+data/ranked_window.json

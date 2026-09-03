@@ -244,7 +244,22 @@ market, every book — `data/line_history/<season>_w<wk>/`) + `line_history.atta
 carries `line_move`: opened → now for the ACTIONABLE line on our side, consensus, cents, with
 us / against us, still available) → `ledger.snapshot` (`--open` = the Tuesday official open;
 else a refresh into `latest`; `late_swap` lane; score components on every row) →
-`build_board_page` → `output/the-board.html` (📈 chip on every prop row; 📒 Record tab). `--cached` RE-PRICES props and TDs from the cached raw lines (model
+`build_board_page` → `output/the-board.html` (📈 chip on every prop row; 📒 Record tab; ⏱ Last Call tab).
+**Kickoff weather** (`weather_feed.py`, Open-Meteo, no key): every live run pulls the forecast at
+the stadium for the kickoff hour; `prop_board` applies the validated `weather.py` multiplier
+(rows carry `wx_mult/wx_wind/wx_temp/wx_roof`, the paragraph says when it moved the number);
+the scorecard's Weather lever reads the forecast pre-game. Domes are neutral.
+**LAST CALL** (`last_call.py`, `run_board.py --window=150 --tag=lastcall`): ~75-90 minutes
+before each slate, price ONLY the games about to kick (every book, ~30-60 credits), with the
+game-day inactives (`data/inactives_<season>_w<wk>.json` → injury-layer override → measured
+cascade), the kickoff forecast and every opened number's move; never touches the week's
+board or the opened ledger. Items: VOID / VOID? / LATE SWAP / STALE (the best book for our
+side ≥1 pt behind the consensus right now) / STILL LIVE / CLOSED / MOVED AGAINST / WEATHER →
+`data/last_call.json` (the ⏱ tab, shown while fresh), a `kickoff` entry in the ledger, and
+LATE SWAP + STALE plays accumulated in `late_swap_all` for Monday's own record. Jobs: the
+Sunday 1:00 slate at 11:40 ET (and 16:40 UTC for standard time) plus a multi-hour kickoff-window
+job (Sun 12:05/19:05/20:05/23:05 UTC, Mon/Thu 23:05, Tue/Fri 00:05) whose gate
+(`last_call.py --games-in=150`) exits silently when no game is inside the window. `--cached` RE-PRICES props and TDs from the cached raw lines (model
 changes never cost credits); `--refresh` runs the data refresh first.
 Grading loop: `grade_week.py <season> <week> --close` (Sunday AM: closing lines into the
 ledger) and `grade_week.py <season> <week>` (Monday: W/L/push/void, units at price, CLV,

@@ -31,7 +31,7 @@ def _dir(season, week):
     d = os.path.join(HIST, f"{season}_w{int(week):02d}"); os.makedirs(d, exist_ok=True); return d
 
 
-def archive(season, week, tag="run"):
+def archive(season, week, tag="run", props_path=None, td_path=None, games=None):
     """Archive the raw caches of the run that just happened (props: every book; TD: best +
     consensus per player; games: intel rows). Returns the snapshot stamp."""
     if week is None: return None
@@ -39,19 +39,19 @@ def archive(season, week, tag="run"):
     d = _dir(season, week)
     n = {}
     try:
-        p = pd.read_parquet(f"{DATA}/_raw_prop_lines.parquet")
+        p = pd.read_parquet(props_path or f"{DATA}/_raw_prop_lines.parquet")
         p["_k"] = p["name"].map(norm_name); p["stamp"] = stamp
         p.to_parquet(os.path.join(d, f"{stamp}_{tag}_props.parquet"), index=False); n["props"] = len(p)
     except Exception as e:
         print("line history: props not archived:", e)
     try:
-        t = pd.read_parquet(f"{DATA}/_raw_td_prices.parquet")
+        t = pd.read_parquet(td_path or f"{DATA}/_raw_td_prices.parquet")
         t["_k"] = t["name"].map(norm_name); t["stamp"] = stamp
         t.to_parquet(os.path.join(d, f"{stamp}_{tag}_td.parquet"), index=False); n["td"] = len(t)
     except Exception as e:
         print("line history: td not archived:", e)
     try:
-        g = json.load(open(f"{DATA}/ranked_board.json")).get("best_games", [])
+        g = games if games is not None else json.load(open(f"{DATA}/ranked_board.json")).get("best_games", [])
         if g:
             gd = pd.DataFrame([{k: r.get(k) for k in ("game", "market", "side", "point", "price", "book", "desk_num")} for r in g]); gd["stamp"] = stamp
             gd.to_parquet(os.path.join(d, f"{stamp}_{tag}_games.parquet"), index=False); n["games"] = len(gd)
@@ -137,10 +137,13 @@ def move_for(row, season, week):
         ol, nl, po, pn, moved = o["line"], n["line"], None, None, None
     cents = (pn - po) if (po is not None and pn is not None) else None
     cons_moved = round((n["line"] - o["line"]) * (1 if side == "Over" else -1), 1) if side in ("Over", "Under") else None
+    # STALE NUMBER: the best book for our side sits behind the consensus RIGHT NOW (Over below the
+    # median line, Under above it) — the last-call edge when the market has moved and one book lags
+    stale = round((n["line"] - nl) if side == "Over" else (nl - n["line"]), 1) if (nl is not None and side in ("Over", "Under")) else None
     return {"open_line": ol, "open_price": po, "opened_at": _fmt_stamp(o["stamp"]), "open_books": o["n_books"], "open_consensus": o["line"],
             "now_line": nl, "now_price": pn, "now_at": _fmt_stamp(n["stamp"]), "now_books": n["n_books"], "now_consensus": n["line"],
             "moved_pts": moved, "moved_unit": "pts", "moved_cents": cents, "consensus_moved": cons_moved, "n_snapshots": len(ser),
-            "with_us": (moved > 0) if moved is not None else None,
+            "stale_book_pts": stale, "with_us": (moved > 0) if moved is not None else None,
             "still_available": (moved is not None and moved <= 0)}
 
 

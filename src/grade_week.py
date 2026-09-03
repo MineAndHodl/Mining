@@ -196,7 +196,8 @@ def grade(season, week, write=True):
     # --- the Card
     card = [grade_pick(p, stats, scores, close) for p in opened["card"]]
     # --- the LATE SWAP lane (from the latest snapshot — it is built Sunday, not Tuesday)
-    late = [grade_pick(p, stats, scores, close) for p in (led.get("latest") or {}).get("late_swap", [])]
+    late_rows = list((led.get("late_swap_all") or {}).values()) or (led.get("latest") or {}).get("late_swap", [])
+    late = [grade_pick(p, stats, scores, close) for p in late_rows]
     # --- the pool (calibration sample): every graded candidate, flat 1u
     pool = [grade_pick(p, stats, scores, close) for p in opened.get("pool", [])]
     # --- Sunday Stack

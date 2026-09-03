@@ -82,7 +82,7 @@ Update IDEAS_LEDGER.md when an idea changes status. Update CLAUDE.md only for se
 - **Rookie baseline**: no-history players onto the market-role baseline in weeks 0-3 so intel
   and injuries can surface one (today they are silently REVIEW).
 - **Kicker lane**: FG-range drive rate × distance make-rate × kicker; earn before shipping.
-- **Weather feed**: Open-Meteo forecast for the Sunday pass; the validated module is idle.
+- ~~Weather feed~~ DONE 2026-09-03 (`weather_feed.py`).
 - **Posting timing**: when do DK/FD post next week's props? If Tuesday 14:30 UTC misses half
   the menu, add a Wednesday capture. Read it off the `latest` ledger snapshots.
 - **Execution-book view**: DK/FD/MGM price beside best-anywhere on every row.

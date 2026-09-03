@@ -87,6 +87,14 @@ def _game_ctx(game, team_code, sched_rows, code2full):
             wx = {"roof": r.get("roof"),
                   "wind": (None if pd.isna(r.get("wind")) else float(r.get("wind"))),
                   "temp": (None if pd.isna(r.get("temp")) else float(r.get("temp")))}
+            if wx["wind"] is None or wx["temp"] is None:            # pre-game: the kickoff forecast
+                try:
+                    import weather_feed as _wf
+                    f = _wf.load().get(game) or {}
+                    if f and not f.get("error"):
+                        wx = {"roof": f.get("roof") or wx["roof"], "wind": f.get("wind"), "temp": f.get("temp"), "forecast": True}
+                except Exception:
+                    pass
             opp = a if tc == h else (h if tc == a else None)
             return {"team_spread": team_spread, "implied_team_pts": round(implied, 1),
                     "opp": opp, "weather": wx}, opp

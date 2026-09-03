@@ -15,6 +15,12 @@ def build(ranked_json=None):
         if isinstance(x, list): return [slim(v) for v in x]
         return x
     page = slim(ranked); page.pop("pool_summary", None)
+    # LAST CALL (data/last_call.json): the kickoff-window list, shown while it is fresh
+    try:
+        import sys as _s; _s.path.insert(0, HERE); import last_call as _lc
+        page["last_call"] = _lc.load_recent()
+    except Exception:
+        page["last_call"] = None
     # the public record (data/record.json, written by grade_week.py) — the transparency product
     try:
         page["record"] = json.load(open(os.path.join(HERE, "..", "data", "record.json")))
