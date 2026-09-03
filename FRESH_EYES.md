@@ -170,3 +170,10 @@ we believe, what freezes at the Week 1 open, and the in-season calendar of re-ea
   → Google News → transcripts/quotes → intel + the watch (126 articles, 248 quotes in week 1). Intel
   patterns for every position; hard gates hardened (game-week dating, IR-always, no conditionals/past/
   other-player clauses). Tests 173 → 192.
+
+## The bridge must close
+Every pick shown carries `bridge` (src/bridge.py): baseline + factors − faded/priced × weather ×
+cascade = our number; P − fair = edge; (conviction + trust) × verdict = Desk Score. `run_board`
+prints `bridge: N picks, K with a residual` — K must be 0 before anything ships; a model change
+that breaks the arithmetic (a new multiplicative step, a new feature) is not done until the bridge
+shows it. `tests/test_pipeline.py::test_bridge` enforces it.

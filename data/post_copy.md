@@ -1,4 +1,4 @@
-# Post copy — 2026 week 1 · generated 2026-09-03T08:08+00:00
+# Post copy — 2026 week 1 · generated 2026-09-03T10:53+00:00
 
 ## card_full
 

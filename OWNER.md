@@ -36,6 +36,11 @@ venture and to make decisions, and he wants to be told — plainly — what was 
 5. **Meta and recursive.** He builds loops ("every new day, fresh eyes", "build this into your
    logic", "recursively improve", "know what I'm thinking before I think it"). He thinks about the
    *process* that produces the picks as much as the picks.
+6. **Wants to see the machine.** After the pieces exist he asks how they combine: "all the factors
+   alone are great but how do they interact and get weighted and come up with… the pick and the
+   confidence interval." Sliders → scorecards → profile → the bridge is one arc: every layer of
+   the model must be *visible per pick*, as arithmetic a gambler can follow. A page that shows the
+   math is a product to him, not documentation. (Added day 5 — the day-4 forecast missed this kind.)
 
 ## 3. How he prompts (patterns, with his actual phrasings)
 - **Stacked asks in one message**, often four or five: "Can we also… Also… Can you…". Each is a real
@@ -138,12 +143,17 @@ first model launched. The standing "needs you" list lives at the end of every re
 THESES.md.
 
 ## 10. Current forecast (scored by the next day's loop)
-Written 2026-09-03 after day 4. What he is most likely to ask next:
-1. *"Is the Watch actually working / why haven't I gotten an email?"* → Because the bundle isn't
-   pushed; every job clones GitHub. Answer ready: the "needs you" line + what the first push
-   unlocks, in one sentence.
-2. *"Can we get the coordinators' pressers too, not just head coaches?"* → Needs a coach map
-   (OCs are not in the schedule table); queued as tomorrow's candidate with the same pipeline.
-3. *"What does Week 1 look like now — what are we actually betting?"* → The Card, in his words,
-   with the coverage line (8 plays, 3 Overs/5 Unders, the thesis kind on each) and the Touchdown
-   Tax legs; already in data/post_copy.md.
+**Day-4 forecast, scored on day 5: 0 of 3.** He asked none of the three (ops / coverage /
+product); he asked for the composite — "how do the factors interact and get weighted and come up
+with the pick and the confidence interval" — a kind the persona did not list. Fixed: lens §2.6
+("wants to see the machine"). Running forecast hit rate: 0/3 (one day scored).
+
+Written 2026-09-03 after day 5. What he is most likely to ask next:
+1. *"Can we show the range/CI on the Card row itself, not just when you tap?"* (see-the-machine) →
+   a compact "likely 31-71" chip beside our number; the bridge already carries `ci`. One template
+   edit, no model change.
+2. *"What line would make us walk away — where does the edge disappear?"* (confidence) → the
+   breakeven line per pick (queued, IDEAS_LEDGER 30): solve P(over L) = fair for L; show
+   "edge gone at 44.5" on the bridge.
+3. *"Is the Watch actually working / why haven't I gotten an email?"* (ops, carried) → nothing
+   runs until the bundle is pushed; the "needs you" line.

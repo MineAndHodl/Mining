@@ -7,6 +7,7 @@ nothing is simulated. Rebuilt by every scheduled job and the daily Fresh Eyes lo
 """
 import os, sys, json, glob, datetime, subprocess
 import pandas as pd
+sys.path.insert(0, HERE if "HERE" in dir() else os.path.dirname(os.path.abspath(__file__)))
 
 HERE = os.path.dirname(os.path.abspath(__file__)); DATA = os.path.join(HERE, "..", "data"); OUT = os.path.join(HERE, "..", "output")
 
@@ -249,6 +250,31 @@ path.draw{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.8s .3s f
 .lab .st{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;border:1px solid var(--rule)}
 .st.measuring{color:var(--amber);border-color:rgba(245,179,66,.5)}.st.building{color:var(--cyan);border-color:rgba(99,213,230,.5)}.st.queued{color:var(--muted)}.st.shipped{color:var(--good);border-color:rgba(70,211,154,.5)}
 .foot{margin-top:22px;font-family:var(--mono);font-size:11.5px;color:var(--dim);max-width:90ch}
+/* the bridge — one pick, all the way down */
+.bx{margin-top:14px}
+.bxhead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;margin-bottom:8px}
+.bxhead .nm{font-family:var(--disp);font-weight:700;font-size:20px}
+.bxhead .mk{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.bxrow{display:grid;grid-template-columns:250px 1fr 70px;gap:12px;align-items:center;margin:5px 0;font-size:13px}
+.bxrow .bl{color:var(--ink);font-weight:600;line-height:1.25}
+.bxrow .bl small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:400;color:var(--dim);font-size:11px;line-height:1.3;margin-top:1px;font-family:var(--mono)}
+.bxt{position:relative;height:12px;border-radius:4px;background:#070C18;border:1px solid var(--rule)}
+.bxt .bxln{position:absolute;top:-4px;bottom:-4px;width:0;border-left:2px dashed var(--amber)}
+.bxb{position:absolute;top:2px;height:6px;border-radius:3px;min-width:2px}
+.bxb.pos{background:var(--good)} .bxb.neg{background:var(--bad)} .bxb.priced{background:repeating-linear-gradient(45deg,var(--muted) 0 3px,transparent 3px 6px)} .bxb.mult{background:var(--cyan)} .bxb.residual{background:var(--rule)}
+.bxd{position:absolute;top:-1px;width:12px;height:12px;border-radius:50%;transform:translateX(-50%);background:var(--ink)}
+.bxd.end{background:var(--amber)}
+.bxband{position:absolute;top:2px;height:6px;border-radius:3px;background:var(--amber);opacity:.25}
+.bxband.core{top:0;height:10px;opacity:.5}
+.bxv{font-family:var(--mono);font-size:12px;text-align:right;color:var(--muted);white-space:nowrap}
+.bxv.pos{color:var(--good)} .bxv.neg{color:var(--bad)} .bxv.big{color:var(--ink);font-weight:700;font-size:13px}
+.bxeq{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px}
+.bxc{font-family:var(--mono);font-size:11.5px;padding:4px 9px;border-radius:5px;background:var(--panel2);border:1px solid var(--rule);color:var(--muted);white-space:nowrap}
+.bxc b{color:var(--ink)}
+.bxc.final{color:var(--amber);border-color:rgba(245,179,66,.5);font-family:var(--disp);font-size:13px;font-weight:700}
+.bxo{color:var(--dim);font-family:var(--mono)}
+.bxnote{font-size:12.5px;color:var(--muted);margin-top:8px;max-width:90ch}
+@media (max-width:860px){.bxrow{grid-template-columns:110px 1fr 56px;gap:7px;font-size:12px}.bxrow .bl small{display:none}.bxrow .bl small.keep{display:block}}
 @media (prefers-reduced-motion:reduce){.ln{transition:none}.meter i{transition:none}path.draw{animation:none;stroke-dashoffset:0}.pulse i{animation:none}.cursor{animation:none}}
 </style>
 <div class="wrap">
@@ -281,6 +307,7 @@ path.draw{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.8s .3s f
     <div class="wall" id="wall"></div>
   </div>
   <div class="charts" id="charts"></div>
+  <div class="panel bx" id="bx"></div>
   <div class="grid2">
     <div class="panel loop">
       <div class="eyebrow">In the lab right now <small>being built and tested — nothing ships until it wins</small></div>
@@ -361,6 +388,36 @@ const C=$("#charts");
     s+=`<text x="${L+k*bw+bw/2}" y="${H-B+16}" fill="#8B98B0" font-size="10" text-anchor="middle" font-family="JetBrains Mono,monospace">${m.replace("_yds"," yds").replace("receptions","rec'ns")}</text>`;});
   s+=`<text x="${L}" y="${H-6}" fill="#F5B342" font-size="10" font-family="JetBrains Mono,monospace">■ 2024 held out</text><text x="${L+110}" y="${H-6}" fill="#63D5E6" font-size="10" font-family="JetBrains Mono,monospace">■ 2025 held out</text></svg>`;
   C.insertAdjacentHTML("beforeend",`<div class="panel chart"><div class="eyebrow">How often our strong signals hit</div>${s}<div class="cap">On the plays the model feels strongest about, how often our side hit — scored on a full season the model had never seen, twice. The dashed line is what you need at -110 just to break even.</div></div>`);})();
+// ---- the bridge: one pick from this week's Card, every step, nothing hidden
+(function(){const B=LAB.bridge_example; const el=$("#bx"); if(!B||!B.bridge){el.style.display="none";return;}
+  const b=B.bridge; const sg=(v,d)=>((v>=0?"+":"−")+Math.abs(v).toFixed(d==null?1:d)), pc=v=>Math.round(v*100)+"%";
+  let cur=b.start.value; const vals=[cur]; const rows=[]; (b.steps||[]).forEach(s=>{const from=cur; cur=Math.round((cur+s.delta)*100)/100; vals.push(cur); rows.push({...s,from,to:cur});});
+  const ci=b.ci||{}; const td=b.kind==="td";
+  const pts=vals.concat([ci.p25,ci.p75,b.line].filter(x=>typeof x==="number"));
+  const lo=td?0:Math.min(...pts), hi=Math.max(...pts); const pad=(hi-lo)*0.05||1; const L=td?0:Math.max(0,lo-pad), R=hi+pad; const X=v=>Math.max(0,Math.min(100,(v-L)/(R-L)*100));
+  const tick=(!td&&typeof b.line==="number")?`<div class="bxln" style="left:${X(b.line)}%"></div>`:"";
+  const row=(l,sm,inner,v,cls)=>`<div class="bxrow"><span class="bl" title="${(sm||"").replace(/"/g,"&quot;")}">${l}${sm?`<small class="${cls==='big'?'keep':''}">${sm}</small>`:""}</span><div class="bxt">${tick}${inner}</div><span class="bxv ${cls||""}">${v}</span></div>`;
+  let h=td?"":row(b.start.label,b.start.note||"",`<div class="bxd" style="left:${X(b.start.value)}%"></div>`,b.start.value,"big");
+  rows.forEach(s=>{const a=Math.min(s.from,s.to), w=Math.abs(X(s.to)-X(s.from)); const cls=s.kind==="factor"?(s.delta>=0?"pos":"neg"):s.kind;
+    h+=row(s.label,s.note||"",`<div class="bxb ${cls}" style="left:${X(a)}%;width:${Math.max(w,0.6)}%"></div>`,td?sg(s.delta,2):sg(s.delta),(s.kind==="factor"?(s.delta>=0?"pos":"neg"):""));});
+  const band=(!td&&typeof ci.p10==="number")?`<div class="bxband" style="left:${X(ci.p10)}%;width:${X(ci.p90)-X(ci.p10)}%"></div><div class="bxband core" style="left:${X(ci.p25)}%;width:${X(ci.p75)-X(ci.p25)}%"></div>`:"";
+  const endsm=td?`0 TDs ${pc(b.dist.p0)} · 1 TD ${pc(b.dist.p1)} · 2+ ${pc(b.dist.p2plus)}`:`likely range ${ci.p25}–${ci.p75} · wide ${ci.p10}–${ci.p90}`;
+  h+=row(b.end.label,endsm,`${band}<div class="bxd end" style="left:${X(b.end.value)}%"></div>`,td?b.end.value.toFixed(2):b.end.value,"big");
+  const pr=b.prob||{}, sc=b.score||{}, c=sc.conviction||{}, t=sc.trust;
+  const eq=[]; if(td){eq.push(`<span class="bxc"><b>${(pr.lam||0).toFixed(2)}</b> xTD</span><span class="bxo">→</span><span class="bxc">raw <b>${pc(pr.p_raw||0)}</b></span>`); if(typeof pr.p_xtd==="number") eq.push(`<span class="bxo">→</span><span class="bxc">calibrated <b>${pc(pr.p_xtd)}</b></span>`); if(typeof pr.p_model==="number") eq.push(`<span class="bxo">→</span><span class="bxc">blend <b>${pc(pr.p_model)}</b></span>`); if(typeof pr.implied==="number") eq.push(`<span class="bxo">vs</span><span class="bxc">implied <b>${pc(pr.implied)}</b></span>`);}
+  else{eq.push(`<span class="bxc">P(${(b.side||"").toLowerCase()} ${b.line}) <b>${pc(pr.model_p||0)}</b></span><span class="bxo">−</span><span class="bxc">fair <b>${pc(pr.fair||0)}</b></span>`);}
+  if(typeof pr.edge==="number") eq.push(`<span class="bxo">=</span><span class="bxc final">${sg(pr.edge*100)} pts edge</span>`);
+  const eq2=[`<span class="bxc">45</span><span class="bxo">+</span><span class="bxc">value <b>${sg(c.value||0)}</b></span><span class="bxo">+</span><span class="bxc">hittable <b>${sg(c.hittable||0)}</b></span>`];
+  if(t) eq2.push(`<span class="bxo">+</span><span class="bxc">trust <b>${sg(t.trust)}</b></span>`);
+  if(sc.mult&&Math.abs(sc.mult-1)>1e-6) eq2.push(`<span class="bxo">×</span><span class="bxc">verdict <b>${sc.mult}</b></span>`);
+  eq2.push(`<span class="bxo">→</span><span class="bxc final">Desk ${sc.score}</span>`); if(sc.grade) eq2.push(`<span class="bxo">→</span><span class="bxc final">${sc.grade}${sc.recommended&&sc.units>0?` · ${sc.units}u`:""}</span>`);
+  el.innerHTML=`<div class="eyebrow">How a number is reached <small>one pick from this week's Card — every step, nothing hidden; every pick on the Board shows its own</small></div>
+    <div class="bxhead"><span class="nm">${B.name} ${B.side||""} ${td?"to score":B.line}</span><span class="mk">${B.market||""}${B.book?` · ${B.book}`:""}${B.price!=null?` · ${B.price>0?"+":""}${B.price}`:""}</span></div>
+    ${h}
+    ${(b.in_line&&b.in_line.length)?`<div class="bxnote"><b>Already in the market's number:</b> ${b.in_line.join(" · ")} — measured, so they are not added twice.</div>`:""}
+    <div class="bxeq">${eq.join("")}</div><div class="bxeq">${eq2.join("")}</div>
+    <div class="bxnote">${td?"Expected touchdowns by where his chances come from, on today's scoring environment; then calibrated on two seasons of results and set against the best price.":`Dashed amber is the line. The gold band is our range — the number is a distribution, and the % is how much of it clears the line.${b.coverage&&b.coverage.likely?` Measured on ${(b.coverage.n||0).toLocaleString()} held-out player-games, the likely range caught ${pc(b.coverage.likely)} of outcomes (a perfect 50%) and the wide range ${pc(b.coverage.wide)} (of 80%).`:""} Each bar is a signal times the weight it earned; the striped bar is what has faded across the offseason or is already in the line.`} The score is conviction${t?" plus trust":""}; the bands turn it into a grade and the rails into units.</div>`;
+})();
 // ---- the loop timeline
 const tl=$("#tl"); const items=[];
 (LAB.loop_items||[]).forEach(x=>items.push(x));
@@ -408,7 +465,8 @@ def build():
                   {"t": "Beat-report feed, automatic, for every player on the board", "s": "shipped"},
                   {"t": "Coach press conferences — transcripts and quotes, every team, every week", "s": "shipped"},
                   {"t": "Red-zone package inclusion for pass-catchers in the touchdown model", "s": "shipped"},
-                  {"t": "Ready-to-post copy from the frozen numbers", "s": "shipped"}]
+                  {"t": "Ready-to-post copy from the frozen numbers", "s": "shipped"},
+                  {"t": "The bridge — every pick shows its math: baseline → factors → what the market already has → our number with its range → % vs fair → edge → score → grade", "s": "shipped"}]
     lab["chips"] = [
         {"k": "earned", "t": "recency form (last-3 / last-1)"}, {"k": "earned", "t": "multi-factor ridge · 5 seasons"}, {"k": "earned", "t": "market-role baseline weeks 0-3"},
         {"k": "earned", "t": "offseason form ratio"}, {"k": "earned", "t": "market lag (weekly cross-section)"}, {"k": "earned", "t": "route participation · snap trend"},
@@ -418,6 +476,17 @@ def build():
         {"k": "live", "t": "line history · opened → now"}, {"k": "live", "t": "Last Call · inactives · stale numbers"},
         {"k": "assumed", "t": "beat-intel score weight (4 pts)"}, {"k": "assumed", "t": "Desk Score hump · tail · trust"}, {"k": "assumed", "t": "grade bands · rails"}, {"k": "assumed", "t": "TD anchor .35 · market-disagreement rail"},
     ]
+    # the bridge example: the #1 pick on this week's Card (its full bridge, as the Board shows it)
+    try:
+        rb = J("ranked_board.json") or {}
+        ex = next((r for r in rb.get("recommended", []) if isinstance(r.get("bridge"), dict) and not r["bridge"].get("error")), None)
+        if ex:
+            from rank_board import CAT_LABEL
+            lab["bridge_example"] = {"name": ex.get("name"), "side": ex.get("side"), "line": ex.get("line"), "market": CAT_LABEL.get(ex.get("cat"), ex.get("cat")),
+                                     "book": ex.get("book"), "price": ex.get("price"), "bridge": ex["bridge"]}
+    except Exception:
+        pass
+    lab["wall"].insert(4, {"t": "How every number is reached — shown on every pick, step by step, with its range"})
     html = TEMPLATE.replace("/*DATA*/{}", json.dumps(lab, separators=(",", ":")))
     path = os.path.join(OUT, "the-lab.html"); open(path, "w").write(html)
     return path

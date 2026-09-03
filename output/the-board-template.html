@@ -98,6 +98,37 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 .chip.mv{text-transform:none;letter-spacing:0;font-weight:600;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
 .chip.mv.with{color:var(--green);border-color:var(--green-d)}
 .chip.mv.against{color:var(--amber);border-color:var(--amber)}
+/* the bridge: baseline → factors → already in the line → our number (with the range) → P → edge → score → grade */
+.br{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
+.brrow{display:grid;grid-template-columns:210px 1fr 64px;gap:10px;align-items:center;margin:4px 0;font-size:12px}
+.brrow .bl{color:var(--ink);font-weight:600;line-height:1.25}
+.brrow .bl small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:400;color:var(--dim);font-size:10.5px;line-height:1.3;margin-top:1px}
+.brrow.anchor .bl{color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-size:10.5px;font-weight:700}
+.brtrack{position:relative;height:12px;border-radius:4px;background:var(--panel)}
+.brtrack .ln{position:absolute;top:-3px;bottom:-3px;width:0;border-left:2px dashed var(--amber);opacity:.85}
+.brtrack .mk{position:absolute;top:-3px;bottom:-3px;width:0;border-left:2px solid var(--blue);opacity:.7}
+.brbar{position:absolute;top:2px;height:8px;border-radius:3px;min-width:2px}
+.brbar.pos{background:var(--green)} .brbar.neg{background:var(--heat)} .brbar.priced{background:repeating-linear-gradient(45deg,var(--dim) 0 3px,transparent 3px 6px);opacity:.9} .brbar.mult{background:var(--blue)} .brbar.residual{background:var(--line2)}
+.brdot{position:absolute;top:0;width:12px;height:12px;border-radius:50%;transform:translateX(-50%);background:var(--ink);border:2px solid var(--panel2)}
+.brdot.end{background:var(--gold)}
+.brband{position:absolute;top:3px;height:6px;border-radius:3px;background:var(--gold);opacity:.28}
+.brband.core{top:1px;height:10px;opacity:.55}
+.brv{font-family:var(--mono);font-size:11.5px;text-align:right;color:var(--muted);white-space:nowrap}
+.brv.pos{color:var(--green)} .brv.neg{color:var(--heat)} .brv.big{color:var(--ink);font-weight:700;font-size:12.5px}
+.brchips{font-size:11.5px;color:var(--dim);margin:6px 0 2px;line-height:1.6}
+.brchips b{color:var(--muted);font-weight:600}
+.brline{margin-top:9px;font-size:12.5px;color:var(--ink);line-height:1.5}
+.brline .k{color:var(--muted)}
+.breq{display:flex;flex-wrap:wrap;gap:5px 6px;align-items:center;margin-top:8px}
+.brt{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:6px;background:var(--panel);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.brt b{color:var(--ink);font-weight:700}
+.brt.sum{border-color:var(--line2);color:var(--ink)}
+.brt.final{background:rgba(245,197,24,.12);border-color:rgba(245,197,24,.4);color:var(--gold);font-family:var(--disp);font-size:12.5px;font-weight:800;letter-spacing:.02em}
+.brop{color:var(--dim);font-family:var(--mono);font-size:12px}
+.pbar{display:grid;grid-template-columns:210px 1fr 64px;gap:10px;align-items:center;margin:4px 0;font-size:12px}
+.pbar .t{height:10px;border-radius:4px;background:var(--panel);position:relative}
+.pbar .t>i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+@media (max-width:560px){.brrow,.pbar{grid-template-columns:104px 1fr 54px;gap:7px;font-size:11.5px}.brrow .bl small{display:none}.brrow .bl small:has(.keep){display:-webkit-box}}
 </style>
 
 <div class="wrap">
@@ -187,6 +218,86 @@ function renderProfile(pf, side){
   return `<div class="pfhead">Player profile <small>tracking &amp; charting percentiles among his position, the second market, outside projections, the crowd</small></div><div style="margin-top:6px">${rows}</div><div class="flegend">Profile levers describe the player — where he ranks among his peers and what the other reads say. They are logged with every pick and graded; the number above is not moved by them.</div>`;
 }
 const GCOL={"A+":"var(--green)","A":"var(--green)","A-":"var(--green-d)","B+":"var(--gold)","B":"var(--muted)","C":"var(--dim)"};
+const r1=v=>Math.round(v*10)/10, sg=(v,d)=>((v>=0?'+':'−')+Math.abs(v).toFixed(d==null?1:d)), pc=v=>Math.round(v*100)+'%';
+function amer(x){return x==null?'':((x>0?'+':'')+x);}
+function scoreEq(s, td){
+  // Desk Score = [45 + value(edge) + hittable(p)] conviction  (+ trust)  × verdict → score → grade → units
+  if(!s||!s.conviction) return '';
+  const c=s.conviction, t=s.trust; const chips=[];
+  chips.push(`<span class="brt">base <b>45</b></span>`);
+  chips.push(`<span class="brop">+</span><span class="brt" title="the edge, humped past ${Math.round(11)} pts (a blowout gap reads as a stale number, not free money)${c.tail_discount?`; tail discount ×${c.tail_discount} for a low-probability play`:''}">value <b>${sg(c.value)}</b></span>`);
+  chips.push(`<span class="brop">+</span><span class="brt" title="how hittable: (P − ${c.anchor}) × 55 — the neutral hit rate for this market is ${pc(c.anchor)}">hittable <b>${sg(c.hittable)}</b></span>`);
+  chips.push(`<span class="brop">=</span><span class="brt sum">conviction <b>${c.conviction}</b></span>`);
+  if(t){
+    chips.push(`<span class="brop">+</span><span class="brt" title="sample depth ${sg(t.sample)} (projection confidence ${t.confidence!=null?t.confidence:'—'}) · market breadth ${sg(t.breadth)} (${t.n_books!=null?t.n_books:'?'} books post this market) · beat intel ${sg(t.intel)} (provisional, to be earned)">trust <b>${sg(t.trust)}</b> <span style="color:var(--dim)">sample ${sg(t.sample)} · breadth ${sg(t.breadth)} · intel ${sg(t.intel)}</span></span>`);
+  }
+  if(s.mult&&Math.abs(s.mult-1)>1e-6) chips.push(`<span class="brop">×</span><span class="brt" title="${s.verdict||''} verdict from the investigate pass">verdict <b>${s.mult}</b></span>`);
+  chips.push(`<span class="brop">→</span><span class="brt final">Desk ${s.score!=null?s.score:'—'}</span>`);
+  if(s.grade) chips.push(`<span class="brop">→</span><span class="brt final" style="color:${GCOL[s.grade]||'var(--gold)'}">${s.grade}${s.grade_sized&&s.grade_sized!==s.grade?` sized ${s.grade_sized}`:''}${s.recommended&&s.units>0?` · ${s.units}u`:(s.rail?' · railed':'')}</span>`);
+  const rail=s.rail?`<div class="brchips"><b>Rail:</b> ${s.rail}${s.cap_note?` · ${s.cap_note}`:''}</div>`:(s.cap_note?`<div class="brchips"><b>Cap:</b> ${s.cap_note}</div>`:'');
+  return `<div class="brline"><span class="k">The score.</span> Conviction is the edge and how hittable it is${t?'; trust is how much evidence stands behind it':''} — bands turn it into a grade, the rails into units.</div><div class="breq">${chips.join('')}</div>${rail}`;
+}
+function renderBridge(b, p){
+  // THE BRIDGE — how the number, the probability, the edge and the grade are reached, one pick
+  // at a time. Every bar is a number already on the row; the arithmetic closes (a residual, if
+  // any, is drawn as "rounding"). See src/bridge.py.
+  if(!b||b.error) return '';
+  if(b.kind==='td') return renderTdBridge(b,p);
+  const u=b.unit||''; const side=(b.side||'Over').toLowerCase();
+  let cur=b.start.value; const vals=[cur]; const rows=[];
+  (b.steps||[]).forEach(s=>{const from=cur; cur=r1(cur+s.delta); vals.push(cur); rows.push({...s,from,to:cur});});
+  const ci=b.ci||{}; const mk=b.market_num;
+  const pts=vals.concat([ci.p25,ci.p75,b.line,mk].filter(x=>typeof x==='number'));   // the 25-75% band sets the scale; the 10-90% band clips
+  const lo=Math.min(...pts), hi=Math.max(...pts); const pad=(hi-lo)*0.05||1; const L=Math.max(0,lo-pad), R=hi+pad;
+  const X=v=>Math.max(0,Math.min(100,(v-L)/(R-L)*100));
+  const lineTick=(typeof b.line==='number')?`<div class="ln" style="left:${X(b.line)}%" title="the line ${b.line}"></div>`:'';
+  const mkTick=(typeof mk==='number')?`<div class="mk" style="left:${X(mk)}%" title="the book's implied number ${mk}"></div>`:'';
+  const row=(label,small,inner,val,cls)=>`<div class="brrow ${cls||''}"><span class="bl" title="${(small||'').replace(/<[^>]+>/g,'').replace(/"/g,'&quot;')}">${label}${small?`<small>${small}</small>`:''}</span><div class="brtrack">${lineTick}${mkTick}${inner}</div><span class="brv ${cls||''}">${val}</span></div>`;
+  let h=row(b.start.label,b.start.note,`<div class="brdot" style="left:${X(b.start.value)}%"></div>`,`${b.start.value}`,'big');
+  rows.forEach(s=>{
+    const a=Math.min(s.from,s.to), w=Math.abs(X(s.to)-X(s.from));
+    const cls=s.kind==='factor'?(s.delta>=0?'pos':'neg'):s.kind;
+    h+=row(s.label,s.note||'',`<div class="brbar ${cls}" style="left:${X(a)}%;width:${Math.max(w,0.6)}%"></div>`,sg(s.delta),(s.kind==='factor'?(s.delta>=0?'pos':'neg'):''));
+  });
+  const band=(typeof ci.p10==='number')?`<div class="brband" style="left:${X(ci.p10)}%;width:${X(ci.p90)-X(ci.p10)}%"></div><div class="brband core" style="left:${X(ci.p25)}%;width:${X(ci.p75)-X(ci.p25)}%"></div>`:'';
+  h+=row(b.end.label,`<span class="keep">likely range ${ci.p25}-${ci.p75} · wide ${ci.p10}-${ci.p90}</span>`,`${band}<div class="brdot end" style="left:${X(b.end.value)}%"></div>`,`${b.end.value}`,'big');
+  const chips=[];
+  if(b.in_line&&b.in_line.length) chips.push(`<b>Already priced by the market's number:</b> ${b.in_line.join(' · ')} — measured: the market's number moves with the game total and venue at our own earned weights, so adding them again would double-count.`);
+  if(b.off&&b.off.length) chips.push(`<b>Not applied before Week 4:</b> ${b.off.join(' · ')} — measured: no early-season signal for this market; switches on once current-season games exist.`);
+  const pr=b.prob||{};
+  const probRows=(typeof pr.model_p==='number'&&typeof pr.fair==='number')?`
+    <div class="pbar"><span class="bl" style="color:var(--ink);font-weight:600">Our P(${side} ${b.line})</span><div class="t"><i style="width:${Math.round(pr.model_p*100)}%;background:var(--green)"></i></div><span class="brv big">${pc(pr.model_p)}</span></div>
+    <div class="pbar"><span class="bl" style="color:var(--muted)">Fair at ${amer(pr.price)}${pr.book?` ${pr.book}`:''}</span><div class="t"><i style="width:${Math.round(pr.fair*100)}%;background:var(--line2)"></i></div><span class="brv">${pc(pr.fair)}</span></div>`:'';
+  const edgeTxt=(typeof pr.edge==='number')?`<span class="brt final">${sg(pr.edge*100)} pts edge</span>`:'';
+  const cov=b.coverage; const covTxt=(cov&&cov.likely)?` Measured on ${(cov.n||0).toLocaleString()} held-out player-games: the likely range caught ${pc(cov.likely)} of outcomes (a perfect 50%), the wide range ${pc(cov.wide)} (of 80%) — the misses lean low, early exits and blowouts.`:'';
+  return `<div class="br"><div class="pfhead" style="margin-top:0;padding-top:0;border-top:0">How we get to the number <small>baseline → each factor's full read (signal × the weight it earned) → what has faded or is already in the line → our number, with its range. Dashed amber = the line${typeof mk==='number'?' · blue = the book\'s implied number':''}.</small></div>
+    <div style="margin-top:8px">${h}</div>${chips.length?`<div class="brchips">${chips.join('<br>')}</div>`:''}
+    <div class="brline"><span class="k">The probability.</span> Our number is a distribution, not a point — the range above is it. The % is how much of it clears the line; fair is the vig-free market at the price we're betting.${covTxt}</div>
+    <div style="margin-top:6px">${probRows}</div><div class="breq" style="margin-top:6px"><span class="brt">${pc(pr.model_p)} ours</span><span class="brop">−</span><span class="brt">${pc(pr.fair)} fair</span><span class="brop">=</span>${edgeTxt}</div>
+    ${scoreEq(b.score,false)}</div>`;
+}
+function renderTdBridge(b,p){
+  let cur=0; const vals=[0]; const rows=[];
+  (b.steps||[]).forEach(s=>{const from=cur; cur=cur+s.delta; vals.push(cur); rows.push({...s,from,to:cur});});
+  const hi=Math.max(...vals,0.05); const R=hi*1.06; const X=v=>Math.max(0,Math.min(100,v/R*100));
+  const row=(label,small,inner,val,cls)=>`<div class="brrow ${cls||''}"><span class="bl">${label}${small?`<small>${small}</small>`:''}</span><div class="brtrack">${inner}</div><span class="brv ${cls||''}">${val}</span></div>`;
+  let h='';
+  rows.forEach(s=>{const a=Math.min(s.from,s.to), w=Math.abs(X(s.to)-X(s.from)); const cls=s.kind==='factor'?(s.delta>=0?'pos':'neg'):s.kind;
+    h+=row(s.label,s.note||'',`<div class="brbar ${cls}" style="left:${X(a)}%;width:${Math.max(w,0.6)}%"></div>`,(s.delta>=0?'+':'−')+Math.abs(s.delta).toFixed(2),(s.kind==='factor'?(s.delta>=0?'pos':'neg'):''));});
+  const d=b.dist||{};
+  h+=row(b.end.label,`<span class="keep">0 TDs ${pc(d.p0||0)} · 1 TD ${pc(d.p1||0)} · 2+ ${pc(d.p2plus||0)}</span>`,`<div class="brdot end" style="left:${X(b.end.value)}%"></div>`,`${b.end.value.toFixed(2)}`,'big');
+  const pr=b.prob||{};
+  const chain=[`<span class="brt"><b>${(pr.lam||0).toFixed(2)}</b> xTD</span>`,`<span class="brop">→</span><span class="brt" title="1 − e^(−xTD)">raw <b>${pc(pr.p_raw||0)}</b></span>`];
+  if(typeof pr.p_xtd==='number') chain.push(`<span class="brop">→</span><span class="brt" title="the fitted calibration (top bucket .50 → .53 on two seasons)">calibrated <b>${pc(pr.p_xtd)}</b></span>`);
+  if(typeof pr.p_pooled==='number'&&typeof pr.w_xtd==='number') chain.push(`<span class="brop">→</span><span class="brt" title="blended ${Math.round(pr.w_xtd*100)}/${Math.round((1-pr.w_xtd)*100)} with the pooled rate model (${pc(pr.p_pooled)}); the xTD share ramps up as current-season games accrue">blend <b>${pc(pr.p_model)}</b> <span style="color:var(--dim)">(pooled ${pc(pr.p_pooled)})</span></span>`);
+  if(typeof pr.implied==='number') chain.push(`<span class="brop">vs</span><span class="brt">implied <b>${pc(pr.implied)}</b> at ${amer(pr.price)}${pr.book?` ${pr.book}`:''}</span>`);
+  if(typeof pr.edge==='number') chain.push(`<span class="brop">=</span><span class="brt final">${sg(pr.edge*100)} pts edge</span>`);
+  return `<div class="br"><div class="pfhead" style="margin-top:0;padding-top:0;border-top:0">How we get to the number <small>expected touchdowns by where his chances come from (chances per game × how often he finishes there), then today's scoring environment, the injury cascade and the red-zone defense.</small></div>
+    <div style="margin-top:8px">${h}</div>
+    <div class="brline"><span class="k">The probability.</span> Expected TDs become a chance to score at least once, calibrated on two seasons of results, blended with the pooled model, and set against the best price on the board.</div>
+    <div class="breq">${chain.join('')}</div>
+    ${scoreEq(b.score,true)}</div>`;
+}
 function gradeBlock(p){
   const g=p.grade||"C", sc=+p.score||0, col=scoreColor(sc);
   const units=(p.recommended&&p.units>0)?`${p.units}u`:(p.grade==="B"?"lean":"ref");
@@ -225,7 +336,7 @@ function propRow(p,i){
     <div class="pmain"><div class="nm">${top?'🔥 ':''}${p.name} <span style="color:var(--muted);font-weight:600">${p.side||''}</span></div>
       <div class="meta">${statusTags(p)}<span class="chip mk">${mk}</span>${p.verdict&&p.verdict!=="KEEP"?`<span class="vbadge v-${p.verdict.toLowerCase()}">${p.verdict==="CONFIRMED"?"✓ confirmed":p.verdict}</span>`:""}${typeof p.ud_line==="number"?`<span class="chip" title="Underdog's line for the same player-market — a second market's read">2nd mkt ${p.ud_line}</span>`:""}${p.thesis_kind==="off-market"?`<span class="vbadge v-offmarket" title="this book's number sits off the consensus of the other books — the number is the play">⇄ off-market ${typeof p.off_market==="number"?(p.off_market>=10?Math.round(p.off_market):p.off_market):""}</span>`:""}<span class="num">${num}</span> <span class="edge${(typeof p.edge==="number"&&p.edge<0)?" neg":""}">${fmtEdge(p.edge)}</span> <span class="num" style="color:var(--muted)">${price} ${p.book||''}${p.n_books>1?` · best of ${p.n_books}`:''}</span>${lineMove(p)}</div></div>
     ${gradeBlock(p)}
-    <div class="why hide">${p.reason||'—'}${renderCard(p.scorecard, p.side)}${renderProfile(p.profile, p.side)}</div>
+    <div class="why hide">${p.reason||'—'}${renderBridge(p.bridge, p)}${renderCard(p.scorecard, p.side)}${renderProfile(p.profile, p.side)}</div>
   </div>`;
 }
 function gameRow(g,i){

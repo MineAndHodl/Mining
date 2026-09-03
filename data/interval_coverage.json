@@ -1,0 +1,54 @@
+{
+ "bands": {
+  "likely": [
+   25,
+   75
+  ],
+  "wide": [
+   10,
+   90
+  ]
+ },
+ "by_market": {
+  "rush_yds": {
+   "n": 3936,
+   "likely": 0.445,
+   "wide": 0.728,
+   "below_p10": 0.165,
+   "above_p90": 0.107
+  },
+  "rec_yds": {
+   "n": 7856,
+   "likely": 0.444,
+   "wide": 0.712,
+   "below_p10": 0.178,
+   "above_p90": 0.11
+  },
+  "receptions": {
+   "n": 7857,
+   "likely": 0.526,
+   "wide": 0.829,
+   "below_p10": 0.071,
+   "above_p90": 0.1
+  },
+  "pass_yds": {
+   "n": 1179,
+   "likely": 0.45,
+   "wide": 0.753,
+   "below_p10": 0.154,
+   "above_p90": 0.092
+  }
+ },
+ "pooled": {
+  "n": 20828,
+  "likely": 0.475,
+  "wide": 0.762,
+  "below_p10": 0.134,
+  "above_p90": 0.105,
+  "seasons": [
+   2024,
+   2025
+  ],
+  "note": "walk-forward: weights fit on prior seasons; ranges from the pricing distribution"
+ }
+}

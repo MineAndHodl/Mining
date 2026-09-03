@@ -191,7 +191,7 @@ def build_td_board(key=None, max_games=None, days=8, cached=False, raw_paths=Non
         import rz_defense as rzd
         RZD = rzd.RZDefense(2026)
         p_x_list, lam_x_list, fac = [], [], {c: [] for c in XTD_FACTOR_COLS}
-        keep_mask, role_notes, rz_notes, rz_mults = [], [], [], []
+        keep_mask, role_notes, rz_notes, rz_mults, env_mults, role_mults = [], [], [], [], [], []
         for _, b in out.iterrows():
             st = INJ.status(b["name"]) if INJ else None
             if st and st.get("status") == "Out":
@@ -201,6 +201,7 @@ def build_td_board(key=None, max_games=None, days=8, cached=False, raw_paths=Non
             r = xmap.get(norm_name(b["name"]))
             if r is None or b.get("p_model") is None:
                 p_x_list.append(None); lam_x_list.append(None); role_notes.append(None); rz_notes.append(None); rz_mults.append(None)
+                env_mults.append(None); role_mults.append(None)
                 for c in XTD_FACTOR_COLS: fac[c].append(None)
                 continue
             team = r["team"]; mult = env_mult.get(team, 1.0)
@@ -211,13 +212,13 @@ def build_td_board(key=None, max_games=None, days=8, cached=False, raw_paths=Non
             home_c, away_c = ABBR.get(home_full), ABBR.get(away_full)
             opp = away_c if team == home_c else (home_c if team == away_c else None)
             zmult, znote = RZD.multiplier(opp) if opp else (1.0, None)
-            rz_notes.append(znote); rz_mults.append(zmult)
+            rz_notes.append(znote); rz_mults.append(zmult); env_mults.append(round(float(mult), 3)); role_mults.append(round(float(rmult), 3))
             lam_x = float(r["xtd"]) * mult * rmult * zmult
             p_x = float(xm.p_atd(lam_x))
             p_x_list.append(round(p_x, 3)); lam_x_list.append(round(lam_x, 3))
             for c in XTD_FACTOR_COLS: fac[c].append(r.get(c))
         out["p_xtd"] = p_x_list; out["lam_xtd"] = lam_x_list; out["role_note"] = role_notes
-        out["rz_note"] = rz_notes; out["rz_mult"] = rz_mults
+        out["rz_note"] = rz_notes; out["rz_mult"] = rz_mults; out["env_mult"] = env_mults; out["role_mult"] = role_mults
         for c in XTD_FACTOR_COLS: out[c] = fac[c]
         out = out[pd.Series(keep_mask, index=out.index)].copy()   # drop players listed Out
         out["p_old"] = out["p_model"]

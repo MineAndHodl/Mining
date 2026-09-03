@@ -324,6 +324,21 @@ correlation measurements, DK SGP calibration quotes.
 - EARN: game-script-conditional correlations (blowout vs close) · more DK quotes for
   calibration (owner can paste slips).
 
+- **The bridge (Alex, day 5: "a composite that shows how we get to our edge… the pick and the
+  confidence interval"; `bridge.py`):** every pick shown carries a waterfall that MUST close —
+  baseline (the market's number before Week 4; his own baseline in season) + each factor's full
+  read (signal × earned weight) − faded/already priced (form ratio × market lag, one striped bar)
+  × weather × cascade = our number, with the pricing distribution's 25-75 / 10-90 ranges; P − fair
+  = edge; (45 + value + hittable) + (sample + breadth + intel) × verdict = Desk Score → grade →
+  rails → units. TD: chances × finish by zone × env × cascade × RZ defense → raw → calibrated →
+  blended → vs implied. `rank_board.desk_score_parts/trust_parts` are the one source of truth for
+  the score arithmetic. Under the market baseline the environment factors are listed as "already
+  priced" (never bars); role tilts switched off before Week 4 are "not applied yet". Range
+  coverage measured (`interval_check.py`): 25-75 catches 47.5%, 10-90 catches 76% of 20.8k held-out
+  outcomes, misses lean low; widening the CV does NOT improve P(over) log-loss (tested, rejected)
+  — the left-tail SHAPE is the open item. Inputs frozen in the ledger. `run_board` prints
+  `bridge: N picks, K with a residual`; K must be 0.
+
 ## Pipeline (src/)
 `refresh_data.py` FIRST (current-season pbp / player-games / schedules; nflverse-release
 fallbacks; idempotent) — it is the mode switch: `run_board` reads `season_state()` and runs
@@ -383,6 +398,8 @@ comes from `data/data_ledger.json`, `data/monitor/status.json`, the validation J
 and git. Nothing simulated. `[tested]` lines say what was tried, never the verdict.
 
 ## Still owed
+- **From the bridge:** the breakeven line per pick ("edge gone at L*"), the range chip on the Card
+  row, the bridge in one line in the post copy, an early-exit left-tail mixture as a T4 challenger.
 - **Run the grading loop** (built 2026-09-02, unproven on live data): Week 1 grades Monday; after
   3 graded weeks re-earn the intel weight, the cascade, the grade bands and every ASSUMED
   constant in the Desk Score (IDEAS_LEDGER §4 lists them); check the early-season TD top bucket.

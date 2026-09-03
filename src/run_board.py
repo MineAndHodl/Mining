@@ -165,6 +165,17 @@ def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False, ope
     except Exception as e:
         print("second opinions skipped:", e)
     bf.attach_all(ranked)
+    # 5b) the bridge: baseline → factors → already-in-the-line → weather/cascade → our number
+    #     (with the distribution's ranges) → P(over) vs fair → edge → Desk Score → grade, on
+    #     every pick shown. Arranges numbers already on the row; checks the arithmetic closes.
+    try:
+        import bridge
+        n_br = bridge.attach_all(ranked)
+        bad = [r for lst in ([ranked.get("recommended", [])] + list((ranked.get("by_category") or {}).values())) for r in lst
+               if isinstance(r.get("bridge"), dict) and (r["bridge"].get("error") or abs(float(r["bridge"].get("unexplained") or 0)) > max(0.01 * abs(float(r.get("our_num") or 1)), 0.15))]
+        print(f"bridge: {n_br} picks, {len(bad)} with a residual")
+    except Exception as e:
+        print("bridge skipped:", e)
     gs = ranked.get("grading", {})
     print(f"grades: {gs.get('grade_counts')} | recommended {gs.get('n_recommended')} "
           f"({gs.get('units_recommended')}u) | season cap {gs.get('season_cap')}")

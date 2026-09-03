@@ -115,6 +115,30 @@ the run), **REJECTED** (tested, lost), **BLOCKED** (needs something only Alex ca
     / ESPN → quotes about board players → intel, the watch, the Model Room. Free. OCs next (no
     coordinator table in the schedule; needs a coach map).
 
+### 0e. Alex's ask, day 5 (2026-09-03) — "a composite that shows how we get to our edge… the pick and the confidence interval"
+28. **The bridge** (`bridge.py`, on every pick shown, Board + Model Room) — a waterfall in the
+    stat's units: the baseline we build on (the market's number before Week 4; his own baseline in
+    season) + each factor's FULL read (signal × the weight it earned) − what has faded across the
+    offseason or is already in the line (the measured form ratio × the measured market lag, one
+    striped bar, never hidden) × weather × the injury cascade = our number, with the pricing
+    distribution's 25-75 and 10-90 ranges; then P(over) vs the vig-free fair → edge; then
+    45 + value + hittable = conviction, + sample/breadth/intel = trust, × verdict = Desk Score →
+    grade → rails → units. Touchdowns: chances × finish by zone × environment × cascade × red-zone
+    defense = expected TDs → raw → calibrated → blended → vs implied → edge. The arithmetic must
+    close on every pick (`run_board` prints the residual count; tests enforce it). Inputs frozen in
+    the ledger (`bridge_start`, `contrib_raw`, `mu_pre`, the TD multipliers).
+29. **Range coverage measured** (`interval_check.py`, 20,828 held-out player-games, 2024+2025):
+    the likely range catches 47.5% (target 50%), the wide range 76% (target 80%); receptions are
+    right (51/82); yardage misses lean LOW (13-18% below p10 vs 10%) — early exits and blowouts.
+    **Tested, not adopted:** scaling the CV up (×1.1-1.3) fixes band coverage but does NOT improve
+    out-of-sample P(over) log-loss at lines around our number (flat for rushing, worse for
+    receiving/passing) — the width is right for pricing; the miss is the SHAPE of the left tail.
+    Queued: a two-part distribution (an early-exit component) as a challenger; stated on the page
+    as measured.
+30. Queued from the bridge: the **breakeven line** on every pick (the number at which our edge is
+    zero — "edge gone at 44.5"); the bridge in one line in the post copy; grading the bars — which
+    factor's contribution predicts CLV in season (the attribution version of T1/T2).
+
 ## 1. Product lanes
 | Idea (Alex) | Status | Where / note |
 |---|---|---|

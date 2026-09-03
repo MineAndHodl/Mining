@@ -43,6 +43,38 @@ def _desk_score(edge, model_p, mult=1.0, anchor=0.52):
     return round(float(np.clip(score, 20, 95)), 1)
 
 
+def desk_score_parts(edge, model_p, anchor=0.52):
+    """The conviction score's pieces (the bridge shows them): base 45 + value(edge) +
+    hittable(p) → clipped. Same arithmetic as _desk_score, exposed."""
+    edge = float(edge or 0); p = float(model_p if model_p is not None else 0.5)
+    val = edge * 260 if edge <= EDGE_PEAK else EDGE_PEAK * 260 - (edge - EDGE_PEAK) * 260
+    tail = min(1.0, p / 0.40); val *= tail
+    hittable = (p - anchor) * 55
+    raw = 45 + val + hittable
+    return {"base": 45.0, "value": round(val, 1), "hittable": round(hittable, 1), "anchor": anchor,
+            "tail_discount": (round(tail, 2) if tail < 1 else None), "past_peak": bool(edge > EDGE_PEAK),
+            "raw": round(raw, 1), "conviction": round(float(np.clip(raw, 20, 95)), 1)}
+
+
+def trust_parts(row):
+    """The trust term's pieces (sample depth, market breadth, beat intel) — same arithmetic as
+    _trust, exposed for the bridge."""
+    conf = row.get("confidence"); nb = row.get("n_books_mkt")
+    if nb is None or (isinstance(nb, float) and nb != nb):
+        nb = row.get("n_books")
+    sample = breadth = intel = 0.0
+    if conf is not None and not (isinstance(conf, float) and conf != conf):
+        sample = (float(conf) - 0.7) * 22.0
+    if nb is not None and not (isinstance(nb, float) and nb != nb):
+        nb = int(nb); breadth = (-3.0 if nb <= 1 else (0.0 if nb == 2 else 3.0))
+    bi = row.get("intel_lean")
+    if bi is not None and not (isinstance(bi, float) and bi != bi):
+        intel = float(np.clip(bi, -1, 1)) * INTEL_PROV_WEIGHT
+    return {"sample": round(sample, 1), "breadth": round(breadth, 1), "intel": round(intel, 1), "n_books": (int(nb) if nb is not None and not (isinstance(nb, float) and nb != nb) else None),
+            "confidence": (round(float(conf), 2) if conf is not None and not (isinstance(conf, float) and conf != conf) else None),
+            "trust": round(sample + breadth + intel, 1)}
+
+
 def _trust(row):
     """Robustness of the edge — what separates an A+ from an A- when edges look alike:
       sample depth : projection confidence (games of real history behind the number)
@@ -204,7 +236,8 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "score_conviction": _nn(r.get("score_conviction")), "score_trust": _nn(r.get("score_trust")),
                          "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),
                          "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", ""),
-                         "contrib": r.get("contrib"), "confidence": r.get("confidence"),
+                         "contrib": r.get("contrib"), "contrib_raw": r.get("contrib_raw"), "bridge_start": _nn(r.get("bridge_start")), "mu_pre": _nn(r.get("mu_pre")),
+                         "confidence": r.get("confidence"),
                          "offseason": r.get("offseason"), "form_gap": _nn(r.get("form_gap")), "last_season": _nn(r.get("last_season")),
                          "market_lag": _nn(r.get("market_lag")), "thesis_kind": _nn(r.get("thesis_kind")), "cons_mean": _nn(r.get("cons_mean")),
                          "tilt": _nn(r.get("tilt")), "off_market": _nn(r.get("off_market")),
@@ -228,6 +261,10 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
             rows.append({"cat": "anytime_td", "score": sc, "name": r["name"], "mkt_flag": flagged, "mkt_ratio": _nn(r.get("mkt_ratio")),
                          "game": r.get("game"), "line": 0.5, "side": "Yes",
                          "our_num": r.get("p_model"), "edge": r.get("edge"), "ev": None,
+                         "p_xtd": _nn(r.get("p_xtd")), "p_old": _nn(r.get("p_old")), "xtd_weight": _nn(r.get("xtd_weight")), "lam_xtd": _nn(r.get("lam_xtd")),
+                         "xtd": _nn(r.get("xtd")), "rz_mult": _nn(r.get("rz_mult")), "implied_consensus": _nn(r.get("implied_consensus")),
+                         "env_mult": _nn(r.get("env_mult")), "role_mult": _nn(r.get("role_mult")), "lam_pooled": _nn(r.get("lam")),
+                         "p_implied": _nn(r.get("p_implied")), "rz_note": _nn(r.get("rz_note")), "role_note": _nn(r.get("role_note")),
                          "model_p": r.get("p_model"), "price": r.get("price"), "book": _nn(r.get("book")) or "draftkings",
                          "n_books": _nn(r.get("n_books")), "position": _nn(r.get("position")),
                          "reason": rsn})

@@ -600,6 +600,37 @@ def test_owner_in_the_loop():
     check("the latest loop entry carries the Owner's Pass findings and a forecast check slot", last.get("owner_pass") and "owner_forecast_check" in last)
 
 
+def test_bridge():
+    """The bridge (Alex: 'a composite that shows how we get to our edge… the pick and the
+    confidence interval'): on every pick shown, baseline + factors − already-in-the-line
+    × weather × cascade = our number; P vs fair = edge; conviction + trust × verdict = score."""
+    print("\n-- the bridge --")
+    import json as _j, math as _m
+    import bridge as br, rank_board as rbk
+    d = _j.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    shown = [r for r in d.get("recommended", []) if not r.get("kind")] + [r for rows in d.get("by_category", {}).values() for r in rows]
+    check("every pick shown carries a bridge", shown and all(isinstance(r.get("bridge"), dict) and not r["bridge"].get("error") for r in shown), f"{sum(1 for r in shown if not r.get('bridge'))} missing")
+    bad = br.check(d)
+    check("the arithmetic closes on every pick (baseline + steps = our number; xTD steps = expected TDs)", not bad, str(bad[:3]))
+    yd = [r for r in shown if r["bridge"].get("kind") == "yardage"]
+    check("yardage bridges: start + Σ steps = our number within rounding", all(abs(r["bridge"]["start"]["value"] + sum(s["delta"] for s in r["bridge"]["steps"]) - r["bridge"]["end"]["value"]) <= 0.16 for r in yd))
+    check("weeks 0-3: the start is the market's number and the environment is listed as already priced", all(r["bridge"]["start"]["label"].startswith("The market") and set(r["bridge"]["in_line"]) >= {"Game total", "Venue"} for r in yd if r.get("offseason") and r.get("contrib")))
+    check("a full-strength read is shown, then what the market already has is subtracted (never hidden)", any(s["kind"] == "priced" for r in yd for s in r["bridge"]["steps"]))
+    check("every factor bar says signal × weight", all(s.get("note") and "weight" in s["note"] for r in yd for s in r["bridge"]["steps"] if s["kind"] == "factor" and s.get("key")))
+    check("the range is the same distribution p_over uses (p50 ≈ the median of our number's distribution)", all(r["bridge"]["ci"]["p25"] < r["bridge"]["ci"]["p50"] < r["bridge"]["ci"]["p75"] for r in yd))
+    check("P − fair = edge on every yardage pick", all(abs((r["bridge"]["prob"]["model_p"] - r["bridge"]["prob"]["fair"]) - r["bridge"]["prob"]["edge"]) < 0.002 for r in yd))
+    check("score parts reproduce the row's conviction and trust", all(abs(r["bridge"]["score"]["conviction"]["conviction"] - r["score_conviction"]) < 0.06 and abs(r["bridge"]["score"]["trust"]["trust"] - r["score_trust"]) < 0.06 for r in yd if r.get("score_conviction") is not None))
+    check("(conviction + trust) × verdict = the Desk Score (clipped 20-95)", all(abs(min(95, max(20, (r["bridge"]["score"]["conviction"]["conviction"] + r["bridge"]["score"]["trust"]["trust"]) * r["bridge"]["score"]["mult"])) - r["score"]) < 0.2 for r in yd))
+    td = [r for r in shown if r["bridge"].get("kind") == "td"]
+    check("TD bridges: chances × finish by zone, then environment/cascade/red-zone defense, = expected TDs", td and all(abs(sum(s["delta"] for s in r["bridge"]["steps"]) - r["bridge"]["end"]["value"]) <= 0.006 for r in td))
+    check("TD probability chain: raw = 1 − e^(−xTD); blend = w·calibrated + (1−w)·pooled", all(abs(r["bridge"]["prob"]["p_raw"] - (1 - _m.exp(-r["bridge"]["prob"]["lam"]))) < 0.002 and abs(r["bridge"]["prob"]["w_xtd"] * r["bridge"]["prob"]["p_xtd"] + (1 - r["bridge"]["prob"]["w_xtd"]) * r["bridge"]["prob"]["p_pooled"] - r["bridge"]["prob"]["p_model"]) < 0.002 for r in td))
+    check("TD score has no trust term (the TD scale is conviction alone, anchored at .35)", all(r["bridge"]["score"]["trust"] is None and r["bridge"]["score"]["conviction"]["anchor"] == rbk.TD_ANCHOR for r in td))
+    tmpl = open(os.path.join(HERE, "..", "output", "the-board-template.html")).read(); page = open(os.path.join(HERE, "..", "output", "the-board.html")).read()
+    check("the Board renders the bridge on every pick (waterfall, range, P vs fair, score equation)", "renderBridge(p.bridge" in tmpl and "renderTdBridge" in tmpl and "scoreEq(" in tmpl and "How we get to the number" in page)
+    lab = open(os.path.join(HERE, "..", "output", "the-lab.html")).read()
+    check("the Model Room shows one pick all the way down", "How a number is reached" in lab and '"bridge_example"' in lab)
+
+
 def test_line_history_and_ledger_alignment():
     """Every bet knows where it opened and where it is now; the ledger is aligned with the product."""
     print("\n-- line history + ledger alignment --")
@@ -683,7 +714,7 @@ if __name__ == "__main__":
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_fresh_eyes_day3_universe(); test_fresh_eyes_day4_profile_coaches(); test_owner_in_the_loop(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_fresh_eyes_day3_universe(); test_fresh_eyes_day4_profile_coaches(); test_owner_in_the_loop(); test_bridge(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

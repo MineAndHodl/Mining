@@ -504,5 +504,208 @@
     "answer": "the Card in his words with the thesis kind on each pick + the Touchdown Tax legs; data/post_copy.md"
    }
   ]
+ },
+ {
+  "date": "2026-09-03",
+  "day": 5,
+  "brief": "Alex: all the ranking things should have a composite / weighted average that shows how we get to our % over-under / edge \u2014 how the factors interact, get weighted and come up with the pick and the confidence interval.",
+  "hats": {
+   "handicapper": [
+    "a gambler wants to see the market's number, what we add, what the books already have, and the range \u2014 not eight sliders that each say 'up a bit'",
+    "the striped bar (faded or already priced) is the honest part: it says out loud that most of a hot last-3 is already in the line"
+   ],
+   "quant": [
+    "the model is additive then distributional then a score, so the composite is a waterfall that must close: baseline + w\u00b7signals \u2212 scaled-away \u00d7 weather \u00d7 cascade = our number; P \u2212 fair = edge; (45 + value + hittable) + (sample + breadth + intel) \u00d7 verdict = Desk Score",
+    "under the market baseline the environment factors are zero by design (measured double-count) \u2014 they belong under 'already priced', not as bars; role tilts switched off before Week 4 are 'not applied yet', not 'in the line'",
+    "the range is only honest if measured: interval_check.py on 20,828 held-out player-games"
+   ],
+   "business": [
+    "every pick now shows its math on the Board; the Model Room shows the #1 Card pick all the way down \u2014 a screenshot no tout account can produce",
+    "the coverage sentence (48% vs a perfect 50%) is a trust device, not a weakness"
+   ]
+  },
+  "critiques": [
+   "first pass showed the applied (scaled) contributions with a zero-height 'already in the line' bar \u2014 unreadable; rebuilt as full read then subtraction",
+   "the TD bridge did not close (env/role multipliers were not on the row; the xTD table is built neutral) \u2014 td_board now carries env_mult/role_mult and the bridge closes to 0.000",
+   "the Model Room's run-log class `.ln` (opacity 0) swallowed the bridge's line tick \u2014 renamed",
+   "yardage ranges run narrow on the low side (13-18% of outcomes under p10): a shape problem, not a width problem \u2014 widening the CV does not improve P(over) log-loss, so the pricing distribution stands and the left tail is queued as a challenger"
+  ],
+  "tested": {
+   "bridge_closes": {
+    "picks": 61,
+    "residual": 0
+   },
+   "interval_coverage_pooled": {
+    "n": 20828,
+    "likely": 0.475,
+    "wide": 0.762,
+    "below_p10": 0.134,
+    "above_p90": 0.105,
+    "seasons": [
+     2024,
+     2025
+    ],
+    "note": "walk-forward: weights fit on prior seasons; ranges from the pricing distribution"
+   },
+   "interval_coverage_by_market": {
+    "rush_yds": {
+     "n": 3936,
+     "likely": 0.445,
+     "wide": 0.728,
+     "below_p10": 0.165,
+     "above_p90": 0.107
+    },
+    "rec_yds": {
+     "n": 7856,
+     "likely": 0.444,
+     "wide": 0.712,
+     "below_p10": 0.178,
+     "above_p90": 0.11
+    },
+    "receptions": {
+     "n": 7857,
+     "likely": 0.526,
+     "wide": 0.829,
+     "below_p10": 0.071,
+     "above_p90": 0.1
+    },
+    "pass_yds": {
+     "n": 1179,
+     "likely": 0.45,
+     "wide": 0.753,
+     "below_p10": 0.154,
+     "above_p90": 0.092
+    }
+   },
+   "cv_scale_vs_pover_logloss": {
+    "rush_yds": {
+     "1.0": {
+      "logloss": 0.6515,
+      "brier": 0.2296
+     },
+     "1.1": {
+      "logloss": 0.651,
+      "brier": 0.2294
+     },
+     "1.15": {
+      "logloss": 0.651,
+      "brier": 0.2294
+     },
+     "1.2": {
+      "logloss": 0.6512,
+      "brier": 0.2295
+     }
+    },
+    "rec_yds": {
+     "1.0": {
+      "logloss": 0.6595,
+      "brier": 0.2335
+     },
+     "1.1": {
+      "logloss": 0.6599,
+      "brier": 0.2337
+     },
+     "1.15": {
+      "logloss": 0.6604,
+      "brier": 0.234
+     },
+     "1.2": {
+      "logloss": 0.6611,
+      "brier": 0.2343
+     }
+    },
+    "pass_yds": {
+     "1.0": {
+      "logloss": 0.6237,
+      "brier": 0.217
+     },
+     "1.1": {
+      "logloss": 0.624,
+      "brier": 0.2171
+     },
+     "1.15": {
+      "logloss": 0.6244,
+      "brier": 0.2172
+     },
+     "1.2": {
+      "logloss": 0.6251,
+      "brier": 0.2175
+     }
+    },
+    "receptions": {
+     "1.0": {
+      "logloss": 0.6723,
+      "brier": 0.2397
+     },
+     "1.1": {
+      "logloss": 0.6723,
+      "brier": 0.2397
+     },
+     "1.15": {
+      "logloss": 0.6723,
+      "brier": 0.2397
+     },
+     "1.2": {
+      "logloss": 0.6723,
+      "brier": 0.2397
+     }
+    }
+   },
+   "result": "REJECTED CV widening (band coverage up, P(over) log-loss flat/worse); ADOPTED the bridge on every pick + the measured coverage sentence"
+  },
+  "numbers": {
+   "card": "unchanged \u2014 the bridge re-arranges numbers already on the rows; no price moved",
+   "tests": "197 \u2192 212",
+   "coverage": "likely 48% (target 50%), wide 76% (target 80%), n=20828"
+  },
+  "verdict": "SHIPPED: the bridge (src/bridge.py) on every pick shown \u2014 baseline \u2192 each factor's full read (signal \u00d7 earned weight) \u2192 faded/already priced \u2192 weather \u2192 cascade \u2192 our number with its 25-75 / 10-90 range \u2192 P vs fair \u2192 edge \u2192 conviction + trust \u00d7 verdict \u2192 Desk Score \u2192 grade \u2192 units; TD version by zone \u00d7 type \u2192 environment \u2192 cascade \u2192 red-zone defense \u2192 raw \u2192 calibrated \u2192 blended \u2192 vs implied. Rendered on the Board (waterfall, range band, line tick, equation chips) and as a worked example on the Model Room; inputs frozen in the ledger; range coverage measured and stated.",
+  "shipped": [
+   "src/bridge.py (yardage + TD bridges, score parts, check)",
+   "rank_board.desk_score_parts / trust_parts (one source of truth for the score arithmetic)",
+   "prop_board: contrib_raw / bridge_start / mu_pre; td_board: env_mult / role_mult on rows",
+   "run_board: bridge.attach_all + residual report",
+   "the-board-template: renderBridge / renderTdBridge / scoreEq",
+   "build_lab_page: 'How a number is reached' panel + wall line + lab line",
+   "interval_check.py + data/interval_coverage.json",
+   "ledger PICK_FIELDS: bridge inputs frozen",
+   "tests: test_bridge (15 checks)"
+  ],
+  "tomorrow": [
+   "the breakeven line per pick (edge gone at L*)",
+   "the range chip on the Card row",
+   "the bridge in one line in the post copy",
+   "left-tail (early-exit) mixture as a challenger for T4"
+  ],
+  "owner_pass": [
+   "coverage: 61 picks shown (Card, best props, every category tab incl. TD) carry a bridge; games lane none (market intel, T10) \u2014 say so",
+   "rooted in truth: every bar is a row field; the arithmetic closes on all 61 (tested); the weights shown are the earned ridge weights; the coverage numbers are out of sample",
+   "impress: the waterfall with the line and the range, the striped 'already priced' bar, the equation chips \u2014 a screenshot",
+   "confidence: the range is measured (48/76) and stated; the misses lean low \u2014 queued",
+   "edge nobody else has: the measured market lag as a bar on every pick",
+   "runs without him: yes \u2014 bridge is part of run_board; still nothing live until the push",
+   "critical: the range's left tail is thin; the TD bridge needed row fields it didn't have; the first design hid the subtraction"
+  ],
+  "owner_forecast_check": {
+   "hits": 0,
+   "misses": 3,
+   "note": "he asked for the composite/CI (see-the-machine) \u2014 none of the three forecast kinds (ops, coverage, product). OWNER.md \u00a72.6 added; \u00a710 rewritten."
+  },
+  "owner_forecast": [
+   {
+    "ask": "Can we show the range/CI on the Card row itself, not just when you tap?",
+    "kind": "see-the-machine",
+    "answer": "a 'likely 31-71' chip beside our number from bridge.ci \u2014 template only"
+   },
+   {
+    "ask": "What line would make us walk away \u2014 where does the edge disappear?",
+    "kind": "confidence",
+    "answer": "breakeven line per pick: solve P(over L) = fair; show 'edge gone at 44.5' on the bridge"
+   },
+   {
+    "ask": "Is the Watch actually working / why haven't I gotten an email?",
+    "kind": "ops",
+    "answer": "nothing runs until the bundle is pushed; the needs-you line"
+   }
+  ]
  }
 ]

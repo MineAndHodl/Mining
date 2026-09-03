@@ -323,6 +323,7 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
             # in-season rows, so applying it unscaled across the offseason roughly DOUBLED every
             # Week-1 edge and manufactured a tail of absurd ones (a +45% "edge" on a rushing under).
             role_base = baseline
+            feats_raw = dict(feats)          # before the offseason ratio, the market lag and the market-baseline zeroing
             # PER-PLAYER gap (Fresh Eyes day 2): the offseason treatment keys off HIS window, not
             # the global mode. gap 0 = his last game is this season (full form, own baseline);
             # gap 1 = his window crosses one offseason (the measured half-strength ratio + the
@@ -376,9 +377,13 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
             # per-factor contribution (weight x feature) for the honest scorecard/rationale
             w = model.get("weights", {}).get(mkt, {})
             contrib = {f: round(w.get(f, 0.0) * feats[f], 2) for f in feats} if w else {}
+            # the same contributions BEFORE scaling — what the market already had / what we set aside
+            contrib_raw = {f: round(w.get(f, 0.0) * feats_raw[f], 2) for f in feats_raw} if w else {}
+            mu_pre = our_mu                  # our mean before weather and the injury cascade (the bridge's middle)
         else:                          # no recent games (rookie / new role) -> role-model projection
             our_mu = float(pr[mkt]) if (pr is not None and mkt in pr and pd.notna(pr[mkt])) else None
             trend = 0.0; baseline = our_mu; log = None; src = "role"; gap = None; last_season = None; lag = None
+            contrib_raw = {}; role_base = our_mu; mu_pre = our_mu
         if our_mu is None or our_mu <= 0:
             continue
         wg = (weather_by_game or {}).get(b["game"])
@@ -408,6 +413,8 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                     "contrib": contrib, "offseason": (gap is None and recency_week is None) or (gap is not None and gap >= 1),
                     "form_gap": gap, "last_season": (int(last_season) if last_season is not None and last_season == last_season else None),
                     "market_lag": (round(float(lag), 3) if lag is not None else None),
+                    "bridge_start": (round(float(role_base), 2) if role_base is not None else None), "mu_pre": (round(float(mu_pre), 2) if mu_pre is not None else None),
+                    "contrib_raw": contrib_raw,
                     "market_num": round(pm.market_mean(mkt, b["line"], p["fair_over"]), 1),
                     "cons_mean": (round(cons_mean[(k, mkt)], 1) if (k, mkt) in cons_mean else None),
                     "side": p["side"], "edge": p["edge"], "model_p": p["model_p"], "fair": p["fair"],
