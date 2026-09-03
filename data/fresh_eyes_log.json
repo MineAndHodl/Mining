@@ -477,6 +477,32 @@
    "ingest_universe coach_feed",
    "tests: test_fresh_eyes_day4_profile_coaches"
   ],
-  "tomorrow": "grade the profile levers once weeks exist (which tracking percentile predicts CLV?); OC pressers (coordinators aren't in the schedule table \u2014 add a coach map); end-zone target share from pbp (air_yards \u2265 yardline) for the TD model; kicker lane"
+  "tomorrow": "grade the profile levers once weeks exist (which tracking percentile predicts CLV?); OC pressers (coordinators aren't in the schedule table \u2014 add a coach map); end-zone target share from pbp (air_yards \u2265 yardline) for the TD model; kicker lane",
+  "owner_pass": [
+   "coverage: receivers/QBs were always in the TD model \u2014 the report must say coverage in one line before what changed (his question exposed a reporting gap, not a model gap)",
+   "runs without him: the Watch, the coach feed and every job are dead until the bundle is pushed \u2014 the day's value should not depend on his ops"
+  ],
+  "owner_forecast_check": {
+   "hits": null,
+   "misses": null,
+   "note": "first forecast written today; scored tomorrow"
+  },
+  "owner_forecast": [
+   {
+    "ask": "Is the Watch actually working / why haven't I gotten an email?",
+    "kind": "ops",
+    "answer": "every job clones GitHub; nothing runs until the bundle is pushed \u2014 one line, in the needs-you list"
+   },
+   {
+    "ask": "Can we get the coordinators' pressers too, not just head coaches?",
+    "kind": "coverage",
+    "answer": "needs a coach map (OCs aren't in the schedule table); same pipeline; tomorrow's candidate"
+   },
+   {
+    "ask": "What does Week 1 look like now \u2014 what are we actually betting?",
+    "kind": "product",
+    "answer": "the Card in his words with the thesis kind on each pick + the Touchdown Tax legs; data/post_copy.md"
+   }
+  ]
  }
 ]

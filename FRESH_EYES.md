@@ -33,6 +33,14 @@ graded), `data/feature_lab.json`, `data/record.json`. Then open the live board
 why it is there. Pick one number the model shows and re-derive it by hand. Find one place
 where the page and the model disagree. Write the three findings down even if none is a bug.
 
+**2b. The Owner's Pass (OWNER.md §6).** Before choosing, run Alex's twelve questions on today's
+board and today's candidate: coverage ("are we including ___?"), truth, would it impress a gambler,
+confidence, the edge nobody else has, money/followers, runs without him, what else, self-critique,
+dumbed down, ugly stuff off the page, decide-don't-ask. Write the two that bite hardest. Then score
+yesterday's `owner_forecast` (hits/misses) and write today's — the three asks he is most likely to
+make next, phrased as he would, with what answers each. Two misses on the same kind of ask → edit
+OWNER.md.
+
 **3. Choose ONE thing and finish it.** The best candidate from steps 1-2 that can be measured
 today. Test it the repo's way:
 - yardage/count feature → `src/feature_lab.py` (two held-out seasons; adopt only if it wins both);
@@ -50,8 +58,16 @@ the numbers with vs without, the verdict, what changed on the board, tomorrow's 
 Never change a weight because it "makes sense"; never present an untested idea as a finding.
 
 **5. Leave the trail.** Append to `data/fresh_eyes_log.json`:
-`{date, hats: {handicapper, quant, business}, critiques, tested, numbers, verdict, shipped, tomorrow}`.
+`{date, hats: {handicapper, quant, business}, critiques, owner_pass, owner_forecast_check, owner_forecast, tested, numbers, verdict, shipped, tomorrow}`.
 Update IDEAS_LEDGER.md when an idea changes status. Update CLAUDE.md only for settled findings.
+
+## The owner in the loop
+OWNER.md is Alex as a persona: how he thinks (businessman → handicapper → quant, exhaustive,
+recursive), how he prompts (stacked asks, coverage and confidence questions, competitor questions,
+presentation asks with a truth clause, delegated how, free rein), what the loop gets from him, where
+his input needs translation (volume vs rigor, profile ≠ weight, underspecified asks, he never sees
+the rejected list, ops follow-through is his bottleneck), and how to write to him. THESES.md is what
+we believe, what freezes at the Week 1 open, and the in-season calendar of re-earning.
 
 ## Standing rules for the loop
 - Measure, never assert. The data sets the weight; a feature ships only if it wins out of sample.

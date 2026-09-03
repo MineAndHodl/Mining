@@ -3,7 +3,10 @@
 **The full operating prompt is `THE_DESK_PROMPT.md` — read it first; this file is the short form.
 `IDEAS_LEDGER.md` is the audit of every idea Alex ever raised and its honest status — read it
 before proposing anything "new". `FRESH_EYES.md` is the daily improvement loop (three hats,
-one shipped improvement a day, logged in `data/fresh_eyes_log.json`) — "improve" means run it.**
+one shipped improvement a day, logged in `data/fresh_eyes_log.json`) — "improve" means run it.
+`OWNER.md` is Alex as a persona in that loop (the Owner's Pass runs on everything before it ships;
+his next asks are forecast and scored daily). `THESES.md` is what we believe, what freezes at the
+Week 1 open, and the in-season calendar of re-earning. `DATA_UNIVERSE.md` is every data source.**
 
 Read this first, every session. It is the accumulated clarity of a long iterative build:
 what we're doing, how we work, what's been proven, what every variable is for, and what's

@@ -585,6 +585,21 @@ def test_fresh_eyes_day4_profile_coaches():
     check("the Model Room reads the coaches and shows the profile on the wall", "what the coaches said" in html.lower() and "tracking & charting profile" in html.lower())
 
 
+def test_owner_in_the_loop():
+    """The owner persona and the thesis registry are part of the loop: files exist, the loop
+    protocol references the Owner's Pass, and the latest log entry carries a scored forecast."""
+    print("\n-- the owner in the loop --")
+    import json as _j
+    own = open(os.path.join(HERE, "..", "OWNER.md")).read(); th = open(os.path.join(HERE, "..", "THESES.md")).read(); fe = open(os.path.join(HERE, "..", "FRESH_EYES.md")).read()
+    check("OWNER.md carries the Owner's Pass (12 questions), the anticipation protocol and a current forecast", "Owner's Pass" in own and "Anticipation protocol" in own and "Current forecast" in own and own.count("**\"") >= 12)
+    check("THESES.md carries every thesis with a kill criterion, the freeze date and the in-season calendar", th.count("| T") >= 12 and "Dies if" in th and "September 8" in th and "Week 9" in th)
+    check("FRESH_EYES.md runs the Owner's Pass and logs the forecast", "Owner's Pass" in fe and "owner_forecast" in fe)
+    log = _j.load(open(os.path.join(HERE, "..", "data", "fresh_eyes_log.json")))
+    last = log[-1]
+    check("the latest loop entry forecasts the owner's next three asks (phrased, with answers)", isinstance(last.get("owner_forecast"), list) and len(last["owner_forecast"]) == 3 and all(x.get("ask") and x.get("answer") for x in last["owner_forecast"]))
+    check("the latest loop entry carries the Owner's Pass findings and a forecast check slot", last.get("owner_pass") and "owner_forecast_check" in last)
+
+
 def test_line_history_and_ledger_alignment():
     """Every bet knows where it opened and where it is now; the ledger is aligned with the product."""
     print("\n-- line history + ledger alignment --")
@@ -668,7 +683,7 @@ if __name__ == "__main__":
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_fresh_eyes_day3_universe(); test_fresh_eyes_day4_profile_coaches(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_fresh_eyes_day3_universe(); test_fresh_eyes_day4_profile_coaches(); test_owner_in_the_loop(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)
