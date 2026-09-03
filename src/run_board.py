@@ -34,7 +34,7 @@ def load_adp():
         return pd.DataFrame(columns=["name", "adp"])
 
 
-def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False):
+def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False, open_week=False, tag=None):
     key = key or os.environ.get("ODDS_API_KEY")
     proj = pd.read_parquet(f"{DATA}/projection_2026.parquet")
     cache_p = f"{DATA}/_raw_prop_board.parquet"; cache_t = f"{DATA}/_raw_td_board.parquet"
@@ -65,6 +65,7 @@ def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False):
         if board is not None and len(board):
             board.to_parquet(cache_p)
     if board is not None and len(board):
+        board.to_parquet(cache_p)                 # the priced board always mirrors this run
         board["status"] = board.apply(pb.classify, axis=1)
         board["reason"] = board.apply(lambda r: pb.reason(r), axis=1)
     picks = board[board["status"] == "PICK"] if board is not None and len(board) else pd.DataFrame()
@@ -148,12 +149,25 @@ def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False):
         if isinstance(x, list): return [_clean(v) for v in x]
         if isinstance(x, float) and x != x: return None
         return x
-    ranked = _clean(ranked)
-    json.dump(ranked, open(f"{DATA}/ranked_board.json", "w"), indent=1)
-    # 7) the ledger: freeze every number we put out (the grading loop's input)
+    ranked = _clean(ranked); pool = _clean(pool)
+    # 7) line history: archive this fetch (live runs only — a cached re-price has no new lines)
+    #    and annotate every row with where its number OPENED and where it is NOW.
+    import ledger, line_history as lh
     try:
-        import ledger
-        ledger.snapshot({**ranked, "pool": _clean(pool)})
+        games_list = sorted({r.get("game") for r in pool if r.get("game")} | {g.get("game") for g in ranked.get("best_games", []) or [] if g.get("game")})
+        wk_season, wk_week, _ = ledger.resolve_week(games_list, season)
+        if not cached:
+            lh.archive(wk_season, wk_week, tag=tag or ("open" if open_week else "run"))
+        ranked = lh.attach({**ranked, "pool": pool}, wk_season, wk_week)
+        pool = ranked.pop("pool", pool)
+        ranked["line_movers"] = lh.movers(wk_season, wk_week)
+    except Exception as e:
+        print("line history skipped:", e)
+    json.dump(ranked, open(f"{DATA}/ranked_board.json", "w"), indent=1)
+    # 8) the ledger: freeze every number we put out (the grading loop's input). --open marks
+    #    this run as the week's OFFICIAL open (the Tuesday card); any earlier build is a preview.
+    try:
+        ledger.snapshot({**ranked, "pool": pool}, force_open=open_week)
     except Exception as e:
         print("ledger not written:", e)
     bbp.build()
@@ -167,4 +181,6 @@ def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False):
 
 if __name__ == "__main__":
     d = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 14
-    run(days=d, rebuild_games="--games" in sys.argv, cached="--cached" in sys.argv, refresh="--refresh" in sys.argv)
+    tag = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--tag=")), None)
+    run(days=d, rebuild_games="--games" in sys.argv, cached="--cached" in sys.argv, refresh="--refresh" in sys.argv,
+        open_week="--open" in sys.argv, tag=tag)

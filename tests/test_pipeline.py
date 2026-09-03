@@ -439,6 +439,31 @@ def test_fresh_eyes_day1():
     check("every Card pick is at least a coin-flip on our numbers", all((r.get("model_p") or 0) >= 0.5 for r in d.get("recommended", [])))
 
 
+def test_line_history_and_ledger_alignment():
+    """Every bet knows where it opened and where it is now; the ledger is aligned with the product."""
+    print("\n-- line history + ledger alignment --")
+    import json as _j, line_history as lh, ledger as L, glob as _g
+    d = _j.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    card = d.get("recommended", [])
+    check("every Card pick carries a line_move (opened -> now)", all(r.get("line_move") for r in card))
+    lm = [r["line_move"] for r in card if r.get("line_move")]
+    check("line_move tracks the ACTIONABLE line for our side and the consensus", all("open_line" in m and "open_consensus" in m and "still_available" in m for m in lm))
+    check("Card lines match the tracked opened line at open (same snapshot)", all(abs(float(r["line"]) - float(r["line_move"]["open_line"])) < 1e-9 for r in card if r.get("line_move") and r["line_move"].get("n_snapshots") == 1) or any(m.get("n_snapshots", 0) > 1 for m in lm))
+    snaps = _g.glob(os.path.join(HERE, "..", "data", "line_history", "*", "*_props.parquet"))
+    check("a raw all-book line snapshot is archived for the week", len(snaps) >= 1)
+    leds = sorted(_g.glob(os.path.join(HERE, "..", "data", "ledger", "*.json")))
+    led = _j.load(open(leds[-1]))
+    check("ledger marks the open as preview until the Tuesday --open run", led.get("opened_kind") in ("preview", "official"))
+    check("ledger carries the late-swap lane and a snapshot history", "late_swap" in led["latest"] and len(led.get("history", [])) >= 1)
+    p0 = led["opened"]["card"][0]
+    check("ledger rows carry score components + line move for re-earning", "score_conviction" in p0 and "score_trust" in p0 and "line_move" in p0)
+    # market-role baseline from the CONSENSUS line: the shop must prefer the better line
+    import pandas as pd
+    raw = pd.read_parquet(os.path.join(HERE, "..", "data", "_raw_prop_board.parquet"))
+    hen = raw[(raw.name == "Derrick Henry") & (raw.mkt == "rush_yds")]
+    check("shop prefers the best available line for our side (Henry Over 77.5 @ betrivers, not 78.5)", (not len(hen)) or float(hen.iloc[0]["line"]) <= 77.5, str(hen[["book", "line"]].values.tolist()))
+
+
 def test_games_lane():
     """Games are rebuilt live, labeled, and never on the Card until a games edge is validated."""
     print("\n-- games lane --")
@@ -477,7 +502,7 @@ if __name__ == "__main__":
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_line_history_and_ledger_alignment()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

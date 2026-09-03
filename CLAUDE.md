@@ -63,6 +63,10 @@ The board is the product: every pick on it must be something a sharp would nod a
   anchors were 10-40% too wide at the high-volume end; DK's alternate-line ladders
   (`alt_ladder_probe.py`) implied the within-player shape, not ours. `data/cv_anchors.json`
   overrides `props_model.CV_ANCHORS`; the Card re-priced 5U/3O → 4/4.
+- **Market-role baseline comes from the CONSENSUS line, not each book's line** (Fresh Eyes day
+  1): with a per-book baseline every posted line implied its own number, every line looked
+  equally +EV and the shop could not prefer BetRivers 77.5 over FanDuel 78.5. Consensus = median
+  line across books; the Card now takes the best available number for our side.
 - **Feature lab (`feature_lab.py`, two held-out seasons):** game-script spread, short week and
   team pace add NOTHING to the residual model (all WASH) — the obvious handicapper angles are
   already absorbed by form, total, home and baseline. Logged in `data/feature_lab.json`.
@@ -235,8 +239,12 @@ multifactor projection, volume-CV pricing, 8-book line shop) → `td_board` (poo
 8-book TD shop, measured env, RZ defense, rail) → `games_lane` (live market-intel rows, never
 on the Card) → `rank_board` (conviction Desk Score, diversity cap, TD anchor) → `grading`
 (The Card + rails) → `board_factors`/`factor_scorecard` → `sunday_stack` + `atd_stack`
-(Touchdown Tax) + `primetime_sgp` → `ledger.snapshot` (opened/latest) → `build_board_page` →
-`output/the-board.html`. `--cached` RE-PRICES props and TDs from the cached raw lines (model
+(Touchdown Tax) + `primetime_sgp` → `line_history.archive` (every fetch: the whole raw
+market, every book — `data/line_history/<season>_w<wk>/`) + `line_history.attach` (every row
+carries `line_move`: opened → now for the ACTIONABLE line on our side, consensus, cents, with
+us / against us, still available) → `ledger.snapshot` (`--open` = the Tuesday official open;
+else a refresh into `latest`; `late_swap` lane; score components on every row) →
+`build_board_page` → `output/the-board.html` (📈 chip on every prop row; 📒 Record tab). `--cached` RE-PRICES props and TDs from the cached raw lines (model
 changes never cost credits); `--refresh` runs the data refresh first.
 Grading loop: `grade_week.py <season> <week> --close` (Sunday AM: closing lines into the
 ledger) and `grade_week.py <season> <week>` (Monday: W/L/push/void, units at price, CLV,

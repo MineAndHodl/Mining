@@ -198,6 +198,24 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                                week=pi_week(recency_week))
     except Exception as _e:
         INTEL = None; print("player intel unavailable:", _e)
+    # CONSENSUS per player-market (median line across books; de-vigged fair Over at that line).
+    # In market-baseline mode the role baseline must come from the CONSENSUS, not from each
+    # book's own line — otherwise every book's line implies its own baseline, every line looks
+    # equally +EV, and the shop can't prefer BetRivers 77.5 over FanDuel 78.5 (it took 78.5).
+    cons = {}
+    try:
+        bb = board.copy(); bb["_k"] = bb["name"].map(_norm)
+        for (k_, m_), g_ in bb.groupby(["_k", "mkt"]):
+            med = float(g_["line"].median())
+            at = g_[g_["line"] == med]
+            if not len(at): at = g_.iloc[(g_["line"] - med).abs().argsort()[:1]]
+            fo = []
+            for _, r_ in at.iterrows():
+                io2, iu2 = implied(r_["over_price"]), implied(r_["under_price"])
+                if io2 + iu2: fo.append(io2 / (io2 + iu2))
+            cons[(k_, m_)] = (med, float(np.mean(fo)) if fo else 0.5, int(g_["book"].nunique()))
+    except Exception as _e:
+        cons = {}
     out = []
     for _, b in board.iterrows():
         k = _norm(b["name"]); mkt = b["mkt"]
@@ -245,9 +263,11 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                 # the MARKET-IMPLIED MEAN is the role baseline and our edge is the discounted
                 # tilts on top of it — our alpha, the market's role read. Not anchoring: once
                 # current-season games exist we revert to our own (validated) baseline.
-                io_, iu_ = implied(b["over_price"]), implied(b["under_price"])
-                fair_o_ = io_ / (io_ + iu_) if (io_ + iu_) else 0.5
-                role_base = float(pm.market_mean(mkt, b["line"], fair_o_))
+                c_line, c_fair, _nb = cons.get((k, mkt), (None, None, 0))
+                if c_line is None:
+                    io_, iu_ = implied(b["over_price"]), implied(b["under_price"])
+                    c_fair = io_ / (io_ + iu_) if (io_ + iu_) else 0.5; c_line = b["line"]
+                role_base = float(pm.market_mean(mkt, c_line, c_fair))
                 # The mean-reversion weight was EARNED on our own baseline — a noisy sample mean
                 # that overstates high values and deserves shrinking. The market's number is
                 # already a shrunk estimate; regressing it again double-shrinks and pushed 73% of

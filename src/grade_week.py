@@ -115,18 +115,31 @@ def load_week_scores(season, week):
 
 # ------------------------------------------------------------------ closing lines
 def capture_close(season, week):
-    """Closing lines for the OPENED picks, read from the most recent raw boards (run this right
-    after the Sunday-morning run: the raw parquets ARE the closing snapshot)."""
+    """Closing lines for the OPENED picks: the last line-history snapshot (consensus line across
+    books + best price at each side), falling back to the last raw board. Run it right after
+    the Sunday-morning run (or the late-swap run) — that fetch IS the closing snapshot."""
     led = L.load(season, week)
     if not led: raise SystemExit("no ledger for that week")
     close = {"taken_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="minutes"), "props": {}, "td": {}, "games": {}}
     try:
-        pb = pd.read_parquet(f"{DATA}/_raw_prop_board.parquet"); pb["_k"] = pb["name"].map(norm_name)
-        for _, r in pb.iterrows():
-            close["props"][f"{r['_k']}|{r['mkt']}"] = {"line": float(r["line"]), "over_price": int(r.get("over_price") or 0) or None,
-                                                       "under_price": int(r.get("under_price") or 0) or None, "book": r.get("book")}
+        import line_history as lh
+        files = lh._snapshots(season, week, "props")
+        if files:
+            p = pd.read_parquet(files[-1]); close["source"] = os.path.basename(files[-1])
+            g = p.groupby(["_k", "mkt"]).agg(line=("line", "median"), over_price=("over_price", "max"), under_price=("under_price", "max"), n_books=("book", "nunique"))
+            for (k, mkt), r in g.iterrows():
+                close["props"][f"{k}|{mkt}"] = {"line": float(r["line"]), "over_price": int(r["over_price"]) if r["over_price"] == r["over_price"] else None,
+                                               "under_price": int(r["under_price"]) if r["under_price"] == r["under_price"] else None, "n_books": int(r["n_books"])}
     except Exception as e:
-        print("prop close not captured:", e)
+        print("line-history close not captured:", e)
+    if not close["props"]:
+        try:
+            pb = pd.read_parquet(f"{DATA}/_raw_prop_board.parquet"); pb["_k"] = pb["name"].map(norm_name)
+            for _, r in pb.iterrows():
+                close["props"][f"{r['_k']}|{r['mkt']}"] = {"line": float(r["line"]), "over_price": int(r.get("over_price_kept") or 0) or None,
+                                                           "under_price": int(r.get("under_price_kept") or 0) or None, "book": r.get("book")}
+        except Exception as e:
+            print("prop close not captured:", e)
     try:
         td = pd.read_parquet(f"{DATA}/_raw_td_prices.parquet"); td["_k"] = td["name"].map(norm_name)
         for _, r in td.iterrows():
@@ -182,6 +195,8 @@ def grade(season, week, write=True):
     scores = load_week_scores(season, week)
     # --- the Card
     card = [grade_pick(p, stats, scores, close) for p in opened["card"]]
+    # --- the LATE SWAP lane (from the latest snapshot — it is built Sunday, not Tuesday)
+    late = [grade_pick(p, stats, scores, close) for p in (led.get("latest") or {}).get("late_swap", [])]
     # --- the pool (calibration sample): every graded candidate, flat 1u
     pool = [grade_pick(p, stats, scores, close) for p in opened.get("pool", [])]
     # --- Sunday Stack
@@ -242,6 +257,7 @@ def grade(season, week, write=True):
 
     results = {"graded_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="minutes"),
                "card": {"picks": card, "record": _rec(card)},
+               "late_swap": {"picks": late, "record": _rec(late)},
                "pool": {"record": _rec(pool), "by_grade": _cal(pool, "grade"), "by_model_p": _cal(pool, "model_p")},
                "stack": stack_res, "tax": tax_res, "sgps": sgp_res,
                "games": {"rows": games_res, "record": _rec(games_res)}}
@@ -257,6 +273,7 @@ def _append_record(season, week, results):
     rec = json.load(open(p)) if os.path.exists(p) else {"weeks": []}
     rec["weeks"] = [w for w in rec["weeks"] if not (w["season"] == season and w["week"] == week)]
     rec["weeks"].append({"season": season, "week": week, "card": results["card"]["record"], "pool": results["pool"]["record"],
+                         "late_swap": results.get("late_swap", {}).get("record"),
                          "stack": (results["stack"] or {}).get("result"), "stack_units": (results["stack"] or {}).get("units_won"),
                          "tax": (results["tax"] or {}).get("result"), "tax_units": (results["tax"] or {}).get("units_won"),
                          "sgps": [(s["result"], s["hits"], s["n"]) for s in results["sgps"]],
@@ -276,6 +293,8 @@ def summary_text(results):
              + (f", avg CLV {c['clv_avg']:+.2f}" if c.get("clv_avg") is not None else "")]
     for pk in results["card"]["picks"]:
         lines.append(f"  {pk['result']:5s} {pk['name']} {pk['side']} {pk['line']} ({pk['price']:+d}) actual {pk['actual']} grade {pk['grade']}")
+    ls = results.get("late_swap", {}).get("record") or {}
+    if ls.get("w", 0) + ls.get("l", 0): lines.append(f"LATE SWAP: {ls['w']}-{ls['l']} ({ls['units_flat']:+.2f}u flat)")
     if results["stack"]: lines.append(f"SUNDAY STACK: {results['stack']['result']} ({results['stack']['price']:+d})")
     if results["tax"]: lines.append(f"TOUCHDOWN TAX: {results['tax']['result']} ({results['tax']['price']:+d})")
     for s in results["sgps"]: lines.append(f"SGP {s['game']}: {s['hits']}/{s['n']} legs hit — {s['result']}")

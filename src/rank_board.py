@@ -67,9 +67,16 @@ def _trust(row):
 
 def prop_score(row):
     """Desk Score for a prop pick: conviction (edge + hit-probability) + trust (sample depth,
-    market breadth), times the investigate verdict multiplier (SUSPECT cut, CONFIRMED boosted)."""
+    market breadth), times the investigate verdict multiplier (SUSPECT cut, CONFIRMED boosted).
+    The components are written onto the row (score_conviction / score_trust) so the grading
+    loop can re-earn the ASSUMED constants (EDGE_PEAK, the tail discount, the trust term)."""
     base = _desk_score(row.get("edge"), row.get("model_p"), 1.0)
-    s = (base + _trust(row)) * float(row.get("score_mult", 1.0) or 1.0)
+    t = _trust(row)
+    s = (base + t) * float(row.get("score_mult", 1.0) or 1.0)
+    try:
+        row["score_conviction"] = base; row["score_trust"] = round(float(t), 2)
+    except Exception:
+        pass
     return round(float(np.clip(s, 20, 95)), 1)
 
 

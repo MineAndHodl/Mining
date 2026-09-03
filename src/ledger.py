@@ -4,11 +4,19 @@ This is the foundation of the forward-grading loop (THE_DESK_PROMPT work order 2
 that can't be graded can't improve. Each weekly run snapshots the whole product into
 data/ledger/<season>_w<week>.json:
 
-  opened  — the FIRST snapshot of the week (the Tuesday numbers). Never overwritten: this is
-            what "beat the close" is measured against.
-  latest  — the most recent snapshot (the Sunday-morning refresh overwrites it).
-  close   — closing lines captured for the opened picks (grade_week.capture_close).
+  opened  — the week's OFFICIAL open: the Tuesday card, run with `run_board.py --open`. This
+            is what "beat the close" and the record are measured against. Before an official
+            open exists, the first build stands in as a "preview" open (opened_kind) and the
+            official run replaces it; an official open is never replaced.
+  latest  — the most recent snapshot (Thursday refresh, Sunday final, late swap overwrite it).
+  history — one line per snapshot taken (when, how many Card / late-swap rows, kind).
+  close   — closing lines for the opened picks (grade_week.capture_close: the last
+            line-history snapshot before kickoff — consensus line + best price at our side).
   results — filled by grade_week.py after the games: W/L/push/void, units, CLV.
+  late_swap — the Sunday 11:40 ET lane: players lifted by a teammate's game-day absence who
+            clear the Card's bar; its own record, never retro-added to the opened Card.
+Every row also carries its line_move (opened → now, from line_history) and its Desk Score
+components (score_conviction / score_trust) so the loop can re-earn the assumed constants.
 
 Each snapshot carries: The Card (every recommended straight bet with its model number, price,
 grade, units and the factor contributions that produced it), the graded pool (every scored
@@ -33,8 +41,9 @@ ABBR = {"Arizona Cardinals":"ARI","Atlanta Falcons":"ATL","Baltimore Ravens":"BA
 
 PICK_FIELDS = ["name", "game", "cat", "side", "line", "price", "book", "our_num", "market_num", "model_p", "edge",
                "score", "grade", "grade_sized", "units", "recommended", "rail", "thesis", "confidence", "n_books",
-               "contrib", "inj_lean", "inj_status", "intel_lean", "intel_signals", "mkt_ratio", "mkt_flag", "position",
-               "offseason", "verdict"]
+               "shop_adv", "contrib", "inj_lean", "inj_status", "role_mult", "role_note", "intel_lean", "intel_signals",
+               "intel_hard", "mkt_ratio", "mkt_flag", "position", "offseason", "verdict", "score_mult", "line_move",
+               "score_conviction", "score_trust"]
 
 
 def game_teams(game):
@@ -73,9 +82,14 @@ def build_snapshot(ranked):
                    | {g.get("game") for g in ranked.get("best_games", []) or [] if g.get("game")})
     season, week, kickoff = resolve_week(games)
     pool = ranked.get("pool") or []
+    # LATE SWAP lane: a teammate's game-day absence lifted this player's number (role cascade),
+    # and he clears the Card's own bar — its own record, never retro-added to the opened Card
+    late = [_pick(r) for r in pool if not r.get("kind") and r.get("role_note") and "is out" in str(r.get("role_note"))
+            and r.get("grade") in ("A+", "A", "A-", "B+") and (r.get("model_p") or 0) >= 0.5]
     snap = {"season": season, "week": week, "first_kickoff": kickoff,
             "generated_at": ranked.get("generated_at"), "taken_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="minutes"),
             "card": [_pick(r) for r in ranked.get("recommended", []) if not r.get("kind")],
+            "late_swap": late,
             "pool": [_pick(r) for r in pool if r.get("grade") in ("A+", "A", "A-", "B+", "B")],
             "sunday_stack": ranked.get("sunday_stack"),
             "td_stack": ranked.get("td_stack"),
@@ -91,18 +105,24 @@ def ledger_path(season, week):
 
 
 def snapshot(ranked, force_open=False):
-    """Write the week's ledger: `latest` always; `opened` only the first time (or force_open)."""
+    """Write the week's ledger: `latest` always. `opened` = the week's OFFICIAL open (the Tuesday
+    card, run with --open); until an official open exists the first build stands in as a
+    'preview' open and the next official run replaces it. An official open is never replaced."""
     snap = build_snapshot(ranked)
     if snap["week"] is None:
         print("ledger: could not resolve the week from the schedule — not written"); return None
     os.makedirs(LEDGER_DIR, exist_ok=True)
     path = ledger_path(snap["season"], snap["week"])
     led = json.load(open(path)) if os.path.exists(path) else {"season": snap["season"], "week": snap["week"], "status": "open"}
-    if "opened" not in led or force_open:
-        led["opened"] = snap
+    if "opened" not in led:
+        led["opened"] = snap; led["opened_kind"] = "official" if force_open else "preview"
+    elif force_open and led.get("opened_kind") != "official":
+        led["opened"] = snap; led["opened_kind"] = "official"
     led["latest"] = snap
+    led.setdefault("history", []).append({"taken_at": snap["taken_at"], "n_card": len(snap["card"]), "n_late_swap": len(snap["late_swap"]),
+                                          "kind": "official" if force_open else "refresh"})
     json.dump(led, open(path, "w"), indent=1)
-    print(f"ledger: {os.path.basename(path)} — card {len(snap['card'])}, pool {len(snap['pool'])}, "
+    print(f"ledger: {os.path.basename(path)} [{led.get('opened_kind')} open] — card {len(snap['card'])}, late-swap {len(snap['late_swap'])}, pool {len(snap['pool'])}, "
           f"stack {'yes' if snap['sunday_stack'] else 'no'}, tax {'yes' if snap['td_stack'] else 'no'}, sgps {len(snap['sgps'])}, games {len(snap['games'])}")
     return path
 

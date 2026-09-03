@@ -91,6 +91,9 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 .empty{color:var(--dim);font-size:13px;padding:20px;text-align:center}
 .note{font-size:12px;color:var(--dim);margin-top:22px;line-height:1.55;border-top:1px solid var(--line);padding-top:14px}
 .count{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.chip.mv{text-transform:none;letter-spacing:0;font-weight:600;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.chip.mv.with{color:var(--green);border-color:var(--green-d)}
+.chip.mv.against{color:var(--amber);border-color:var(--amber)}
 </style>
 
 <div class="wrap">
@@ -173,6 +176,19 @@ function statusTags(p){
   if(p.cap_note) t+=`<span class="gtag" title="${p.cap_note}">wk-1 cap</span>`;
   return t;
 }
+function lineMove(p){
+  const m=p.line_move; if(!m) return "";
+  if(p.cat==="anytime_td"){
+    const o=(m.open_price>0?"+":"")+m.open_price, n=(m.now_price>0?"+":"")+m.now_price;
+    if(m.n_snapshots<2||m.moved_pts==null) return `<span class="chip mv">📈 opened ${o} ${m.open_book||''} · tracking</span>`;
+    const w=m.moved_pts>0; return `<span class="chip mv ${w?'with':'against'}">📈 ${o} → ${n} · market ${w?'▲':'▼'} ${Math.abs(m.moved_pts)}% ${w?'toward him':'away'}</span>`;
+  }
+  const op=m.open_price!=null?((m.open_price>0?"+":"")+m.open_price):"", np_=m.now_price!=null?((m.now_price>0?"+":"")+m.now_price):"";
+  if(m.n_snapshots<2) return `<span class="chip mv">📈 opened ${m.open_line} (${op}) ${m.opened_at||''} · tracking</span>`;
+  if(m.moved_pts===0){ const c=m.moved_cents||0; return `<span class="chip mv">📈 opened ${m.open_line} (${op}) → ${m.now_line} (${np_}) · line unchanged${c?` · price ${c>0?'+':''}${c}¢`:''}</span>`; }
+  const w=m.with_us; const dir=w?'moved WITH us':'moved AGAINST us';
+  return `<span class="chip mv ${w?'with':'against'}">📈 ${m.open_line} (${op}) → ${m.now_line} (${np_}) · ${w?'+':'−'}${Math.abs(m.moved_pts)} ${dir}${w?' · CLV so far':' · better number now'}</span>`;
+}
 function propRow(p,i){
   const sc=+p.score||0, top=i<3&&active==="best"&&p.recommended;
   const mk=CATLABEL[p.cat]||p.cat;
@@ -182,7 +198,7 @@ function propRow(p,i){
   return `<div class="play ${top?'top':''} ${p.recommended?'':'lean'}" onclick="this.querySelector('.why').classList.toggle('hide')">
     <div class="rank">${i+1}</div>
     <div class="pmain"><div class="nm">${top?'🔥 ':''}${p.name} <span style="color:var(--muted);font-weight:600">${p.side||''}</span></div>
-      <div class="meta">${statusTags(p)}<span class="chip mk">${mk}</span>${p.verdict&&p.verdict!=="KEEP"?`<span class="vbadge v-${p.verdict.toLowerCase()}">${p.verdict==="CONFIRMED"?"✓ confirmed":p.verdict}</span>`:""}<span class="num">${num}</span> <span class="edge${(typeof p.edge==="number"&&p.edge<0)?" neg":""}">${fmtEdge(p.edge)}</span> <span class="num" style="color:var(--muted)">${price} ${p.book||''}${p.n_books>1?` · best of ${p.n_books}`:''}</span></div></div>
+      <div class="meta">${statusTags(p)}<span class="chip mk">${mk}</span>${p.verdict&&p.verdict!=="KEEP"?`<span class="vbadge v-${p.verdict.toLowerCase()}">${p.verdict==="CONFIRMED"?"✓ confirmed":p.verdict}</span>`:""}<span class="num">${num}</span> <span class="edge${(typeof p.edge==="number"&&p.edge<0)?" neg":""}">${fmtEdge(p.edge)}</span> <span class="num" style="color:var(--muted)">${price} ${p.book||''}${p.n_books>1?` · best of ${p.n_books}`:''}</span>${lineMove(p)}</div></div>
     ${gradeBlock(p)}
     <div class="why hide">${p.reason||'—'}${renderCard(p.scorecard, p.side)}</div>
   </div>`;
