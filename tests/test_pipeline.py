@@ -421,6 +421,24 @@ def test_ledger_and_grader():
     check("parlay: a lost leg loses, a void leg (DNP) drops out", overall == "LOSS" and gw.grade_parlay(legs[:1] + legs[2:], stats, {}, {}, f)[1] == "WIN")
 
 
+def test_fresh_eyes_day1():
+    """Day-1 findings: measured within-player CV anchors; the public-record rail on the Card."""
+    print("\n-- fresh eyes day 1: distribution + record rail --")
+    import props_model as pm, grading, json as _j
+    check("CV anchors come from the within-player measurement (data/cv_anchors.json)",
+          os.path.exists(os.path.join(HERE, "..", "data", "cv_anchors.json")) and abs(pm.cv_for("pass_yds", 240) - 0.29) < 0.03, f"{pm.cv_for('pass_yds', 240):.3f}")
+    check("starting-QB passing spread matches the book's implied shape (~.27-.30), not the old .40", pm.cv_for("pass_yds", 250) < 0.32)
+    check("receptions anchor is EXTRA dispersion (~.2), not total CV (~.5)", pm.cv_for("receptions", 5.5) < 0.3)
+    check("workhorse rush CV ~.45-.50 (was .53)", 0.42 <= pm.cv_for("rush_yds", 90) <= 0.50, f"{pm.cv_for('rush_yds', 90):.3f}")
+    rows = [{"score": 90, "model_p": 0.42, "cat": "anytime_td", "line": 0.5, "name": "Dog", "game": "g"},
+            {"score": 85, "model_p": 0.58, "cat": "rec_yds", "line": 50.5, "name": "Fav", "game": "g"}]
+    rec, _ = grading.apply(rows, weeks_played=5)
+    check("public-record rail: a +EV 42% touchdown dog cannot be on the Card", not rows[0]["recommended"] and "Touchdown Tax" in (rows[0]["rail"] or ""))
+    check("a 58% play stays on the Card", rows[1]["recommended"])
+    d = _j.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    check("every Card pick is at least a coin-flip on our numbers", all((r.get("model_p") or 0) >= 0.5 for r in d.get("recommended", [])))
+
+
 def test_games_lane():
     """Games are rebuilt live, labeled, and never on the Card until a games edge is validated."""
     print("\n-- games lane --")
@@ -459,7 +477,7 @@ if __name__ == "__main__":
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

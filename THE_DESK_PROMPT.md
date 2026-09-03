@@ -111,6 +111,15 @@ every sent pick against the close and the outcome, re-earn the weights (recency,
 intel, each lever), and re-check calibration by grade. That loop is the engine; this review is
 the steering. Neither needs the owner's input.
 
+## 2c. The daily Fresh Eyes loop (Alex, 2026-09-02) — see FRESH_EYES.md
+
+Every day until the official first model launches (and "improve" ever after): read the brain,
+put on three hats — the maniacal handicapper (where is unpriced edge?), the quant (does it all
+fit; what is the weakest assumption?), the businessman (marketable, fun, makes money?) —
+critique today's Card adversarially, choose ONE thing, test it the repo's way, ship or shelve
+honestly, and log it in data/fresh_eyes_log.json. Small, replicated, shipped. Day 1 found our
+own distribution too wide (the book was right) and fixed it.
+
 ## 3. What is already proven — carry forward, do not rederive
 
 - **Recency is the core yardage edge.** Last-3 form vs baseline predicts the residual; +8.6%
@@ -124,7 +133,11 @@ the steering. Neither needs the owner's input.
 - **Week-1 baseline must be the market's role read.** Every absurd Week-1 edge traced to a
   stale last-season baseline blind to a role change the market had priced. Market-implied
   mean = role baseline in Week 1; our tilts on top; revert once games exist.
-- **CV is volume-dependent** (rush 0.83 low-usage → 0.53 workhorse; rec 0.89 → 0.57).
+- **CV is volume-dependent, and it must be measured WITHIN a player's season** (`cv_measure.py`,
+  5 seasons): pass .55/.39/.29/.28 at 160/205/240/275; rec 1.01→.53 from 13 to 96 yds; rush
+  1.09→.45 from 11 to 97; receptions' EXTRA dispersion beyond Poisson ~.20. The earlier anchors
+  were pooled across players and were 10-40% too wide at the top; DK's alternate ladders agree
+  with the within-player numbers. `data/cv_anchors.json` overrides `props_model.CV_ANCHORS`.
 - **Mean ≠ median on skewed yardage**; compare our mean to the market-implied mean, never to
   the line.
 - **Correlations are measured**: QB-WR 0.696, WR-WR 0.507, same-player cross-skill ~0.10.

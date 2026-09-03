@@ -51,6 +51,11 @@ EARLY_FLOOR = "A-"
 # Micro-prop lines are not Card material: thin markets, often limited, and a public record built
 # on "QB under 5.5 rushing yards" reads like noise. Shown as leans; never on the Card.
 MIN_CARD_LINE = {"rush_yds": 15.0, "rec_yds": 10.0, "receptions": 2.5, "pass_yds": 150.0}
+# PUBLIC-RECORD RAIL (Fresh Eyes day 1, the businessman's hat): the Card is a hit-rate product
+# as much as a units product — followers read W-L before ROI. A +230 touchdown dog at 42% is
+# +EV but loses 58% of the time; on the Card it drags the record even when it is right. Card
+# picks must be at least coin-flips on our numbers; +EV dogs live in the Touchdown Tax lane.
+CARD_MIN_P = 0.50
 # validated macro theses -> cap override. Empty until a thesis has a walk-forward backtest.
 # e.g. {"pass_yds:Under": 5}
 MACRO_THESES = {}
@@ -129,6 +134,10 @@ def apply(rows, weeks_played=0):
             continue
         if not r.get("kind") and float(r.get("line") or 0) < MIN_CARD_LINE.get(r.get("cat"), 0):
             r["recommended"] = False; r["rail"] = "micro-prop line (not card material)"; r["units"] = 0.0; continue
+        if r.get("model_p") is not None and float(r.get("model_p")) < CARD_MIN_P:
+            r["recommended"] = False; r["units"] = 0.0
+            r["rail"] = ("public-record rail: under 50% to hit on our numbers — +EV, but it lives in the "
+                         "Touchdown Tax lane, not on the Card"); continue
         if len(rec) >= slate_max:
             r["recommended"] = False; r["rail"] = f"card cap ({slate_max} picks while the record is young)"; r["units"] = 0.0; continue
         t = r["thesis"]; gm = r.get("game") or r.get("pick", "")

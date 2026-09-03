@@ -10,6 +10,7 @@ Per player-game we project a distribution of the stat and price P(over line):
 Calibrated out-of-sample: predicted P(X>threshold) must match realized rates.
 Only edges that beat the vig AND clear a data-confidence floor become picks.
 """
+import os
 import numpy as np
 import pandas as pd
 from scipy.stats import gamma, norm
@@ -34,6 +35,19 @@ CV_ANCHORS = {
     "kicking_points": [(7, 0.48)],
     "field_goals":    [(1.5, 0.55)],
 }
+# MEASURED PROPERLY (cv_measure.py, Fresh Eyes day 1): the anchors above were pooled by volume
+# bucket ACROSS players (between-player differences inflate the spread) and receptions' total
+# CV was applied as extra dispersion on top of Poisson (variance double-counted). The DK
+# alternate-line ladders (alt_ladder_probe.py) implied a distribution 10-40% narrower at the
+# high-volume end — and the within-player-season measurement agrees with the book, not with
+# us. data/cv_anchors.json (median within-player-season CV by tier, 2021-25, x1.03) overrides.
+try:
+    import json as _json
+    _CVJ = _json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "cv_anchors.json")))
+    for _m, _pts in _CVJ.get("anchors", {}).items():
+        if _pts: CV_ANCHORS[_m] = [tuple(p) for p in _pts]
+except Exception:
+    pass
 DIST = {"rec_yds": "gamma", "rush_yds": "gamma", "pass_yds": "normal", "receptions": "count",
         "rush_att": "count", "pass_att": "normal", "pass_cmp": "normal",
         "kicking_points": "normal", "field_goals": "count"}

@@ -1,0 +1,71 @@
+[
+ {
+  "date": "2026-09-02",
+  "day": 1,
+  "hats": {
+   "handicapper": [
+    "DK alternate-line ladders: does the book price the SHAPE of a player's distribution right? (probe built: alt_ladder_probe.py)",
+    "cross-market consistency: implied receptions x YPR vs the yards line (log at open, grade later)",
+    "game-day inactives arbitrage: price the backup off the measured cascade before the books adjust (late-swap job)"
+   ],
+   "quant": [
+    "weakest assumption: our CV anchors were pooled ACROSS players by volume bucket; the honest quantity is within-player-season CV",
+    "receptions used total CV as extra dispersion on top of Poisson -> variance double counted",
+    "Desk Score constants (edge peak, tail discount, trust term, intel weight) remain ASSUMED -> owed to the graded pool"
+   ],
+   "business": [
+    "the Card is a hit-rate product: followers read W-L before ROI -> CARD_MIN_P .50; +EV TD dogs live in the Touchdown Tax",
+    "a Record tab on the board (transparency is the brand)",
+    "the 11:40 ET late swap as the paid-tier hook; the Monday 'beat the close' report card as free content"
+   ]
+  },
+  "critiques": [
+   "the pass-yds distribution was 40% too wide for starting QBs (ours .40 vs real .28; DK .27) -> every pass edge was shrunk toward 50%",
+   "Johnston +230 anytime TD (42%) sat on the Card: +EV but a 58% loser on the public record",
+   "games lane skipped on an SSL hiccup and fell back to the last labeled build (fallback works; note it)"
+  ],
+  "tested": {
+   "feature_lab": {
+    "spread_c": "WASH",
+    "short_week": "WASH",
+    "pace_c": "WASH"
+   },
+   "alt_ladder_probe": "47 DK ladders fit (rmse<=.03): book CV falls with volume like reality; ours was too wide at the top",
+   "cv_measure": "median within-player-season CV by tier, 2021-25 (n=3700 player-seasons)"
+  },
+  "numbers": {
+   "pass_yds_cv": {
+    "old_anchor_240": 0.395,
+    "within_player_240": 0.284,
+    "dk_ladder": 0.266,
+    "new": 0.292
+   },
+   "rush_yds_cv_90": {
+    "old": 0.53,
+    "new": 0.467
+   },
+   "rec_yds_cv_95": {
+    "old": 0.57,
+    "new": 0.532
+   },
+   "receptions_extra_dispersion": {
+    "old_total_cv_misapplied": 0.46,
+    "new": 0.2
+   },
+   "card_before": "5 Unders / 3 Overs",
+   "card_after": "4 Unders / 4 Overs"
+  },
+  "verdict": "ADOPTED: measured CV anchors (props re-priced); ADOPTED: public-record rail; SHIPPED: Record tab, late-swap job + inactives override; WASH: spread/short-week/pace features",
+  "shipped": [
+   "src/cv_measure.py + data/cv_anchors.json wired into props_model",
+   "src/alt_ladder_probe.py + data/alt_ladder_probe.json",
+   "src/feature_lab.py + data/feature_lab.json",
+   "grading.CARD_MIN_P",
+   "Record tab",
+   "injury_layer inactives override",
+   "Desk: Sunday late swap trigger",
+   "FRESH_EYES.md"
+  ],
+  "tomorrow": "early-exit mixture for the left tail (zero-inflated component) OR posting-timing read once a second ledger snapshot exists; re-probe alt ladders after the CV fix for a vig-curve edge"
+ }
+]

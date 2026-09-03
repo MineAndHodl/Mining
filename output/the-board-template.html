@@ -113,7 +113,7 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 <script>
 const D = /*DATA*/{};
 const CATLABEL={rec_yds:"Receiving Yds",rush_yds:"Rushing Yds",receptions:"Receptions",anytime_td:"Anytime TD",pass_yds:"Passing Yds",rush_att:"Rush Att"};
-const VIEWS=[["best","🎫 The Card"],["games","🏈 Games"],["stack","🧱 Sunday Stack"],["tdstack","🎯 Touchdown Tax"]];
+const VIEWS=[["best","🎫 The Card"],["games","🏈 Games"],["stack","🧱 Sunday Stack"],["tdstack","🎯 Touchdown Tax"],["record","📒 Record"]];
 if((D.primetime_sgps||[]).length) VIEWS.push(["sgp","🏟️ Primetime SGP"]);
 Object.keys(D.by_category||{}).forEach(c=>VIEWS.push([c,CATLABEL[c]||c]));
 const HINTS={best:"Top plays across every category, ranked by conviction.",games:"Spreads, totals & moneylines — best value on the slate."};
@@ -218,6 +218,16 @@ function render(){
       <div class="pscore"><div class="v" style="color:var(--gold)">${(m.combined_american>0?'+':'')+m.combined_american}</div><div class="l">Payout</div></div></div>`+
       m.legs.map((l,i)=>`<div class="play" style="cursor:default"><div class="rank">${i+1}</div><div class="pmain"><div class="nm" style="font-size:15px">${l.leg}</div><div class="meta"><span class="grade" style="font-size:14px;color:${GCOL[l.grade]||'var(--dim)'}">${l.grade||''}</span><span class="num">${l.price>0?'+':''}${l.price}</span> <span class="num" style="color:var(--muted)">model ${Math.round((l.model_p||0)*100)}%</span> <span class="num" style="color:var(--dim)">${l.game||''}</span></div></div><div class="pscore"></div></div>`).join('')+
       `<div class="note" style="margin-top:12px">${m.note||''}</div>`;
+    return;
+  }
+  if(active==="record"){
+    hint.textContent="THE RECORD — every Card pick graded against the closing line and the result, week by week. Only the Card counts; the Sunday Stack, Touchdown Tax and primetime lottos keep their own records. Numbers are frozen when we post them (the ledger), never edited after.";
+    const R=D.record; const wks=(R&&R.weeks)||[];
+    if(!wks.length){L.innerHTML='<div class="empty">The record starts Week 1. Every pick on the Card is frozen in the ledger the moment it posts and graded Monday: W-L, units at the posted price, and whether we beat the closing line.</div>';return;}
+    const t=R.card_season||{w:0,l:0,push:0,units:0};
+    const fmt=(u)=>(u>=0?'+':'')+(Math.round(u*100)/100).toFixed(2)+'u';
+    L.innerHTML=`<div class="play top" style="cursor:default"><div class="rank">📒</div><div class="pmain"><div class="nm">Season: ${t.w}-${t.l}${t.push?'-'+t.push:''}</div><div class="meta"><span class="num">${fmt(t.units)} sized</span></div></div><div class="pscore"><div class="v" style="color:${t.units>=0?'var(--green)':'var(--bad)'}">${fmt(t.units)}</div><div class="l">Net</div></div></div>`+
+      wks.slice().reverse().map(w=>{const c=w.card||{};return `<div class="play" style="cursor:default"><div class="rank">W${w.week}</div><div class="pmain"><div class="nm" style="font-size:15px">The Card ${c.w}-${c.l}${c.push?'-'+c.push:''} · ${fmt(c.units||0)}</div><div class="meta"><span class="num">${c.clv_avg!=null?('avg CLV '+(c.clv_avg>=0?'+':'')+c.clv_avg+' pts'):''}</span><span class="num" style="color:var(--muted)">stack ${w.stack||'—'} · tax ${w.tax||'—'} · SGPs ${(w.sgps||[]).map(s=>s[1]+'/'+s[2]).join(', ')||'—'}</span></div></div><div class="pscore"></div></div>`;}).join('');
     return;
   }
   if(active==="tdstack"){

@@ -15,6 +15,11 @@ def build(ranked_json=None):
         if isinstance(x, list): return [slim(v) for v in x]
         return x
     page = slim(ranked); page.pop("pool_summary", None)
+    # the public record (data/record.json, written by grade_week.py) — the transparency product
+    try:
+        page["record"] = json.load(open(os.path.join(HERE, "..", "data", "record.json")))
+    except Exception:
+        page["record"] = None
     html=tmpl.replace("/*DATA*/{}", json.dumps(page, separators=(",", ":")))
     open(os.path.join(OUT,"the-board.html"),"w").write(html)
     return os.path.join(OUT,"the-board.html")

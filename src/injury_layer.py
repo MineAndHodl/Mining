@@ -42,8 +42,8 @@ class InjuryLayer:
     def __init__(self, season=2026, week=None):
         self.season = season; self.week = week
         self.coef = json.load(open(f"{DATA}/role_multiplier.json")) if os.path.exists(f"{DATA}/role_multiplier.json") else {}
-        self.report = self._load_report()
         self.roles, self.shares = self._roles_from_last_season()
+        self.report = self._load_report()
 
     # ------------------------------------------------------------------ data
     def _load_report(self):
@@ -52,10 +52,36 @@ class InjuryLayer:
         except Exception:
             inj = pd.DataFrame()
         if not len(inj):
-            return pd.DataFrame(columns=["week", "team", "gsis_id", "full_name", "position", "report_status", "practice_status", "report_primary_injury"])
+            empty = pd.DataFrame(columns=["week", "team", "gsis_id", "full_name", "position", "report_status", "practice_status", "report_primary_injury", "_k"])
+            return self._apply_inactives(empty, self.week if self.week is not None else 1)
         wk = self.week if self.week is not None else int(inj["week"].max())
         cur = inj[inj["week"] == wk].copy()
         cur["_k"] = cur["full_name"].map(norm_name)
+        return self._apply_inactives(cur, wk)
+
+    def _apply_inactives(self, cur, wk):
+        """GAME-DAY INACTIVES OVERRIDE (the Sunday late-swap run): official inactives drop ~90
+        minutes before kickoff, hours after the last injury report. data/inactives_<season>_w<wk>.json
+        = {"out": ["Player Name", ...], "active": ["Player Name", ...]} — names ruled OUT are added
+        to (or overwrite) the report as Out; names confirmed ACTIVE clear a Questionable/Doubtful."""
+        try:
+            path = f"{DATA}/inactives_{self.season}_w{int(wk):02d}.json"
+            if not os.path.exists(path): return cur
+            ov = json.load(open(path))
+        except Exception:
+            return cur
+        cur = cur.copy()
+        for nm in ov.get("active", []):
+            cur = cur[cur["_k"] != norm_name(nm)]
+        rows = []
+        for nm in ov.get("out", []):
+            k = norm_name(nm)
+            cur = cur[cur["_k"] != k]
+            tm_role = self.roles.get(k) if hasattr(self, "roles") else None
+            rows.append({"week": wk, "team": tm_role[0] if tm_role else None, "gsis_id": None, "full_name": nm, "position": None,
+                         "report_status": "Out", "practice_status": None, "report_primary_injury": "inactive (game day)", "_k": k})
+        if rows:
+            cur = pd.concat([cur, pd.DataFrame(rows)], ignore_index=True)
         return cur
 
     def _roles_from_last_season(self):

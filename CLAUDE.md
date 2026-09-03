@@ -2,7 +2,8 @@
 
 **The full operating prompt is `THE_DESK_PROMPT.md` — read it first; this file is the short form.
 `IDEAS_LEDGER.md` is the audit of every idea Alex ever raised and its honest status — read it
-before proposing anything "new".**
+before proposing anything "new". `FRESH_EYES.md` is the daily improvement loop (three hats,
+one shipped improvement a day, logged in `data/fresh_eyes_log.json`) — "improve" means run it.**
 
 Read this first, every session. It is the accumulated clarity of a long iterative build:
 what we're doing, how we work, what's been proven, what every variable is for, and what's
@@ -55,8 +56,16 @@ The board is the product: every pick on it must be something a sharp would nod a
   total_c, home, base_c]; walk-forward weights; stable across L2 3-30). `multifactor.py`.
 - **Market-anchoring is circular.** Copying the market guarantees no edge; "market efficient"
   was a modeling artifact.
-- **CV is volume-dependent.** rush_yds CV 0.83 low-usage vs ~0.53 for 70+-yd backs; rec_yds
-  0.89 vs 0.57; a workhorse is steadier. `props_model.cv_for`.
+- **CV is volume-dependent — measured WITHIN a player's season (`cv_measure.py`, Fresh Eyes
+  day 1).** pass_yds .55/.39/.29/.28 at 160/205/240/275; rec_yds 1.01 → .53 (13 → 96 yds);
+  rush_yds 1.09 → .45 (11 → 97); receptions' EXTRA dispersion beyond Poisson ~.20 (the old
+  anchor applied total CV as extra dispersion — variance double-counted). The earlier pooled
+  anchors were 10-40% too wide at the high-volume end; DK's alternate-line ladders
+  (`alt_ladder_probe.py`) implied the within-player shape, not ours. `data/cv_anchors.json`
+  overrides `props_model.CV_ANCHORS`; the Card re-priced 5U/3O → 4/4.
+- **Feature lab (`feature_lab.py`, two held-out seasons):** game-script spread, short week and
+  team pace add NOTHING to the residual model (all WASH) — the obvious handicapper angles are
+  already absorbed by form, total, home and baseline. Logged in `data/feature_lab.json`.
 - **Mean ≠ median on skewed yardage**, but the correction is modest for high-volume players;
   compare our mean to the market-implied mean, never to the line itself.
 - **Correlations are measured, not assumed:** QB-WR 0.696, two-WR 0.507, same-player
@@ -84,7 +93,8 @@ The board is the product: every pick on it must be something a sharp would nod a
   median +5.6% (was +44% / +11%).
 - **Grades & rails (`grading.py`):** Desk Score is a conviction rank, not a win probability.
   A+ >=82 (2u), A 76-81 (1.5u), A- 70-75 (1u), B+ 64-69 (0.5u, the recommendation floor),
-  B lean (shown, not counted), C reference. Trust term (sample depth, book breadth) separates
+  B lean (shown, not counted), C reference. PUBLIC-RECORD RAIL: a Card pick must be >=50% to
+  hit on our numbers (CARD_MIN_P) — +EV touchdown dogs live in the Touchdown Tax lane. Trust term (sample depth, book breadth) separates
   the top. Rails: early-season sizing cap (wk 0-1 A-, wk 2-3 A), max 3 per thesis, 2 per
   game, 15u/week; a validated macro thesis (backtested, in MACRO_THESES) may raise its cap.
   Record rule: only recommended straight bets count; parlays are a separate lotto-lane record.
@@ -232,8 +242,10 @@ Grading loop: `grade_week.py <season> <week> --close` (Sunday AM: closing lines 
 ledger) and `grade_week.py <season> <week>` (Monday: W/L/push/void, units at price, CLV,
 separate records per lane, calibration by grade and by model_p over the whole pool,
 `data/record.json`). Scheduled jobs (Tuesday card, Thursday Touchdown Tax, Sunday final,
-Monday grading, Daily Research Bot) clone GitHub and run exactly these commands; each GUARDs
-that the repo is current and emails "SKIPPED — repo behind" otherwise. Runtime parquets are
+Monday grading, Sunday 11:40 ET late swap with the game-day inactives override
+`data/inactives_<season>_w<wk>.json`, and the daily Fresh Eyes loop) clone GitHub and run
+exactly these commands; each GUARDs that the repo is current and emails "SKIPPED — repo
+behind" otherwise. Runtime parquets are
 committed (the weekly run must reproduce from a fresh clone).
 Research/validation: `multifactor.py`, `recency.py`, `xtd_model.py`, `xtd_validate.py`,
 `correlation_lab.py`, `clv_engine.py`. Tests: `python3 tests/test_pipeline.py` (must be green).

@@ -1,0 +1,281 @@
+{
+ "spread_c": {
+  "feature": "spread_c",
+  "by_season": {
+   "2024": {
+    "rush_yds": {
+     "hit_base": 0.604,
+     "hit_with": 0.6052,
+     "d_hit": 0.0012,
+     "mae_base": 18.527,
+     "mae_with": 18.515,
+     "d_mae": 0.012,
+     "weight": -0.024,
+     "n": 2008
+    },
+    "rec_yds": {
+     "hit_base": 0.6,
+     "hit_with": 0.5955,
+     "d_hit": -0.0045,
+     "mae_base": 19.282,
+     "mae_with": 19.283,
+     "d_mae": -0.001,
+     "weight": -0.103,
+     "n": 3911
+    },
+    "receptions": {
+     "hit_base": 0.6249,
+     "hit_with": 0.6166,
+     "d_hit": -0.0083,
+     "mae_base": 1.429,
+     "mae_with": 1.43,
+     "d_mae": -0.001,
+     "weight": -0.005,
+     "n": 3911
+    },
+    "pass_yds": {
+     "hit_base": 0.6667,
+     "hit_with": 0.6417,
+     "d_hit": -0.025,
+     "mae_base": 66.583,
+     "mae_with": 66.559,
+     "d_mae": 0.024,
+     "weight": -0.667,
+     "n": 600
+    }
+   },
+   "2025": {
+    "rush_yds": {
+     "hit_base": 0.6175,
+     "hit_with": 0.6226,
+     "d_hit": 0.0051,
+     "mae_base": 17.955,
+     "mae_with": 17.947,
+     "d_mae": 0.008,
+     "weight": -0.101,
+     "n": 1948
+    },
+    "rec_yds": {
+     "hit_base": 0.6156,
+     "hit_with": 0.6219,
+     "d_hit": 0.0063,
+     "mae_base": 19.098,
+     "mae_with": 19.086,
+     "d_mae": 0.012,
+     "weight": -0.058,
+     "n": 3946
+    },
+    "receptions": {
+     "hit_base": 0.6333,
+     "hit_with": 0.6346,
+     "d_hit": 0.0013,
+     "mae_base": 1.39,
+     "mae_with": 1.39,
+     "d_mae": 0.0,
+     "weight": -0.001,
+     "n": 3946
+    },
+    "pass_yds": {
+     "hit_base": 0.6078,
+     "hit_with": 0.6121,
+     "d_hit": 0.0043,
+     "mae_base": 65.674,
+     "mae_with": 65.673,
+     "d_mae": 0.001,
+     "weight": -0.431,
+     "n": 579
+    }
+   }
+  },
+  "wins": 2,
+  "cells": 8,
+  "hurt_both_seasons": 0,
+  "verdict": "WASH"
+ },
+ "short_week": {
+  "feature": "short_week",
+  "by_season": {
+   "2024": {
+    "rush_yds": {
+     "hit_base": 0.604,
+     "hit_with": 0.604,
+     "d_hit": 0.0,
+     "mae_base": 18.527,
+     "mae_with": 18.519,
+     "d_mae": 0.008,
+     "weight": -1.19,
+     "n": 2008
+    },
+    "rec_yds": {
+     "hit_base": 0.6,
+     "hit_with": 0.5923,
+     "d_hit": -0.0077,
+     "mae_base": 19.282,
+     "mae_with": 19.303,
+     "d_mae": -0.021,
+     "weight": 1.96,
+     "n": 3911
+    },
+    "receptions": {
+     "hit_base": 0.6249,
+     "hit_with": 0.6217,
+     "d_hit": -0.0032,
+     "mae_base": 1.429,
+     "mae_with": 1.431,
+     "d_mae": -0.002,
+     "weight": 0.172,
+     "n": 3911
+    },
+    "pass_yds": {
+     "hit_base": 0.6667,
+     "hit_with": 0.6583,
+     "d_hit": -0.0084,
+     "mae_base": 66.583,
+     "mae_with": 66.682,
+     "d_mae": -0.099,
+     "weight": 9.384,
+     "n": 600
+    }
+   },
+   "2025": {
+    "rush_yds": {
+     "hit_base": 0.6175,
+     "hit_with": 0.6162,
+     "d_hit": -0.0013,
+     "mae_base": 17.955,
+     "mae_with": 17.952,
+     "d_mae": 0.003,
+     "weight": -0.744,
+     "n": 1948
+    },
+    "rec_yds": {
+     "hit_base": 0.6156,
+     "hit_with": 0.6181,
+     "d_hit": 0.0025,
+     "mae_base": 19.098,
+     "mae_with": 19.105,
+     "d_mae": -0.007,
+     "weight": 1.204,
+     "n": 3946
+    },
+    "receptions": {
+     "hit_base": 0.6333,
+     "hit_with": 0.6333,
+     "d_hit": 0.0,
+     "mae_base": 1.39,
+     "mae_with": 1.39,
+     "d_mae": 0.0,
+     "weight": 0.14,
+     "n": 3946
+    },
+    "pass_yds": {
+     "hit_base": 0.6078,
+     "hit_with": 0.6078,
+     "d_hit": 0.0,
+     "mae_base": 65.674,
+     "mae_with": 65.684,
+     "d_mae": -0.01,
+     "weight": 4.311,
+     "n": 579
+    }
+   }
+  },
+  "wins": 0,
+  "cells": 8,
+  "hurt_both_seasons": 0,
+  "verdict": "WASH"
+ },
+ "pace_c": {
+  "feature": "pace_c",
+  "by_season": {
+   "2024": {
+    "rush_yds": {
+     "hit_base": 0.604,
+     "hit_with": 0.5853,
+     "d_hit": -0.0187,
+     "mae_base": 18.527,
+     "mae_with": 18.555,
+     "d_mae": -0.028,
+     "weight": -0.325,
+     "n": 2008
+    },
+    "rec_yds": {
+     "hit_base": 0.6,
+     "hit_with": 0.5955,
+     "d_hit": -0.0045,
+     "mae_base": 19.282,
+     "mae_with": 19.28,
+     "d_mae": 0.002,
+     "weight": -0.052,
+     "n": 3911
+    },
+    "receptions": {
+     "hit_base": 0.6249,
+     "hit_with": 0.6249,
+     "d_hit": 0.0,
+     "mae_base": 1.429,
+     "mae_with": 1.429,
+     "d_mae": 0.0,
+     "weight": -0.002,
+     "n": 3911
+    },
+    "pass_yds": {
+     "hit_base": 0.6667,
+     "hit_with": 0.6625,
+     "d_hit": -0.0042,
+     "mae_base": 66.583,
+     "mae_with": 66.553,
+     "d_mae": 0.03,
+     "weight": -1.005,
+     "n": 600
+    }
+   },
+   "2025": {
+    "rush_yds": {
+     "hit_base": 0.6175,
+     "hit_with": 0.6149,
+     "d_hit": -0.0026,
+     "mae_base": 17.955,
+     "mae_with": 17.986,
+     "d_mae": -0.031,
+     "weight": -0.298,
+     "n": 1948
+    },
+    "rec_yds": {
+     "hit_base": 0.6156,
+     "hit_with": 0.62,
+     "d_hit": 0.0044,
+     "mae_base": 19.098,
+     "mae_with": 19.102,
+     "d_mae": -0.004,
+     "weight": -0.099,
+     "n": 3946
+    },
+    "receptions": {
+     "hit_base": 0.6333,
+     "hit_with": 0.6301,
+     "d_hit": -0.0032,
+     "mae_base": 1.39,
+     "mae_with": 1.391,
+     "d_mae": -0.001,
+     "weight": -0.008,
+     "n": 3946
+    },
+    "pass_yds": {
+     "hit_base": 0.6078,
+     "hit_with": 0.6078,
+     "d_hit": 0.0,
+     "mae_base": 65.674,
+     "mae_with": 65.679,
+     "d_mae": -0.005,
+     "weight": -0.864,
+     "n": 579
+    }
+   }
+  },
+  "wins": 0,
+  "cells": 8,
+  "hurt_both_seasons": 0,
+  "verdict": "WASH"
+ }
+}

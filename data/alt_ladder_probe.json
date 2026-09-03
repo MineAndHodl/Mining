@@ -1,0 +1,74 @@
+{
+ "n": 47,
+ "by_tier": {
+  "pass_yds|85+": {
+   "n": 8,
+   "cv_book": 0.266,
+   "cv_ours": 0.394,
+   "vig": 0.992
+  },
+  "rec_yds|<30": {
+   "n": 4,
+   "cv_book": 0.931,
+   "cv_ours": 0.876,
+   "vig": 0.971
+  },
+  "rec_yds|30-55": {
+   "n": 12,
+   "cv_book": 0.692,
+   "cv_ours": 0.75,
+   "vig": 0.936
+  },
+  "rec_yds|55-85": {
+   "n": 7,
+   "cv_book": 0.559,
+   "cv_ours": 0.621,
+   "vig": 0.963
+  },
+  "rec_yds|85+": {
+   "n": 2,
+   "cv_book": 0.448,
+   "cv_ours": 0.57,
+   "vig": 0.977
+  },
+  "rush_yds|<30": {
+   "n": 3,
+   "cv_book": 0.857,
+   "cv_ours": 0.803,
+   "vig": 0.898
+  },
+  "rush_yds|30-55": {
+   "n": 5,
+   "cv_book": 0.62,
+   "cv_ours": 0.689,
+   "vig": 0.99
+  },
+  "rush_yds|55-85": {
+   "n": 4,
+   "cv_book": 0.503,
+   "cv_ours": 0.561,
+   "vig": 1.007
+  },
+  "rush_yds|85+": {
+   "n": 2,
+   "cv_book": 0.47,
+   "cv_ours": 0.53,
+   "vig": 1.006
+  }
+ },
+ "slope_pass_yds": {
+  "book": -0.00047,
+  "ours": -0.0004,
+  "n": 8
+ },
+ "slope_rec_yds": {
+  "book": -0.00669,
+  "ours": -0.00463,
+  "n": 25
+ },
+ "slope_rush_yds": {
+  "book": -0.00548,
+  "ours": -0.00425,
+  "n": 14
+ }
+}
