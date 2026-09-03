@@ -65,11 +65,38 @@ The board is the product: every pick on it must be something a sharp would nod a
   overrides `props_model.CV_ANCHORS`; the Card re-priced 5U/3O → 4/4.
 - **Market-role baseline comes from the CONSENSUS line, not each book's line** (Fresh Eyes day
   1): with a per-book baseline every posted line implied its own number, every line looked
-  equally +EV and the shop could not prefer BetRivers 77.5 over FanDuel 78.5. Consensus = median
-  line across books; the Card now takes the best available number for our side.
+  equally +EV and the shop could not prefer BetRivers 77.5 over FanDuel 78.5. Consensus line =
+  median across books (display); the role baseline itself is the median of the books' implied
+  means (day 2, below); the Card takes the best available number for our side.
 - **Feature lab (`feature_lab.py`, two held-out seasons):** game-script spread, short week and
   team pace add NOTHING to the residual model (all WASH) — the obvious handicapper angles are
   already absorbed by form, total, home and baseline. Logged in `data/feature_lab.json`.
+  **Full-game form (`full_game_form.py`, day 2) LOSES both seasons:** dropping partial games
+  (rest, early exits; opportunities < 50% of usual) from the form window makes every market
+  worse — a short game is a real signal about the role. Never re-test.
+- **What the market already prices into a weeks-0-3 line (`market_lag.py`, `data/market_lag.json`,
+  measured on the board itself, mean-reversion controlled, re-measured every run and pooled):**
+  the market's number minus our season baseline moves with the game total at 1.14/pt for passing
+  (our earned weight 1.20), home −4.9 (earned −4.1), R² .82 — the market line IS our baseline plus
+  our environment tilts, so under the market-role baseline total/home/def_delta are ZERO (like
+  base_c); adding them double-counted (Herbert O233.5 +15.6 from the total was a phantom). On
+  FORM the market is selective: it prices late-season QB passing form fully (+.148 vs our applied
+  +.057, CI [+.07, +.21]) and catch counts (+.168 vs +.150), leaves 75% of receiving-yards form
+  and ALL of rushing form (−.08, CI [−.28, +.02]) on the table → `lag_factor` per market on the
+  form tilt (pass 0, receptions 0, rec .75, rush 1.0 in Week 1 2026). The Week-1 edge is rushing
+  and receiving yards; QB yards and catch counts are reference until current-season games.
+- **Per-player form gap (day 2):** the offseason treatment keys off HIS window, not the global
+  mode — gap 1 (one offseason) = half-strength form + market-role baseline (also a returner in
+  Week 6 with no current-season games); gap ≥ 2 (a missed season) = form OFF, trust ×.7, the
+  paragraph names the year (n = 4-12 such rows in five seasons: unmeasurable, so not applied).
+- **Consensus = the median of each book's IMPLIED MEAN (day 2)**, not the median line: two books
+  at different lines (DK 4.5 / FD 3.5) implied the same mean, and the old median-line code
+  manufactured an 8.7% edge between them. Rows carry `tilt` (our read vs consensus) and
+  `off_market` (this book's number vs consensus) signed for our side; `thesis_kind` = model /
+  off-market (3+ books, the number is the play — told that way) / no-consensus (2 books → REVIEW).
+- **Trust reads market breadth (`n_books_mkt`, day 2)**, not books at our shopped line (always 1
+  for a best line — a 6-point artifact against every shopped pick). Home/away is read from the
+  schedule row (the old string test never matched — home was 0 on every live row).
 - **Mean ≠ median on skewed yardage**, but the correction is modest for high-volume players;
   compare our mean to the market-implied mean, never to the line itself.
 - **Correlations are measured, not assumed:** QB-WR 0.696, two-WR 0.507, same-player
@@ -244,6 +271,8 @@ market, every book — `data/line_history/<season>_w<wk>/`) + `line_history.atta
 carries `line_move`: opened → now for the ACTIONABLE line on our side, consensus, cents, with
 us / against us, still available) → `ledger.snapshot` (`--open` = the Tuesday official open;
 else a refresh into `latest`; `late_swap` lane; score components on every row) →
+`post_copy.write` (Card / X teaser / free-pick thread / Touchdown Tax / line moves / report card
+as ready-to-post text from the frozen numbers → `data/post_copy.md`) →
 `build_board_page` → `output/the-board.html` (📈 chip on every prop row; 📒 Record tab; ⏱ Last Call tab).
 **The Model Room** (`build_lab_page.py` → `output/the-lab.html`, artifact fe32517b…): the page that
 shows the model being BUILT — a run log, instruments, calibration charts, the daily loop — every

@@ -97,7 +97,7 @@ def _game_ctx(game, team_code, sched_rows, code2full):
                     pass
             opp = a if tc == h else (h if tc == a else None)
             return {"team_spread": team_spread, "implied_team_pts": round(implied, 1),
-                    "opp": opp, "weather": wx}, opp
+                    "opp": opp, "weather": wx, "is_home": (tc == h), "total": total}, opp
     return None, None
 
 

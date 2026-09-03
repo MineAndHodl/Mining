@@ -39,9 +39,13 @@ def build_recency(through_season=2025, through_week=None):
         w = 0.5 ** (np.arange(len(recent))[::-1] / HALFLIFE)   # most-recent heaviest
         form = float(np.average(recent, weights=w))
         last3 = float(np.mean(ys[-3:])); last1 = float(ys[-1])   # for the multi-factor features
+        # when his window ends: the season/week of his most recent game. The board decides PER
+        # PLAYER whether the form window crosses the offseason (half-strength, measured) or is
+        # older than one offseason (a missed season: unmeasurable, so form is not applied).
         rows.append({"pid": pid, "mkt": mkt, "form": round(form, 1), "baseline": round(baseline, 1),
                      "last3": round(last3, 1), "last1": round(last1, 1),
                      "trend": round(form - baseline, 1), "n_games": len(ys),
+                     "last_season": int(d["season"].iloc[-1]), "last_week": int(d["week"].iloc[-1]),
                      "log": [round(float(x), 1) for x in ys[-RECENT_N:]]})
     r = pd.DataFrame(rows)
     # trend strength percentile within each market (the validated edge lives in the top quartile)

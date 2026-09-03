@@ -73,7 +73,9 @@ Update IDEAS_LEDGER.md when an idea changes status. Update CLAUDE.md only for se
   receiving-yards line; when they disagree, one line is stale. Test prospectively via the
   ledger (log implied YPR at open).
 - **Book dispersion as signal**: when 8 books disagree by ≥2 pts, is the outlier soft or sharp?
-  Log `n_books`, dispersion, outlier book on every pick; grade after 4 weeks.
+  Every row now carries `cons_mean`, `off_market`, `tilt`, `thesis_kind`, `n_books_mkt`
+  (day 2); grade the off-market lane vs the model lane after 4 weeks. One-snapshot read:
+  BetRivers is off the consensus 61% of the time it posts, FanDuel 12%; DK's outliers skew high.
 - **Star Overs shaded**: the TD market overprices stars 10-25 pts; do yardage Overs on
   top-ADP players carry the same public shade? Log ADP rank + side + result.
 - **Early-exit mixture**: P(under) on high lines gets help from injury exits / blowouts; a
@@ -83,6 +85,15 @@ Update IDEAS_LEDGER.md when an idea changes status. Update CLAUDE.md only for se
   and injuries can surface one (today they are silently REVIEW).
 - **Kicker lane**: FG-range drive rate × distance make-rate × kicker; earn before shipping.
 - ~~Weather feed~~ DONE 2026-09-03 (`weather_feed.py`).
+- ~~Rest-game contamination of the form window~~ TESTED day 2: LOSES both seasons (partial
+  games are signal). Never re-test.
+- **Market lag, pooled**: `data/market_lag.json` re-measures every board which tilts the market
+  prices; after 3+ weeks compare the pooled factors to CLV by market (does the rushing edge
+  actually beat the close?). If the in-season cross-section says the market lags in-season
+  form too, the same factor belongs in in-season mode (today it is weeks 0-3 only).
+- **Receptions in Week 1**: catch-count form is priced by the market (day 2) — so the Week-1
+  receptions edge, if any, is pure shape (our .20 extra dispersion vs the book's). Probe DK's
+  receptions ladders the way `alt_ladder_probe.py` did for yards before trusting a shape edge.
 - **Posting timing**: when do DK/FD post next week's props? If Tuesday 14:30 UTC misses half
   the menu, add a Wednesday capture. Read it off the `latest` ledger snapshots.
 - **Execution-book view**: DK/FD/MGM price beside best-anywhere on every row.
@@ -104,3 +115,17 @@ Update IDEAS_LEDGER.md when an idea changes status. Update CLAUDE.md only for se
   Businessman: public-record rail (Card ≥50% to hit; +EV TD dogs live in the Touchdown Tax),
   a Record tab on the board, and a Sunday 11:40 ET late-swap job with a game-day inactives
   override that prices the backup off the measured cascade before the books do.
+- **2026-09-03 (day 2)** — Quant: the ridge weights were earned against OUR baseline but applied
+  on top of the MARKET's number in weeks 0-3. Measured on the board (`market_lag.py`): the
+  market's line is our baseline plus our own total/home tilts (1.14/pt vs 1.20; R² .82) → the
+  environment is no longer re-added under the market baseline (Herbert/Goff Overs were phantom).
+  The same regression on form: the market prices QB passing form (+.148 vs our +.057) and
+  catch counts, ignores rushing form (−.08) and leaves 75% of receiving-yards form → applied as
+  a per-market factor, pooled weekly. Bugs: trust penalized the shop (books at our line, always
+  1); home/away never applied (string bug); a missed season read as "last season" (Watson);
+  two books at different lines "disagreeing" into an 8.7% edge (Kraft) → consensus = median
+  of book-implied means, off-market plays labeled (Mayfield U247.5, 11.9 off), two-book
+  disagreements REVIEW. Handicapper: rest/partial-game contamination tested — LOSES, partial
+  games are signal. Businessman: `post_copy.py` — Card, X teaser, free-pick thread, Touchdown
+  Tax, line moves, report card, generated from the frozen numbers. Card 5O/3U → 3O/5U, rushing
+  form is the Week-1 edge. Tests 136 → 155.

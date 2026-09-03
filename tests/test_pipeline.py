@@ -439,6 +439,59 @@ def test_fresh_eyes_day1():
     check("every Card pick is at least a coin-flip on our numbers", all((r.get("model_p") or 0) >= 0.5 for r in d.get("recommended", [])))
 
 
+def test_fresh_eyes_day2():
+    """Day-2 findings: trust reads market breadth (not books at the shopped line); the venue is
+    detected; a missed season zeroes form; under the market baseline the environment is NOT
+    re-added (the market prices it); the market's LAG on form is measured and applied; two
+    disagreeing books define no consensus; off-market plays are labeled; partial games are
+    signal (full-game form LOSES); post copy is built from the frozen numbers."""
+    print("\n-- fresh eyes day 2: breadth, venue, gap, market lag, consensus, post copy --")
+    import rank_board as rb, board_factors as bf, json as _j, post_copy as pc, market_lag as ml
+    base = {"edge": 0.06, "model_p": 0.58, "confidence": 1.0, "score_mult": 1.0}
+    s_shop = rb.prop_score({**base, "n_books": 1, "n_books_mkt": 4}); s_thin = rb.prop_score({**base, "n_books": 1, "n_books_mkt": 1})
+    check("trust reads books posting the MARKET, not books at our shopped line (+6 swing)", abs((s_shop - s_thin) - 6.0) < 1e-6, f"{s_shop} vs {s_thin}")
+    _pm, sched_rows, code2full, _a, _d = bf._load_context()
+    g_home, _ = bf._game_ctx("Cleveland Browns @ Jacksonville Jaguars", "JAX", sched_rows, code2full)
+    g_away, _ = bf._game_ctx("Cleveland Browns @ Jacksonville Jaguars", "CLE", sched_rows, code2full)
+    check("venue detected from the schedule (JAX home, CLE away) — home was always 0 before", bool(g_home and g_home.get("is_home")) and bool(g_away and not g_away.get("is_home")))
+    raw = pd.read_parquet(os.path.join(HERE, "..", "data", "_raw_prop_board.parquet"))
+    mf_rows = raw[raw.edge_src == "multifactor"]
+    stale = mf_rows[mf_rows.form_gap >= 2]
+    check("a missed season (gap >= 2) zeroes the form tilt and cuts trust", len(stale) == 0 or (all(abs((c or {}).get("form3", 0)) < 1e-9 for c in stale["contrib"]) and (stale["confidence"] <= 0.71).all()), f"n={len(stale)}")
+    off = mf_rows[mf_rows.form_gap >= 1]
+    check("under the market baseline the environment is not re-added (total/home contrib = 0)", len(off) > 0 and all(abs((c or {}).get("total_c", 0)) < 1e-9 and abs((c or {}).get("home", 0)) < 1e-9 for c in off["contrib"]))
+    lagf = ml.load_factors()
+    check("market lag measured for the four markets (data/market_lag.json)", all(m in lagf for m in ("pass_yds", "rush_yds", "rec_yds", "receptions")), str(lagf))
+    check("the market prices late-season QB form; it lags rushing form (pass factor < rush factor)", lagf.get("pass_yds", 1) < lagf.get("rush_yds", 0), str(lagf))
+    if lagf.get("pass_yds", 1) == 0:
+        pq = off[off.mkt == "pass_yds"]
+        check("with lag factor 0 the pass-yds form tilt is zero on every offseason row", all(abs((c or {}).get("form3", 0)) < 1e-9 for c in pq["contrib"]))
+    import prop_board as pb
+    kr = raw[(raw.name == "Tucker Kraft") & (raw.mkt == "receptions")]
+    check("two books at different lines (DK 4.5 / FD 3.5) imply the SAME mean: no manufactured 8.7% edge, no PICK", (not len(kr)) or (all(pb.classify(r.to_dict()) != "PICK" for _, r in kr.iterrows()) and float(kr["edge"].max()) < 0.03), str(kr[["side", "thesis_kind", "edge"]].values.tolist() if len(kr) else "n/a"))
+    nc = raw[raw.thesis_kind == "no-consensus"]
+    check("a two-book disagreement where the number IS the edge is REVIEW, never a PICK", len(nc) == 0 or all(pb.classify(r.to_dict()) == "REVIEW" for _, r in nc.iterrows()), f"n={len(nc)}")
+    bm = raw[(raw.name == "Baker Mayfield") & (raw.mkt == "pass_yds")]
+    check("an off-market number is labeled as the thesis (Mayfield U247.5 vs ~235 consensus)", (not len(bm)) or (bm.iloc[0]["thesis_kind"] == "off-market" and float(bm.iloc[0]["off_market"]) >= 5), str(bm[["thesis_kind", "off_market"]].values.tolist() if len(bm) else "n/a"))
+    check("every priced row carries tilt / off_market / cons_mean for the grading loop", all(c in raw.columns for c in ("tilt", "off_market", "cons_mean", "thesis_kind", "market_lag", "n_books_mkt")))
+    fg = _j.load(open(os.path.join(HERE, "..", "data", "full_game_form.json")))
+    check("full-game form (dropping partial games) LOSES in both seasons — partial games are signal, logged", fg["verdict"]["repl"] == "LOSES" and fg["hurt_both_seasons"]["repl"] >= 3)
+    d = _j.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    card = [r for r in d.get("recommended", []) if not r.get("kind")]
+    check("every Card pick's thesis is a model read or a 3+-book off-market number (never no-consensus)", all(r.get("thesis_kind") in ("model", "off-market") for r in card))
+    out = pc.build(d)
+    P = out["posts"]
+    check("post copy: the teaser fits X (<=280 chars)", P.get("teaser", {}).get("x_ok") is True, str(P.get("teaser", {}).get("chars")))
+    check("post copy: the full Card post names every Card pick", all(r["name"] in P["card_full"]["text"] for r in card))
+    top = max(card, key=lambda r: (float(r.get("model_p") or 0), float(r.get("score") or 0)))
+    check("post copy: the free pick is the Card's most likely winner", top["name"] in P["teaser"]["text"] and top["name"] in P["free_pick"]["thread"][0])
+    check("post copy: the Touchdown Tax post carries the fair price and the cash rate", "fair" in P.get("touchdown_tax", {}).get("text", "") and "Cashes" in P.get("touchdown_tax", {}).get("text", ""))
+    check("post copy: no report card before a week is graded", ("report_card" not in P) or os.path.exists(os.path.join(HERE, "..", "data", "record.json")))
+    fe = _j.load(open(os.path.join(HERE, "..", "data", "fresh_eyes_log.json")))
+    days = fe if isinstance(fe, list) else fe.get("days", [])
+    check("fresh-eyes log has a day-2 entry with numbers and a verdict", any(str(x.get("date", "")).endswith("09-03") and x.get("verdict") and x.get("numbers") for x in days))
+
+
 def test_line_history_and_ledger_alignment():
     """Every bet knows where it opened and where it is now; the ledger is aligned with the product."""
     print("\n-- line history + ledger alignment --")
@@ -522,7 +575,7 @@ if __name__ == "__main__":
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

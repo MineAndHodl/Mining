@@ -67,5 +67,141 @@
    "FRESH_EYES.md"
   ],
   "tomorrow": "early-exit mixture for the left tail (zero-inflated component) OR posting-timing read once a second ledger snapshot exists; re-probe alt ladders after the CV fix for a vig-curve edge"
+ },
+ {
+  "date": "2026-09-03",
+  "day": 2,
+  "hats": {
+   "handicapper": [
+    "rest-game contamination: weeks 17-18 rest/backup games and in-season early exits sit in the form window \u2014 do they poison form3? (test: full_game_form.py, opportunities from pbp)",
+    "which book posts the outlier line? (descriptive, one snapshot: BetRivers off the consensus 61% of the time it posts, FanDuel 12%, DK/ESPN ~27%; DK's outliers skew HIGH 6 of 7)",
+    "what does the market ALREADY price into a Week-1 line? if it prices the total/home/form, our tilts on top are double counts (test: cross-section regression of market mean \u2212 our baseline on our raw features)"
+   ],
+   "quant": [
+    "weakest assumption: the ridge weights were EARNED against our season baseline but are APPLIED on top of the market's number in weeks 0-3 \u2014 earned vs assumed, upstream vs downstream",
+    "trust term counted books at our shopped line (always 1 for a best line) \u2014 an artifact penalizing the shop by 6 Desk-Score points",
+    "home/away: the live board compared a team code to the last three letters of the home team's full name \u2014 home was ALWAYS 0; the venue weight never applied",
+    "a player who missed a whole season (Watson) got 'closed last season with 176, 125...' \u2014 2024 games; the offseason ratio was measured on one-offseason gaps only (gap>=2: n=4-12, unmeasurable)"
+   ],
+   "business": [
+    "the Card is only a product when it leaves the page: ready-to-post copy (Card, X teaser, free-pick thread, Touchdown Tax, line moves, Monday report card) generated from the frozen numbers every run \u2014 a post can never say what the model didn't",
+    "the free pick = the Card's most likely winner (the public record is a hit-rate product)",
+    "off-market numbers labeled as their own thesis ('BetRivers hangs 247.5 when three books imply ~235') \u2014 a sharp's play, told honestly"
+   ]
+  },
+  "critiques": [
+   "worst pick on the Card at open: Deshaun Watson U178.5 \u2014 'closed last season' with 2024 games behind an Achilles; the form read was stale by construction (fixed: gap>=2 zeroes form, trust \u00d7.7, paragraph says 2024)",
+   "hand re-derivation: Stevenson O39.5 mu=55.0 cv=.587 \u2192 P(over)=.630 matched the board; but Herbert O233.5 carried +15.6 from the game total ON TOP of the market's number \u2014 the market prices the total at 1.14/pt (ours 1.20): a phantom Over",
+   "page vs model: score_conviction/score_trust were written on the record but never copied to the ranked row \u2192 the ledger had nulls (fixed); Kraft U4.5 'edge' 8.7% came from taking FanDuel's 3.5 as the consensus and betting DK's 4.5 \u2014 two books, no consensus (fixed: median of book-implied means; two-book disagreements are REVIEW)"
+  ],
+  "tested": {
+   "full_game_form": {
+    "design": "partial = opportunities (carries/targets/attempts by market) < 50% of his median over the previous 8 games; full-game form = last 3 / last 1 FULL games",
+    "verdict": {
+     "repl": "LOSES",
+     "add": "LOSES"
+    },
+    "note": "dropping partial games from the form window LOSES on every market in both seasons (hit \u22121 to \u22123 pts, MAE up); as an extra feature the ridge gives it ~0 weight. Partial games are signal: a player whose usage was cut keeps producing less."
+   },
+   "market_lag": {
+    "pass_yds": {
+     "n": 32,
+     "market_form3_coef": 0.1481,
+     "ci90": [
+      0.0242,
+      0.2369
+     ],
+     "our_applied": 0.0566,
+     "lag_factor": 0.0,
+     "total_c": 1.1611,
+     "base_c": -0.6403,
+     "r2": 0.859
+    },
+    "rec_yds": {
+     "n": 87,
+     "market_form3_coef": 0.029,
+     "ci90": [
+      -0.0639,
+      0.1147
+     ],
+     "our_applied": 0.116,
+     "lag_factor": 0.75,
+     "total_c": 0.218,
+     "base_c": -0.1142,
+     "r2": 0.13
+    },
+    "receptions": {
+     "n": 86,
+     "market_form3_coef": 0.1682,
+     "ci90": [
+      0.0117,
+      0.3068
+     ],
+     "our_applied": 0.1505,
+     "lag_factor": 0.0,
+     "total_c": -0.0035,
+     "base_c": -0.2102,
+     "r2": 0.245
+    },
+    "rush_yds": {
+     "n": 53,
+     "market_form3_coef": -0.083,
+     "ci90": [
+      -0.2181,
+      0.0439
+     ],
+     "our_applied": 0.1441,
+     "lag_factor": 1.0,
+     "total_c": 0.4375,
+     "base_c": -0.108,
+     "r2": 0.203
+    }
+   },
+   "missed_season_form": "gap>=2 rows in weeks 1-3: n=4 pass, 12 rush, 10 rec/receptions across five seasons \u2014 unmeasurable; form not applied at that gap"
+  },
+  "numbers": {
+   "trust_fix": "4 of 5 Card Overs sat at n_books=1 (trust \u22123) while same-line Unders sat at +3: a 6-point artifact",
+   "market_prices_environment": "pass_yds: market gap ~ total_c +1.14 (earned +1.20), home \u22124.9 (earned \u22124.1), R\u00b2 .82; rec_yds total_c +.21 (earned +.21)",
+   "market_prices_form": "pass_yds +.148 (ours applied +.057, CI [+.07,+.21]) \u2192 factor 0; receptions +.168 (ours +.150) \u2192 0; rec_yds +.029 (ours +.116) \u2192 .75; rush_yds \u2212.083 (CI [\u2212.28,+.02]) \u2192 1.0",
+   "partial_games": {
+    "rush_yds": {
+     "rate": 0.1467,
+     "wk1_3_windows_touched": 0.3076,
+     "form3_shift_if_dropped": 10.94
+    },
+    "rec_yds": {
+     "rate": 0.1267,
+     "wk1_3_windows_touched": 0.2684,
+     "form3_shift_if_dropped": 10.53
+    },
+    "receptions": {
+     "rate": 0.1267,
+     "wk1_3_windows_touched": 0.2684,
+     "form3_shift_if_dropped": 1.02
+    },
+    "pass_yds": {
+     "rate": 0.0679,
+     "wk1_3_windows_touched": 0.1878,
+     "form3_shift_if_dropped": 60.65
+    }
+   },
+   "early_season_residual": "weeks 1-3 vs the prior-season baseline: pass yds \u221225.7 avg, rush \u22124.2, rec \u22124.7 (in-season \u22125.7/\u22120.6/\u22121.2) \u2014 offenses open slow; the market baseline absorbs it",
+   "card_before": "5 Overs / 3 Unders \u2014 Washington, Henry, Stevenson, Herbert, Goff O; Shaheed, Worthy, Wilson U (Herbert/Goff driven by the game total on top of the market)",
+   "card_after": "3 Overs / 5 Unders \u2014 Henry, Stevenson, Brown O; Taylor, Gibbs, Cook, Mayfield (off-market 11.9) U; Washington O \u2014 rushing form is the edge the market leaves on the table"
+  },
+  "verdict": "SHIPPED: trust reads market breadth; venue detected; per-player form gap (missed season \u2192 form off); environment NOT re-added under the market baseline (measured double count); market lag on form measured weekly and applied (QB/receptions form priced by the market, rushing not); consensus = median of book-implied means; two-book disagreements REVIEW; off-market thesis labeled; post copy. REJECTED: full-game form (loses both seasons, logged).",
+  "shipped": [
+   "src/prop_board.py (breadth, gap, environment-off, market lag, consensus mean, thesis kind, paragraphs)",
+   "src/market_lag.py + data/market_lag.json",
+   "src/full_game_form.py + data/full_game_form.json",
+   "src/post_copy.py + data/post_copy.md",
+   "src/recency.py (last_season/last_week)",
+   "src/board_factors.py (is_home)",
+   "src/rank_board.py (n_books_mkt trust, score components carried)",
+   "src/ledger.py (new fields)",
+   "src/build_lab_page.py (day-2 lines)",
+   "tests: test_fresh_eyes_day2"
+  ],
+  "tomorrow": "grade the market-lag table's stability once a second snapshot/week exists (pooled table); rookies onto the market-role baseline; the 'book dispersion as signal' log now has cons_mean/off_market/tilt on every row \u2014 grade it after 4 weeks; re-check the receptions dispersion (.20) against DK's ladder now that catch-count form is off in Week 1"
  }
 ]

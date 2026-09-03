@@ -211,6 +211,13 @@ def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False, ope
         ledger.snapshot({**ranked, "pool": pool}, force_open=open_week)
     except Exception as e:
         print("ledger not written:", e)
+    # 9) post copy: the Card / free pick / Touchdown Tax / line moves as ready-to-post text, built
+    #    from the frozen numbers (data/post_copy.md) — a post can never say what the model didn't.
+    try:
+        import post_copy
+        post_copy.write(ranked)
+    except Exception as e:
+        print("post copy skipped:", e)
     bbp.build()
     print(f"board rebuilt: {len(ranked.get('best_props', []))} best props, "
           f"{len(ranked.get('best_games', []))} games, "

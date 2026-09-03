@@ -35,6 +35,47 @@ the run), **REJECTED** (tested, lost), **BLOCKED** (needs something only Alex ca
    / `price_prop_board`, raw lines cached), like the TD board; `--cached` re-prices free.
 7. **Alex's name won**: "TD Stack" → **Touchdown Tax**.
 
+### 0b. Found by the Fresh Eyes loop, day 2 (2026-09-03) — all fixed, every prop re-priced
+8. **The trust term punished the line shop.** `n_books` counted books at OUR exact line; the
+   kept row is the best line for our side, usually a one-book outlier, so every shopped Over
+   sat at n_books=1 (−3) while same-line Unders sat at +3 — a 6-point Desk-Score artifact.
+   Trust now reads `n_books_mkt` (books posting the market at all); the shopping context stays.
+9. **Home/away was never applied.** The live board compared a team code to the last three
+   letters of the home team's full name ("ers") — `home` was 0 on every row since the venue
+   weight was earned. Now read from the schedule row (`is_home`).
+10. **The environment was being double-counted in weeks 0-3.** Measured on the board itself
+    (`market_lag.py`, mean-reversion controlled): the market's number minus our season
+    baseline moves with the game total at 1.14/pt for passing (our earned weight 1.20), home
+    at −4.9 (earned −4.1), R² .82 — the market line IS our baseline plus our own environment
+    tilts. Herbert O233.5 (+15.6 from the total) and Goff O261.5 (+14.9) were phantom Overs.
+    Under the market-role baseline total/home/def_delta are now zero, like base_c.
+11. **The market prices some late-season form and not others (`data/market_lag.json`).** Same
+    regression on form3: QB passing +.148 (ours applied +.057; 90% CI [+.07, +.21]) → the
+    market prices it fully; receptions +.168 (ours +.150) → priced; receiving yards +.029
+    (ours +.116) → 75% left on the table; rushing −.083 (CI [−.28, +.02]) → the market ignores
+    late-season rushing form entirely. Applied as a per-market factor on the form tilt in
+    market-baseline mode, re-measured every board and pooled across weeks. The Week-1 edge is
+    rushing and receiving yards — QB yards and catch counts are reference only until games.
+12. **A missed season is not "last season".** Watson U178.5 read "closed last season with 176,
+    125, 168, 128" — 2024 games behind an Achilles. Per-player gap: gap 1 = half-strength form
+    + market baseline (also for a returner in Week 6), gap ≥ 2 = form off, trust ×.7,
+    paragraph says the year (n = 4-12 such rows in five seasons: unmeasurable, so not applied).
+13. **Two books at different lines are not a consensus.** DK 4.5 / FD 3.5 made the median
+    "4.0", the code took the nearest book's opinion as truth and "found" 8.7% betting the other
+    (Kraft U4.5). Consensus mean = median of every book's implied mean (they agreed at ~4.6;
+    the edge vanished). Rows carry `tilt` (our read vs consensus) and `off_market` (this book's
+    number vs consensus), signed for our side; a pick whose edge is mostly the number is labeled
+    **off-market** (3+ books; Mayfield U247.5 vs ~235 → 11.9 yds off) and told that way, or
+    **no-consensus** (2 books) → REVIEW, never a PICK.
+14. **Score components never reached the ledger** (written on the record, not copied to the
+    ranked row) — nulls in `score_conviction/score_trust`. Fixed.
+15. **REJECTED: full-game form.** Dropping partial games (opportunities < 50% of his usual;
+    rest games, early exits) from the form window LOSES on every market in both held-out
+    seasons (`full_game_form.py`); partial games are signal — a cut role stays cut.
+16. **Post copy** (`post_copy.py` → `data/post_copy.md` every run): the Card, an X teaser
+    (≤280), the free-pick thread, the Touchdown Tax, line moves, the Monday report card — all
+    generated from the frozen numbers, so a post can never say what the model didn't.
+
 ## 1. Product lanes
 | Idea (Alex) | Status | Where / note |
 |---|---|---|

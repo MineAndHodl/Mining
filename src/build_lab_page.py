@@ -29,6 +29,7 @@ def gather():
     xtd = J("xtd_validation.json") or {}; tde = J("td_env_validation.json") or {}; hc = J("history_compare.json") or {}
     fl = J("feature_lab.json") or {}; cva = J("cv_anchors.json") or {}; inj = J("injury_validation.json") or {}
     fe = J("fresh_eyes_log.json") or []; alt = J("alt_ladder_probe.json") or {}; rec = J("record.json") or {}
+    fgf = J("full_game_form.json") or {}; mlg = J("market_lag.json") or {}
     try: n_pbp = len(pd.read_parquet(f"{DATA}/pbp_2021_2025.parquet", columns=["season"]))
     except Exception: n_pbp = 0
     try:
@@ -68,6 +69,14 @@ def gather():
     for k, v in fl.items():
         L("rejected", f"'{ {'spread_c': 'favorites run it out / dogs throw', 'short_week': 'short-week fatigue', 'pace_c': 'fast-paced teams'}.get(k, k) }' — tested on two seasons, adds nothing, thrown out")
     L("rejected", "'backups inflate their share when the starter was hurt' — tested, loses, thrown out")
+    if fgf.get("verdict"):
+        L("rejected", "'throw out the games where he left early or rested' — tested on two seasons, makes the model WORSE (a short game is a real signal about his role), thrown out")
+    pooled = mlg.get("pooled", {})
+    if pooled:
+        lagd = {m: v.get("lag_factor") for m, v in pooled.items()}
+        L("learned", "measured what the books already bake into an early-season line: the game total and home field (exactly), a quarterback's late-season form (fully), a running back's late-season form (not at all) — so that's where the Week-1 edge lives")
+        L("checked", f"how much of each late-season trend the books leave on the table: rushing yards {int((lagd.get('rush_yds') or 0)*100)}%, receiving yards {int((lagd.get('rec_yds') or 0)*100)}%, catches {int((lagd.get('receptions') or 0)*100)}%, passing yards {int((lagd.get('pass_yds') or 0)*100)}% — re-measured every week")
+    L("checked", "found two bugs the old numbers were hiding: home field was never being applied, and every line-shopped pick was being docked for being shopped — both fixed, every prop re-priced")
     L("shopped", "every anytime-touchdown price across 8 sportsbooks — the best price is usually 10–30 cents better than the consensus")
     for name, n, nb in snap_rows[-2:]:
         st_ = name.split("_")[0]
@@ -93,7 +102,7 @@ def gather():
         "top_bucket": {"pred": top.get("top_pred"), "hit": top.get("top_hit"), "n": top.get("top_n"), "label": "touchdown calibration", "sub": "when we say 50%, it hits"},
         "books": {"v": 8, "label": "sportsbooks shopped", "sub": "best price on every touchdown"},
         "lines": {"v": (max(n for _, n, _ in snap_rows) if snap_rows else 0), "label": "prop lines tracked this week", "sub": "opened → now on every bet"},
-        "rejected": {"v": len([1 for v in fl.values() if v.get("verdict") != "WINS"]) + 2, "label": "ideas tested and thrown out", "sub": "if it doesn't hold up, it's gone"},
+        "rejected": {"v": len([1 for v in fl.values() if v.get("verdict") != "WINS"]) + 2 + (1 if fgf.get("verdict") else 0), "label": "ideas tested and thrown out", "sub": "if it doesn't hold up, it's gone"},
         "tests": {"v": tests.get("passed"), "of": tests.get("total"), "label": "checks before publishing"},
         "weeks_graded": {"v": len(rec.get("weeks", [])), "of": 18, "label": "weeks graded in public", "sub": "the record starts Week 1"},
         "commits": {"v": int(n_commits or 0), "label": "model updates shipped", "sub": head},
@@ -319,19 +328,22 @@ def build():
         "Every anytime-TD price at 8 sportsbooks", "The best line and price for our side", "Where every line opened and where it is now",
         "Books that lag the market (stale numbers)", "Kickoff weather — wind, cold, dome", "Beat writers' reports — pitch counts, roles, ruled out",
         "Player correlations for parlays (measured, not guessed)", "Closing-line value on every pick", "Calibration — do our 60%s hit 60%?",
-        "A public record, frozen at post time"]] + [{"t": t, "x": True} for t in [
-        "Short-week fatigue — tested, no edge", "Fast-paced teams — tested, no edge", "Last year's matchup stats — tested, no edge"]]
+        "A public record, frozen at post time", "What the books already price into an early-season line (measured weekly)",
+        "Off-market numbers — one book far from the consensus, labeled as the play", "A missed season — stale form switched off"]] + [{"t": t, "x": True} for t in [
+        "Short-week fatigue — tested, no edge", "Fast-paced teams — tested, no edge", "Last year's matchup stats — tested, no edge",
+        "Ignoring short games (rest / early exits) — tested, makes it worse"]]
     lab["lab"] = [{"t": "Kicker props — field-goal range drives × distance make-rate", "s": "measuring"},
                   {"t": "Rookie projections — no history yet, market-role baseline", "s": "building"},
                   {"t": "Streaky-player left tail — early exits and blowouts", "s": "measuring"},
                   {"t": "Cross-market checks — catches × yards per catch vs the yards line", "s": "queued"},
                   {"t": "Which book is soft when eight disagree", "s": "measuring"},
+                  {"t": "Ready-to-post copy from the frozen numbers (Card, free pick, Touchdown Tax)", "s": "shipped"},
                   {"t": "Week 1 grading + closing-line report card", "s": "queued"},
                   {"t": "Last Call — inactives, stale numbers, kickoff weather", "s": "shipped"},
                   {"t": "Line tracking on every bet", "s": "shipped"}]
     lab["chips"] = [
         {"k": "earned", "t": "recency form (last-3 / last-1)"}, {"k": "earned", "t": "multi-factor ridge · 5 seasons"}, {"k": "earned", "t": "market-role baseline weeks 0-3"},
-        {"k": "earned", "t": "offseason form ratio"}, {"k": "earned", "t": "volume-dependent spread (within-player)"}, {"k": "earned", "t": "injury cascade k*=.87"},
+        {"k": "earned", "t": "offseason form ratio"}, {"k": "earned", "t": "market lag on form (weekly cross-section)"}, {"k": "earned", "t": "volume-dependent spread (within-player)"}, {"k": "earned", "t": "injury cascade k*=.87"},
         {"k": "earned", "t": "xTD decomposed touchdowns"}, {"k": "earned", "t": "TD environment (measured scale)"}, {"k": "earned", "t": "red-zone defense (small, capped)"},
         {"k": "earned", "t": "measured correlations · copula"}, {"k": "live", "t": "8-book line shop"}, {"k": "live", "t": "beat-intel hard gates"}, {"k": "live", "t": "kickoff weather (validated multiplier)"},
         {"k": "live", "t": "line history · opened → now"}, {"k": "live", "t": "Last Call · inactives · stale numbers"},

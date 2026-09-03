@@ -49,7 +49,13 @@ def _trust(row):
       market breadth: how many books post this line (a one-book line is thinner evidence the
                       number is real; 3+ books agreeing the line exists is firmer footing)
     Range about -7 .. +9 Desk-Score points."""
-    conf = row.get("confidence"); nb = row.get("n_books")
+    conf = row.get("confidence")
+    # market breadth = books posting the MARKET (n_books_mkt), not books at our shopped line
+    # (n_books) — the kept row is the best line for our side, usually a one-book outlier, so the
+    # old count penalized every shopped pick -3 for being shopped (Fresh Eyes day 2).
+    nb = row.get("n_books_mkt")
+    if nb is None or (isinstance(nb, float) and nb != nb):
+        nb = row.get("n_books")
     t = 0.0
     if conf is not None and not (isinstance(conf, float) and conf != conf):
         t += (float(conf) - 0.7) * 22.0                  # 1.0 -> +6.6, 0.7 -> 0, 0.46 -> -5, 0.33 -> -8
@@ -191,11 +197,17 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "game": r.get("game"), "line": r.get("line"), "side": r.get("side"),
                          "our_num": r.get("desk_proj"), "market_num": r.get("market_num"), "edge": r.get("edge"), "ev": r.get("ev"),
                          "model_p": r.get("model_p"), "price": r.get("price"), "book": r.get("book"),
+                         "fair": _nn(r.get("fair")),
                          "n_books": r.get("n_books"), "shop_adv": r.get("shop_adv"),
+                         "n_books_mkt": _nn(r.get("n_books_mkt")), "cons_line": _nn(r.get("cons_line")),
+                         "line_vs_cons": _nn(r.get("line_vs_cons")),
+                         "score_conviction": _nn(r.get("score_conviction")), "score_trust": _nn(r.get("score_trust")),
                          "verdict": r.get("verdict", "KEEP"), "verdict_note": r.get("verdict_note", ""),
                          "score_mult": r.get("score_mult", 1.0), "reason": r.get("reason", ""),
                          "contrib": r.get("contrib"), "confidence": r.get("confidence"),
-                         "offseason": r.get("offseason"),
+                         "offseason": r.get("offseason"), "form_gap": _nn(r.get("form_gap")), "last_season": _nn(r.get("last_season")),
+                         "market_lag": _nn(r.get("market_lag")), "thesis_kind": _nn(r.get("thesis_kind")), "cons_mean": _nn(r.get("cons_mean")),
+                         "tilt": _nn(r.get("tilt")), "off_market": _nn(r.get("off_market")),
                          "inj_status": _nn(r.get("inj_status")), "inj_detail": _nn(r.get("inj_detail")),
                          "role_mult": _nn(r.get("role_mult")), "role_note": _nn(r.get("role_note")),
                          "inj_lean": _nn(r.get("inj_lean")), "inj_note": _nn(r.get("inj_note")),

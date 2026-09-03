@@ -43,6 +43,7 @@ h1{font-family:var(--disp);font-weight:800;font-size:32px;letter-spacing:.3px;ma
 .chip.mk{color:var(--blue);border-color:transparent;background:rgba(74,163,255,.12)}
 .vbadge{font-family:var(--disp);font-weight:800;font-size:9.5px;letter-spacing:.06em;padding:2px 7px;border-radius:5px}
 .v-confirmed{background:rgba(46,230,166,.16);color:var(--green)}
+.v-offmarket{background:rgba(99,213,230,.16);color:#1b8ea3}
 .v-keep{background:var(--panel2);color:var(--muted)}
 .v-suspect{background:rgba(255,159,67,.16);color:var(--amber)}
 .num{font-family:var(--mono);color:var(--ink)}
@@ -198,7 +199,7 @@ function propRow(p,i){
   return `<div class="play ${top?'top':''} ${p.recommended?'':'lean'}" onclick="this.querySelector('.why').classList.toggle('hide')">
     <div class="rank">${i+1}</div>
     <div class="pmain"><div class="nm">${top?'🔥 ':''}${p.name} <span style="color:var(--muted);font-weight:600">${p.side||''}</span></div>
-      <div class="meta">${statusTags(p)}<span class="chip mk">${mk}</span>${p.verdict&&p.verdict!=="KEEP"?`<span class="vbadge v-${p.verdict.toLowerCase()}">${p.verdict==="CONFIRMED"?"✓ confirmed":p.verdict}</span>`:""}<span class="num">${num}</span> <span class="edge${(typeof p.edge==="number"&&p.edge<0)?" neg":""}">${fmtEdge(p.edge)}</span> <span class="num" style="color:var(--muted)">${price} ${p.book||''}${p.n_books>1?` · best of ${p.n_books}`:''}</span>${lineMove(p)}</div></div>
+      <div class="meta">${statusTags(p)}<span class="chip mk">${mk}</span>${p.verdict&&p.verdict!=="KEEP"?`<span class="vbadge v-${p.verdict.toLowerCase()}">${p.verdict==="CONFIRMED"?"✓ confirmed":p.verdict}</span>`:""}${p.thesis_kind==="off-market"?`<span class="vbadge v-offmarket" title="this book's number sits off the consensus of the other books — the number is the play">⇄ off-market ${typeof p.off_market==="number"?(p.off_market>=10?Math.round(p.off_market):p.off_market):""}</span>`:""}<span class="num">${num}</span> <span class="edge${(typeof p.edge==="number"&&p.edge<0)?" neg":""}">${fmtEdge(p.edge)}</span> <span class="num" style="color:var(--muted)">${price} ${p.book||''}${p.n_books>1?` · best of ${p.n_books}`:''}</span>${lineMove(p)}</div></div>
     ${gradeBlock(p)}
     <div class="why hide">${p.reason||'—'}${renderCard(p.scorecard, p.side)}</div>
   </div>`;

@@ -206,7 +206,7 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
     # In market-baseline mode the role baseline must come from the CONSENSUS, not from each
     # book's own line — otherwise every book's line implies its own baseline, every line looks
     # equally +EV, and the shop can't prefer BetRivers 77.5 over FanDuel 78.5 (it took 78.5).
-    cons = {}
+    cons = {}; cons_mean = {}
     try:
         bb = board.copy(); bb["_k"] = bb["name"].map(_norm)
         for (k_, m_), g_ in bb.groupby(["_k", "mkt"]):
@@ -218,8 +218,58 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                 io2, iu2 = implied(r_["over_price"]), implied(r_["under_price"])
                 if io2 + iu2: fo.append(io2 / (io2 + iu2))
             cons[(k_, m_)] = (med, float(np.mean(fo)) if fo else 0.5, int(g_["book"].nunique()))
+            # CONSENSUS MEAN (Fresh Eyes day 2): the median of each book's IMPLIED MEAN (its line +
+            # its de-vigged price through our distribution). With two books at different lines
+            # (DK 4.5 / FD 3.5) the median LINE is 4.0 — a number nobody posts — and the old code
+            # took the nearest book's opinion as the truth and then "found" an 8.7% edge betting
+            # the other book (Kraft Under 4.5). Two disagreeing books define no consensus; their
+            # average does not manufacture one either, but it stops the edge being invented.
+            means = []
+            for _, r_ in g_.drop_duplicates("book").iterrows():
+                io2, iu2 = implied(r_["over_price"]), implied(r_["under_price"])
+                if io2 + iu2 and m_ != "anytime_td":
+                    try: means.append(float(pm.market_mean(m_, float(r_["line"]), io2 / (io2 + iu2))))
+                    except Exception: pass
+            if means: cons_mean[(k_, m_)] = float(np.median(means))
     except Exception as _e:
-        cons = {}
+        cons = {}; cons_mean = {}
+    # MARKET LAG (Fresh Eyes day 2): before pricing, measure which tilts the market already
+    # prices this week — regress (market mean at the consensus − our season baseline) on our
+    # raw features across the slate — and pool it with prior weeks (market_lag.py). The form
+    # tilt under a market baseline is scaled by the market's LAG on it (1 = the market ignores
+    # late-season form in this market; 0 = it prices it fully, so we add nothing).
+    lag_factors = {}
+    try:
+        import market_lag as ml
+        lag_rows = []
+        seen = set()
+        for _, b0 in board.iterrows():
+            k0 = _norm(b0["name"]); m0 = b0["mkt"]
+            if (k0, m0) in seen or m0 == "anytime_td":
+                continue
+            seen.add((k0, m0))
+            rr0 = recmap.get((k0, m0)); pr0 = pj.loc[k0] if k0 in pj.index else None
+            if rr0 is None or pr0 is None:
+                continue
+            if isinstance(pr0, pd.DataFrame): pr0 = pr0.iloc[0]
+            cl0, cf0, _ = cons.get((k0, m0), (None, None, 0))
+            if cl0 is None:
+                continue
+            g0, _o = bf._game_ctx(b0["game"], bf.TEAM_FIX.get(pr0["team"], pr0["team"]), sched_rows, code2full)
+            tot0 = (g0.get("implied_team_pts", 22) * 2) if g0 else 44.0
+            bl0 = float(rr0["baseline"])
+            lag_rows.append({"mkt": m0, "gap": float(pm.market_mean(m0, cl0, cf0)) - bl0, "total_c": tot0 - 44.0,
+                             "base_c": bl0 - model.get("base_med", {}).get(m0, bl0),
+                             "form3": float(rr0["last3"]) - bl0, "form1": float(rr0["last1"]) - bl0})
+        applied = {m_: model.get("weights", {}).get(m_, {}).get("form3", 0.0) * mf.OFFSEASON_FORM_RATIO.get(m_, mf.OFFSEASON_FORM_DEFAULT)
+                   for m_ in {r_["mkt"] for r_ in lag_rows}}
+        fit_ = ml.fit(lag_rows, applied)
+        wk_ = (int(recency_week) + 1) if recency_week is not None else 1
+        lag_factors = ml.update(int(recency_season) + (1 if recency_week is None else 0), wk_, fit_)
+        lag_factors = {m_: v_["lag_factor"] for m_, v_ in lag_factors.items()}
+        print("market lag:", {m_: (fit_[m_].get("coef", {}) or {}).get("form3") for m_ in fit_}, "-> form factor", lag_factors)
+    except Exception as _e:
+        print("market lag skipped:", _e)
     out = []
     for _, b in board.iterrows():
         k = _norm(b["name"]); mkt = b["mkt"]
@@ -243,7 +293,9 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
             # game context for the non-recency factors
             g, opp_team = bf._game_ctx(b["game"], bf.TEAM_FIX.get(team, team), sched_rows, code2full)
             total = (g.get("implied_team_pts", 22) * 2) if g else 44.0    # game total ~ 2x team implied
-            home = 1.0 if (g and team and bf.TEAM_FIX.get(team, team) == b["game"].split(" @ ")[-1][-3:]) else 0.0
+            # venue from the schedule row (Fresh Eyes day 2: the old string test compared a team code
+            # to the last three letters of the home team's full name — home was ALWAYS 0)
+            home = 1.0 if (g and g.get("is_home")) else 0.0
             ddelta = 0.0
             if g and opp_team:
                 if mkt in ("rush_yds", "rush_att"): ddelta = def_vs.get("RB", {}).get(opp_team, 0.0)
@@ -257,9 +309,23 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
             # in-season rows, so applying it unscaled across the offseason roughly DOUBLED every
             # Week-1 edge and manufactured a tail of absurd ones (a +45% "edge" on a rushing under).
             role_base = baseline
-            if recency_week is None:
+            # PER-PLAYER gap (Fresh Eyes day 2): the offseason treatment keys off HIS window, not
+            # the global mode. gap 0 = his last game is this season (full form, own baseline);
+            # gap 1 = his window crosses one offseason (the measured half-strength ratio + the
+            # market-role baseline — also for a player returning in Week 6 with no 2026 games);
+            # gap >= 2 = he missed a whole season (Watson: "closed last season with 176, 125..."
+            # were 2024 games). The ratio was measured on gap-1 rows only; gap >= 2 has n = 4-12
+            # in five seasons — unmeasurable — so form is NOT applied and trust is cut.
+            cur_season = int(recency_season) + (1 if recency_week is None else 0)
+            last_season = rr.get("last_season")
+            gap = (cur_season - int(last_season)) if last_season is not None and last_season == last_season else (1 if recency_week is None else 0)
+            if gap >= 2:
+                feats["form3"] = 0.0; feats["form1"] = 0.0
+            lag = 1.0
+            if gap >= 1:
                 ratio = mf.OFFSEASON_FORM_RATIO.get(mkt, mf.OFFSEASON_FORM_DEFAULT)
-                feats["form3"] *= ratio; feats["form1"] *= ratio
+                lag = float(lag_factors.get(mkt, 1.0))       # the market's lag on this tilt (measured)
+                feats["form3"] *= ratio * lag; feats["form1"] *= ratio * lag
                 # OFFSEASON ROLE BASELINE: with no current-season games, our baseline is last
                 # season's average — blind to the role changes the market has already priced (a
                 # backup now starting, a rookie's full role, a star's new QB). Every absurd Week-1
@@ -271,13 +337,22 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                 if c_line is None:
                     io_, iu_ = implied(b["over_price"]), implied(b["under_price"])
                     c_fair = io_ / (io_ + iu_) if (io_ + iu_) else 0.5; c_line = b["line"]
-                role_base = float(pm.market_mean(mkt, c_line, c_fair))
+                role_base = float(cons_mean.get((k, mkt), pm.market_mean(mkt, c_line, c_fair)))
                 # The mean-reversion weight was EARNED on our own baseline — a noisy sample mean
                 # that overstates high values and deserves shrinking. The market's number is
                 # already a shrunk estimate; regressing it again double-shrinks and pushed 73% of
                 # the Week-1 board to Unders (every star "due to fall"). With a market baseline,
                 # mean-reversion is zero — the market has already done it.
                 feats["base_c"] = 0.0
+                # ...and so has the ENVIRONMENT (Fresh Eyes day 2, measured on this week's board,
+                # mean-reversion controlled): the market's number minus our season baseline moves
+                # with the game total at 1.14/pt for passing (our earned weight 1.20), 0.21 for
+                # receiving (earned 0.21), and with home at -4.9 for passing (earned -4.1); R² .82
+                # for passing. The market line IS our baseline plus our own environment tilts, so
+                # adding total_c/home on top of it double-counts — Herbert O233.5 (+15.6 from the
+                # total) and Goff O261.5 (+14.9) were phantom edges. Under the market baseline only
+                # the tilt the market is known to LAG applies: recent form (half-strength).
+                feats["total_c"] = 0.0; feats["home"] = 0.0; feats["def_delta"] = 0.0
             resid = mf.predict_residual(mkt, feats, model)
             our_mu = max(role_base + resid, 0.1)
             trend = round(float(rr["last3"]) - baseline, 1)
@@ -286,7 +361,7 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
             contrib = {f: round(w.get(f, 0.0) * feats[f], 2) for f in feats} if w else {}
         else:                          # no recent games (rookie / new role) -> role-model projection
             our_mu = float(pr[mkt]) if (pr is not None and mkt in pr and pd.notna(pr[mkt])) else None
-            trend = 0.0; baseline = our_mu; log = None; src = "role"
+            trend = 0.0; baseline = our_mu; log = None; src = "role"; gap = None; last_season = None; lag = None
         if our_mu is None or our_mu <= 0:
             continue
         wg = (weather_by_game or {}).get(b["game"])
@@ -300,6 +375,7 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
             our_mu = our_mu * role_mult
         p = price_ou(mkt, our_mu, b["line"], b["over_price"], b["under_price"])
         conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
+        if gap is not None and gap >= 2: conf *= 0.7    # missed a season: the form read is unmeasurable, trust cut
         # own status shy of Out: Doubtful/Questionable erode trust (the scorecard shows it too)
         if own_inj and own_inj.get("status") == "Doubtful": conf *= 0.5       # mostly don't play (scratch rail)
         elif own_inj and own_inj.get("status") == "Questionable": conf *= 0.92 # measured: no performance drop; scratch risk only
@@ -312,8 +388,11 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                     "rookie": bool(pr["rookie"]) if pr is not None and "rookie" in pr else False,
                     "confidence": conf, "edge_src": src, "trend": round(trend, 1),
                     "baseline": (round(baseline, 1) if baseline else None), "recent_log": log,
-                    "contrib": contrib, "offseason": (recency_week is None),
+                    "contrib": contrib, "offseason": (gap is None and recency_week is None) or (gap is not None and gap >= 1),
+                    "form_gap": gap, "last_season": (int(last_season) if last_season is not None and last_season == last_season else None),
+                    "market_lag": (round(float(lag), 3) if lag is not None else None),
                     "market_num": round(pm.market_mean(mkt, b["line"], p["fair_over"]), 1),
+                    "cons_mean": (round(cons_mean[(k, mkt)], 1) if (k, mkt) in cons_mean else None),
                     "side": p["side"], "edge": p["edge"], "model_p": p["model_p"], "fair": p["fair"],
                     "price": p["price"], "ev": p["ev"],
                     "over_price_kept": b["over_price"], "under_price_kept": b["under_price"],
@@ -341,12 +420,39 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                      "n_books": int(g["book"].nunique()), "shop_adv": round(adv, 3),
                      "best_price": int(g["price"].iloc[best_i]), "book_best": g["book"].iloc[best_i]})
     shopdf = pd.DataFrame(shop)
+    # MARKET BREADTH (Fresh Eyes day 2): how many books post this player-market AT ALL, and the
+    # consensus line. `n_books` above counts books at OUR exact line — and the row we keep is the
+    # best line for our side, which is usually a one-book outlier. So every shopped Over sat at
+    # n_books=1 (trust -3) while a same-line Under scored +3: a 6-point Desk-Score swing that was
+    # an artifact of shopping, not evidence. Trust reads `n_books_mkt`; the shopping context stays
+    # for display and `cons_line` lets the grading loop earn "is the outlier book soft or sharp?"
+    breadth = (df.groupby(["name", "mkt"]).agg(n_books_mkt=("book", "nunique"),
+                                               cons_line=("line", "median")).reset_index())
     df = df.sort_values("edge", ascending=False).drop_duplicates(["name", "mkt", "side"])
     if len(shopdf):
         df = df.merge(shopdf, on=["name", "mkt", "side", "line"], how="left")
         df["price"] = df["best_price"].fillna(df["price"]).astype(int)   # best price AT our line
         df["book"] = df["book_best"].fillna(df["book"])
         df["ev"] = (df["model_p"] * df["price"].map(american_profit) - (1 - df["model_p"])).round(3)
+    df = df.merge(breadth, on=["name", "mkt"], how="left")
+    df["line_vs_cons"] = (df["line"] - df["cons_line"]).round(1)
+    # WHERE THE EDGE COMES FROM (Fresh Eyes day 2): our tilt vs the consensus mean, and this
+    # book's NUMBER vs the consensus — both signed for our side. A pick whose edge is mostly the
+    # number is an OFF-MARKET play (a sharp's line-shop: BetRivers 247.5 when three books imply
+    # ~234), honest only when 3+ books define the consensus; with two disagreeing books there
+    # is no consensus to trust, so it is REVIEW, never a PICK.
+    sgn = np.where(df["side"].eq("Over"), 1.0, -1.0)
+    cm = df["cons_mean"].astype(float)
+    df["tilt"] = ((df["desk_proj"].astype(float) - cm) * sgn).round(2)
+    df["off_market"] = ((cm - df["market_num"].astype(float)) * sgn).round(2)
+    def _kind(r):
+        if r["cons_mean"] is None or r["cons_mean"] != r["cons_mean"]:
+            return "model"
+        om = max(float(r["off_market"] or 0), 0.0); tl = max(float(r["tilt"] or 0), 0.0)
+        if om <= 0 or om < tl:
+            return "model"
+        return "off-market" if int(r.get("n_books_mkt") or 0) >= 3 else "no-consensus"
+    df["thesis_kind"] = df.apply(_kind, axis=1)
     return df
 
 
@@ -363,6 +469,8 @@ def classify(row):
         return "REVIEW"                                   # kicker flat prior — never a pick
     if row.get("edge_src") != "multifactor":
         return "REVIEW"                                   # no recent data to model — untrusted
+    if row.get("thesis_kind") == "no-consensus":
+        return "REVIEW"                                   # two books disagree, no consensus to bet against
     ratio = row["desk_proj"] / row["line"] if row["line"] else 1.0
     if not (TRUST_LO <= ratio <= TRUST_HI):
         return "REVIEW"
@@ -445,7 +553,12 @@ def reason(row, news=None):
     log = list(log) if log is not None and len(log) else None
     loglist = ", ".join(f"{v:g}" for v in log) if log else None
     offseason = row.get("offseason")
-    when = "closed last season" if offseason else "over his last four"
+    gap = row.get("form_gap"); ls_ = row.get("last_season")
+    stale_form = gap is not None and gap == gap and int(gap) >= 2
+    if stale_form:
+        when = f"last played in {int(ls_)}, closing that year" if ls_ is not None and ls_ == ls_ else "last played two seasons ago, closing"
+    else:
+        when = "closed last season" if offseason else "over his last four"
     open_lines = {"Over": f"We're on {name} over {line} {mkt_lbl}. ",
                   "Under": f"Give us {name} under {line} {mkt_lbl}. "}
     lead = open_lines.get(side, f"We like {name} {s} {line} {mkt_lbl}. ")
@@ -458,7 +571,14 @@ def reason(row, news=None):
              "total_c": "the game total", "home": "the venue", "base_c": "mean-reversion"}
     drivers = sorted([(f, v) for f, v in contrib.items() if abs(v) >= 0.4], key=lambda x: -abs(x[1]))[:3]
     mkt_num = row.get("market_num")
-    if drivers:
+    kind = row.get("thesis_kind"); cmn = row.get("cons_mean"); nbm_ = row.get("n_books_mkt"); om_ = row.get("off_market"); tl_ = row.get("tilt")
+    if kind == "off-market" and cmn is not None and cmn == cmn and mkt_num:
+        # the NUMBER is the play: this book sits off the consensus of the other books
+        case += (f"{int(nbm_)} books post this market; their consensus implies about {float(cmn):g} {unit or mkt_lbl} and "
+                 f"{str(row.get('book')).replace('_us', '')} hangs {float(line):g}, which implies ~{float(mkt_num):g} — "
+                 f"{abs(float(om_)):g} {unit or 'units'} off the market for our side. That number, not our model, is the play"
+                 + (f"; our own read adds {float(tl_):+g} on top. " if tl_ is not None and tl_ == tl_ and abs(float(tl_)) >= 0.3 else "; our own read is flat on him. "))
+    elif drivers:
         parts = []
         for f, v in drivers:
             d = ("pushes down" if v < 0 else "pushes up")
@@ -474,6 +594,14 @@ def reason(row, news=None):
              f"{int(row['model_p']*100)}% — {ev:+.0f} cents on the dollar at {price:+d}"
              + (f" ({row.get('book')})" if row.get("book") else "")
              + (f", best of {int(row['n_books'])} books" if row.get("n_books", 0) and row['n_books'] > 1 else "") + ". ")
+    # the shop, in words: our line vs the consensus across the books that post this market
+    nbm = row.get("n_books_mkt"); cl = row.get("cons_line"); lvc = row.get("line_vs_cons")
+    if nbm is not None and nbm == nbm and cl is not None and cl == cl and lvc is not None and lvc == lvc and abs(float(lvc)) >= 0.5 and int(nbm) > 1:
+        better = (side == "Over" and lvc < 0) or (side == "Under" and lvc > 0)
+        pts = abs(float(lvc)); ptxt = f"{pts:g} point{'s' if pts != 1 else ''}"
+        money += (f"The consensus line across {int(nbm)} books is {float(cl):g}; {str(row.get('book')).replace('_us', '')} posts {float(line):g} — "
+                  + (f"the softer number for our side, so the shop is worth {ptxt} of line. " if better
+                     else "a worse number than the field, so the price has to carry the play. "))
     # kickoff weather, only when it moved the number (wind above ~8 mph or cold, outdoors)
     wxm = row.get("wx_mult")
     if wxm is not None and wxm == wxm and abs(float(wxm) - 1.0) >= 0.02 and row.get("wx_roof") not in ("dome", "closed", "indoors"):
@@ -484,8 +612,18 @@ def reason(row, news=None):
         if wbits:
             case += (f"Kickoff forecast: {', '.join(wbits)} — that {'trims' if wxm < 1 else 'lifts'} our number "
                      f"{abs(float(wxm) - 1) * 100:.0f}% ({'passing suffers in wind and cold' if wxm < 1 else 'offenses lean on the run'}). ")
-    conf_note = ("Honest caveat: this leans on late-2025 form across the offseason — an early-season "
-                 "read, sized as a lean." if offseason else "Multi-factor signal, sized to conviction.")
+    if stale_form:
+        conf_note = (f"Honest caveat: his last games were in {int(ls_) if ls_ is not None and ls_ == ls_ else 'a prior season'} — a missed season, so "
+                     "recent form is NOT applied (unmeasurable at that gap); this number is the market's role read plus the "
+                     "environment (game total, venue, weather), with trust cut.")
+    else:
+        conf_note = ("Honest caveat: this leans on late-2025 form across the offseason — an early-season "
+                     "read, sized as a lean." if offseason else "Multi-factor signal, sized to conviction.")
+        mlag = row.get("market_lag")
+        if offseason and mlag is not None and mlag == mlag and float(mlag) < 0.75:
+            conf_note += (f" Measured this week: the market already prices late-season {mkt_lbl} form"
+                          + (" in full" if float(mlag) <= 0.05 else f" at about {(1 - float(mlag)) * 100:.0f}% of our weight")
+                          + ", so our form tilt is scaled down to what it leaves on the table.")
     # injury context: the role cascade (a teammate out feeds him) or his own status
     inj_line = ""
     rn = row.get("role_note"); st = row.get("inj_status")
