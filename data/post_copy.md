@@ -1,25 +1,25 @@
-# Post copy — 2026 week 1 · generated 2026-09-03T04:15+00:00
+# Post copy — 2026 week 1 · generated 2026-09-03T05:15+00:00
 
 ## card_full
 
 THE DESK — Week 1 Card (8 plays)
-▸ Derrick Henry OVER 77.5 rush yds (-115 BetRivers) · A- · 1u — we make it 62%, the market 50%
-▸ Rhamondre Stevenson OVER 39.5 rush yds (-118 BetRivers) · A- · 1u — we make it 63%, the market 50%
-▸ Jonathan Taylor UNDER 78.5 rush yds (-114 DraftKings) · A- · 1u — we make it 60%, the market 50%
-▸ Jahmyr Gibbs UNDER 85.5 rush yds (-111 DraftKings) · A- · 1u — we make it 58%, the market 50%
+▸ Rhamondre Stevenson OVER 39.5 rush yds (-118 BetRivers) · A- · 1u — we make it 62%, the market 50%
+▸ Derrick Henry OVER 77.5 rush yds (-115 BetRivers) · A- · 1u — we make it 60%, the market 50%
+▸ DeMario Douglas UNDER 20.5 rec yds (-118 BetRivers) · A- · 1u — we make it 58%, the market 50%
+▸ Jonathan Taylor UNDER 78.5 rush yds (-114 DraftKings) · A- · 1u — we make it 59%, the market 50%
 ▸ Baker Mayfield UNDER 247.5 pass yds (-117 BetRivers) · A- · 1u — we make it 58%, the market 50%
+▸ Colby Parkinson OVER 21.5 rec yds (-116 DraftKings) · A- · 1u — we make it 57%, the market 51%
+▸ Jahmyr Gibbs UNDER 85.5 rush yds (-111 DraftKings) · A- · 1u — we make it 57%, the market 50%
 ▸ Chase Brown OVER 57.5 rush yds (-114 FanDuel) · A- · 1u — we make it 57%, the market 50%
-▸ James Cook UNDER 74.5 rush yds (-110 DraftKings) · A- · 1u — we make it 57%, the market 50%
-▸ Parker Washington OVER 51.5 rec yds (-114 FanDuel) · A- · 1u — we make it 56%, the market 50%
-Rail: every Card play is ≥56% to hit on our numbers (avg edge +8.9%). Sizes are units, not confidence theater. Graded Monday at the price posted.
+Rail: every Card play is ≥57% to hit on our numbers (avg edge +8.1%). Sizes are units, not confidence theater. Graded Monday at the price posted.
 
-_(948 chars)_
+_(952 chars)_
 
 ## teaser
 
-Week 1 Card is live: 8 plays, every one ≥56% to hit on our numbers.
+Week 1 Card is live: 8 plays, every one ≥57% to hit on our numbers.
 
-Free one: Rhamondre Stevenson OVER 39.5 rush yds (-118 BetRivers) — we make it 63%.
+Free one: Rhamondre Stevenson OVER 39.5 rush yds (-118 BetRivers) — we make it 62%.
 
 The other 7 are in the Desk. Graded Monday, at the posted price.
 
@@ -31,7 +31,7 @@ _(218 chars)_
 
 Free pick, Week 1: Rhamondre Stevenson OVER 39.5 rush yds (-118 BetRivers).
 
-We make it 63%; the price says 50%. Thread 🧵
+We make it 62%; the price says 50%. Thread 🧵
 
 **2/3** (180 chars)
 

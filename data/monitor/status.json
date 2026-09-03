@@ -1,0 +1,206 @@
+{
+ "last_check": "2026-09-03T05:19+00:00",
+ "polls_24h": [
+  "2026-09-03T05:13+00:00",
+  "2026-09-03T05:19+00:00"
+ ],
+ "events_24h": 298,
+ "events_total": 298,
+ "players_watched": 509,
+ "card_players": 8,
+ "feeds": {
+  "espn_injuries": {
+   "refreshed": "2026-09-03T04:34+00:00",
+   "rows": 1930
+  },
+  "rss_news": {
+   "refreshed": "2026-09-03T04:34+00:00",
+   "rows": 347
+  },
+  "sleeper_players": {
+   "refreshed": "2026-09-03T04:32+00:00",
+   "rows": 12226
+  },
+  "sleeper_trending": {
+   "refreshed": "2026-09-03T04:32+00:00",
+   "rows": 100
+  },
+  "sleeper_drops": {
+   "refreshed": "2026-09-03T04:32+00:00",
+   "rows": 100
+  },
+  "underdog_lines": {
+   "refreshed": "2026-09-03T04:34+00:00",
+   "rows": 10684
+  },
+  "action_scoreboard": {
+   "refreshed": "2026-09-03T04:34+00:00",
+   "rows": 16
+  },
+  "espn_news": {
+   "refreshed": "2026-09-03T04:34+00:00",
+   "rows": 50
+  }
+ },
+ "by_kind_24h": {
+  "note": 203,
+  "headline": 61,
+  "status": 0,
+  "trending": 34,
+  "line": 0,
+  "game": 0
+ },
+ "latest": [
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Ryan Flournoy",
+   "on_card": false,
+   "text": "Flournoy is listed as the Cowboys' third wide receiver on the depth chart behind CeeDee Lamb and George Pickens.",
+   "source": "rotowire/espn",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/5083754?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Jake Ferguson",
+   "on_card": false,
+   "text": "Ferguson did not play in any of the Cowboys' three preseason games.",
+   "source": "rotowire/espn",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4242355?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Dak Prescott",
+   "on_card": false,
+   "text": "Prescott didn't log any snaps during the Cowboys' three-game preseason schedule.",
+   "source": "rotowire/espn",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/2577417?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Brock Bowers",
+   "on_card": false,
+   "text": "Bowers will open the 2026 season working with Kirk Cousins as his quarterback after the veteran was named the Week 1 starter Wednesday, Ryan McFadden of ESPN.com reports.",
+   "source": "Ryan McFadden of ESPN.com",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4432665?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Davante Adams",
+   "on_card": false,
+   "text": "Adams didn't suit up for any of the Rams' three-game preseason schedule.",
+   "source": "rotowire/espn",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/16800?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Greg Dulcich",
+   "on_card": false,
+   "text": "Dulcich did not record a target across his two preseason games.",
+   "source": "rotowire/espn",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4367209?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Jordan Mason",
+   "on_card": false,
+   "text": "Mason and Aaron Jones are listed as co-starting running backs on the Vikings' unofficial depth chart following cutdown day Sunday, Rob Kleifield of the team's official site reports.",
+   "source": "Rob Kleifield of the team's official site",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4360569?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Aaron Jones",
+   "on_card": false,
+   "text": "Jones and Jordan Mason are listed as co-starting running backs on the Vikings' unofficial depth chart following cut-down day Sunday, Rob Kleifield of the team's official site reports.",
+   "source": "Rob Kleifield of the team's official site",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/3042519?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Chris Godwin",
+   "on_card": false,
+   "text": "Buccaneers general manager Jason Licht praised Godwin on Monday for his consistency and veteran leadership, Brianna Dix of the team's official site reports.",
+   "source": "Brianna Dix of the team's official site",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/3116165?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Darren Waller",
+   "on_card": false,
+   "text": "Waller, who signed with the Panthers on Aug. 12, took part in team drills with the first-team offense Wednesday as the coaching staff looks to get him fully incorporated ahead of Week 1, Kassidy Hill of the team's official site reports.",
+   "source": "Kassidy Hill of the team's official site",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/2576925?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "note",
+   "who": "Dalton Schultz",
+   "on_card": false,
+   "text": "Schultz did not play in any of the Texans' three preseason games.",
+   "source": "rotowire/espn",
+   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/3117256?lang=en&region=us",
+   "status": "Active",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "headline",
+   "who": "Quinshon Judkins",
+   "on_card": false,
+   "text": "Mike Hall moves past training camp incident with Quinshon Judkins",
+   "source": "rss:yahoo",
+   "url": "https://sports.yahoo.com/articles/mike-hall-moves-past-training-022101229.html",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "headline",
+   "who": "Jordan Love",
+   "on_card": false,
+   "text": "Packers QB Jordan Love hoping to throw more",
+   "source": "rss:yahoo",
+   "url": "https://sports.yahoo.com/articles/packers-qb-jordan-love-hoping-021923115.html",
+   "date": "2026-09-03"
+  },
+  {
+   "ts": "2026-09-03T05:13+00:00",
+   "kind": "headline",
+   "who": "Jahmyr Gibbs",
+   "on_card": true,
+   "text": "Brad Holmes: Long-term plans for Sam LaPorta, Brian Branch haven&#39;t changed",
+   "source": "rss:yahoo",
+   "url": "https://sports.yahoo.com/articles/brad-holmes-long-term-plans-010302405.html",
+   "date": "2026-09-03"
+  }
+ ]
+}

@@ -1,77 +1,541 @@
 {
-  "updated": "2026-09-01",
-  "wired_and_active": [
-    {
-      "src": "nflverse play-by-play (1999-2025)",
-      "use": "EPA ratings, coaching PROE, goal-line/RZ usage, TD model"
-    },
-    {
-      "src": "nflverse player_stats weekly",
-      "use": "prop projection engine (usage + efficiency)"
-    },
-    {
-      "src": "nflverse depth charts + rosters (2026)",
-      "use": "role rank, vacated-opportunity, refreshed every run"
-    },
-    {
-      "src": "nflverse draft picks",
-      "use": "rookie capital priors"
-    },
-    {
-      "src": "nflverse schedules",
-      "use": "coach/QB continuity, closing lines, HFA, macro tests"
-    },
-    {
-      "src": "The Odds API (live)",
-      "use": "sides/totals/ML board + live player prop lines (all markets)"
-    },
-    {
-      "src": "ff_opportunity (fantasy expected stats)",
-      "use": "WIRED \u2014 regression signal (fade lucky / buy due), stabilizer"
-    },
-    {
-      "src": "historical open/close odds (2006-26)",
-      "use": "ingested \u2014 open\u2192close CLV backtest (pending run)"
-    },
-    {
-      "src": "referee/crew stats",
-      "use": "MONITOR overlay (weak penalty signal)"
-    }
-  ],
-  "wired_fires_in_season": [
-    {
-      "src": "nflverse injuries (Out/Doubtful/Questionable + practice)",
-      "use": "WIRED \u2014 availability multiplier; reports drop Week 1 2026"
-    },
-    {
-      "src": "in-season usage (PROE volume, goal-line/RZ shares)",
-      "use": "un-gates movers/rookies/TD props once 2026 games start"
-    }
-  ],
-  "runtime_agent_fetched": [
-    {
-      "src": "beat-writer / depth-chart news",
-      "use": "WebSearch at scheduled-run time \u2192 pick rationale + resolves REVIEW flags. Hook exists; not a cached dataset"
-    }
-  ],
-  "blocked": [
-    {
-      "src": "fantasy ADP feed (dynastyprocess/FantasyPros)",
-      "use": "403 in container; ff_opportunity substitutes"
-    },
-    {
-      "src": "aussportsbetting direct download",
-      "use": "403; Alex provided the file manually instead"
-    }
-  ],
-  "not_yet": [
-    {
-      "src": "player-specific variance shapes",
-      "use": "boom/bust vs possession \u2014 improves prop + smash pricing"
-    },
-    {
-      "src": "game-script conditioning",
-      "use": "project usage given projected game flow"
-    }
+ "built": "2026-09-03T05:19+00:00",
+ "sources": {
+  "pbp": {
+   "family": "nflverse",
+   "feeds": "everything: EPA, zones, roles, TDs, script, pace",
+   "files": 5,
+   "rows": 247284,
+   "columns": 372,
+   "cells": 91989648,
+   "bytes": 102145150,
+   "seasons": [
+    2021,
+    2025
+   ],
+   "n_seasons": 5,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "participation": {
+   "family": "nflverse",
+   "feeds": "personnel, players on the field, defenders in box, pressure, time to throw \u2192 goal-line packages, routes run",
+   "files": 10,
+   "rows": 478989,
+   "columns": 26,
+   "cells": 10403406,
+   "bytes": 34817744,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "ftn_charting": {
+   "family": "nflverse",
+   "feeds": "motion, play action, RPO, screens, blitzers, pass rushers, catchable/contested/drops, QB sneaks",
+   "files": 4,
+   "rows": 185215,
+   "columns": 29,
+   "cells": 5371235,
+   "bytes": 2189341,
+   "seasons": [
+    2022,
+    2025
+   ],
+   "n_seasons": 4,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "stats_player": {
+   "family": "nflverse",
+   "feeds": "every box-score stat per player-week (targets, air yards, YAC, carries, fantasy points)",
+   "files": 10,
+   "rows": 182255,
+   "columns": 150,
+   "cells": 27338250,
+   "bytes": 8267826,
+   "seasons": [
+    2016,
+    2025
+   ],
+   "n_seasons": 10,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "stats_team": {
+   "family": "nflverse",
+   "feeds": "team weekly totals: plays, pass/rush splits, red-zone, turnovers",
+   "files": 10,
+   "rows": 5522,
+   "columns": 138,
+   "cells": 762036,
+   "bytes": 1263807,
+   "seasons": [
+    2016,
+    2025
+   ],
+   "n_seasons": 10,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "ngs_passing": {
+   "family": "nflverse/NGS",
+   "feeds": "tracking-derived: time to throw, air yards, aggressiveness, CPOE, expected completion",
+   "files": 1,
+   "rows": 5933,
+   "columns": 29,
+   "cells": 172057,
+   "bytes": 724317,
+   "seasons": [
+    2016,
+    2025
+   ],
+   "n_seasons": 10,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "ngs_receiving": {
+   "family": "nflverse/NGS",
+   "feeds": "tracking-derived: separation, cushion, intended air yards share, YAC over expected, catch %",
+   "files": 1,
+   "rows": 14731,
+   "columns": 23,
+   "cells": 338813,
+   "bytes": 1118797,
+   "seasons": [
+    2016,
+    2025
+   ],
+   "n_seasons": 10,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "ngs_rushing": {
+   "family": "nflverse/NGS",
+   "feeds": "tracking-derived: rush yards over expected, efficiency, time to line, 8+ in the box rate",
+   "files": 1,
+   "rows": 6059,
+   "columns": 22,
+   "cells": 133298,
+   "bytes": 381166,
+   "seasons": [
+    2016,
+    2025
+   ],
+   "n_seasons": 10,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "pfr_pass": {
+   "family": "nflverse/PFR",
+   "feeds": "pressures, blitzes, hurries, drops by receivers, bad throws, on-target %, pocket time, RPO/play-action splits",
+   "files": 8,
+   "rows": 5424,
+   "columns": 24,
+   "cells": 130176,
+   "bytes": 237816,
+   "seasons": [
+    2018,
+    2025
+   ],
+   "n_seasons": 8,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "pfr_rush": {
+   "family": "nflverse/PFR",
+   "feeds": "yards before/after contact, broken tackles",
+   "files": 8,
+   "rows": 18461,
+   "columns": 16,
+   "cells": 295376,
+   "bytes": 353758,
+   "seasons": [
+    2018,
+    2025
+   ],
+   "n_seasons": 8,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "pfr_rec": {
+   "family": "nflverse/PFR",
+   "feeds": "targets, ADOT, YAC, broken tackles, drops, interceptions on target, passer rating when targeted",
+   "files": 8,
+   "rows": 35724,
+   "columns": 17,
+   "cells": 607308,
+   "bytes": 422258,
+   "seasons": [
+    2018,
+    2025
+   ],
+   "n_seasons": 8,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "pfr_def": {
+   "family": "nflverse/PFR",
+   "feeds": "coverage: targets allowed, completion % allowed, yards allowed, pressures, missed tackles",
+   "files": 8,
+   "rows": 62345,
+   "columns": 29,
+   "cells": 1808005,
+   "bytes": 1246316,
+   "seasons": [
+    2018,
+    2025
+   ],
+   "n_seasons": 8,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "snap_counts": {
+   "family": "nflverse/PFR",
+   "feeds": "offense/defense/ST snaps and snap % per player-game (incl. preseason) \u2192 role anchors",
+   "files": 14,
+   "rows": 324611,
+   "columns": 16,
+   "cells": 5193776,
+   "bytes": 2918884,
+   "seasons": [
+    2013,
+    2025
+   ],
+   "n_seasons": 13,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "espn_qbr_week": {
+   "family": "nflverse/ESPN",
+   "feeds": "ESPN Total QBR per QB-week",
+   "files": 1,
+   "rows": 10709,
+   "columns": 30,
+   "cells": 321270,
+   "bytes": 294869,
+   "seasons": [
+    2006,
+    2025
+   ],
+   "n_seasons": 20,
+   "refreshed": "2026-09-03T04:31+00:00"
+  },
+  "depth_charts": {
+   "family": "nflverse",
+   "feeds": "team depth charts by week (role rank, formation slots)",
+   "files": 6,
+   "rows": 1196441,
+   "columns": 12,
+   "cells": 14807010,
+   "bytes": 6776392,
+   "seasons": [
+    2021,
+    2024
+   ],
+   "n_seasons": 4,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "rosters_weekly": {
+   "family": "nflverse",
+   "feeds": "who is on the roster each week, status, age, experience",
+   "files": 6,
+   "rows": 234844,
+   "columns": 36,
+   "cells": 8454384,
+   "bytes": 4625385,
+   "seasons": [
+    2021,
+    2026
+   ],
+   "n_seasons": 6,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "injuries": {
+   "family": "nflverse",
+   "feeds": "official injury reports: practice status, game status",
+   "files": 5,
+   "rows": 29151,
+   "columns": 16,
+   "cells": 466416,
+   "bytes": 619169,
+   "seasons": [
+    2021,
+    2025
+   ],
+   "n_seasons": 5,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "players": {
+   "family": "nflverse",
+   "feeds": "id crosswalk (gsis/espn/pfr/sleeper/yahoo\u2026), position, draft, birth date",
+   "files": 1,
+   "rows": 25065,
+   "columns": 39,
+   "cells": 977535,
+   "bytes": 3420037,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "contracts": {
+   "family": "nflverse/OTC",
+   "feeds": "contract value/guarantees/years (role security)",
+   "files": 1,
+   "rows": 52585,
+   "columns": 48,
+   "cells": 2524080,
+   "bytes": 11166715,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "draft_picks": {
+   "family": "nflverse",
+   "feeds": "draft capital (rookie baseline prior)",
+   "files": 1,
+   "rows": 12927,
+   "columns": 36,
+   "cells": 465372,
+   "bytes": 698443,
+   "seasons": [
+    1980,
+    2026
+   ],
+   "n_seasons": 47,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "combine": {
+   "family": "nflverse",
+   "feeds": "athleticism (40, vertical, broad, 3-cone, shuttle, size)",
+   "files": 1,
+   "rows": 8968,
+   "columns": 18,
+   "cells": 161424,
+   "bytes": 374318,
+   "seasons": [
+    2000,
+    2026
+   ],
+   "n_seasons": 27,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "officials": {
+   "family": "nflverse",
+   "feeds": "crew assignments per game (penalty/pace tendencies)",
+   "files": 1,
+   "rows": 22012,
+   "columns": 9,
+   "cells": 198108,
+   "bytes": 150096,
+   "seasons": [
+    2015,
+    2026
+   ],
+   "n_seasons": 12,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "schedules": {
+   "family": "nflverse",
+   "feeds": "kickoffs, spread/total/moneyline, roof, surface, temp, wind, referee, rest, coaches, QBs",
+   "files": 1,
+   "rows": 7548,
+   "columns": 46,
+   "cells": 347208,
+   "bytes": 525851,
+   "seasons": [
+    1999,
+    2026
+   ],
+   "n_seasons": 28,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "sleeper_players": {
+   "family": "Sleeper",
+   "feeds": "11k players with every platform id, depth-chart order, injury status/body part, practice notes",
+   "files": 1,
+   "rows": 12226,
+   "columns": 35,
+   "cells": 427910,
+   "bytes": 1373307,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "sleeper_trending": {
+   "family": "Sleeper",
+   "feeds": "the crowd's adds in the last 24h (role news leaks here first)",
+   "files": 1,
+   "rows": 100,
+   "columns": null,
+   "cells": 1200,
+   "bytes": 3894,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "sleeper_drops": {
+   "family": "Sleeper",
+   "feeds": "the crowd's drops in the last 24h",
+   "files": 1,
+   "rows": 100,
+   "columns": null,
+   "cells": 1200,
+   "bytes": 3893,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "sleeper_state": {
+   "family": "Sleeper",
+   "feeds": "current season/week",
+   "files": 1,
+   "rows": 10,
+   "columns": null,
+   "cells": 120,
+   "bytes": 230,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "sleeper_proj_week": {
+   "family": "Sleeper",
+   "feeds": "a second projection set per player-week (usage, yards, TDs) \u2014 a role read to test against the market",
+   "files": 1,
+   "rows": 3272,
+   "columns": null,
+   "cells": 39264,
+   "bytes": 2271415,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "sleeper_proj_season": {
+   "family": "Sleeper",
+   "feeds": "season-long projections (role expectations, ADP)",
+   "files": 1,
+   "rows": 3115,
+   "columns": null,
+   "cells": 37380,
+   "bytes": 3217664,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "sleeper_schedule": {
+   "family": "Sleeper",
+   "feeds": "schedule with status",
+   "files": 1,
+   "rows": 273,
+   "columns": null,
+   "cells": 3276,
+   "bytes": 30320,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "espn_fantasy_proj": {
+   "family": "ESPN",
+   "feeds": "ESPN's weekly + season projections and ownership % for every player",
+   "files": 1,
+   "rows": 25040,
+   "columns": 22,
+   "cells": 550880,
+   "bytes": 833474,
+   "seasons": [
+    2025,
+    2026
+   ],
+   "n_seasons": 2,
+   "refreshed": "2026-09-03T04:32+00:00"
+  },
+  "espn_injuries": {
+   "family": "ESPN",
+   "feeds": "injury designations with dates and details, per team, between official reports",
+   "files": 1,
+   "rows": 1930,
+   "columns": 13,
+   "cells": 25090,
+   "bytes": 546259,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:34+00:00"
+  },
+  "espn_news": {
+   "family": "ESPN",
+   "feeds": "headline feed (injuries, roles, transactions)",
+   "files": 1,
+   "rows": 50,
+   "columns": null,
+   "cells": 600,
+   "bytes": 925300,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:34+00:00"
+  },
+  "underdog_lines": {
+   "family": "Underdog",
+   "feeds": "vig-free medians on hundreds of player props (a second market to compare every line against)",
+   "files": 1,
+   "rows": 10684,
+   "columns": null,
+   "cells": 128208,
+   "bytes": 26596530,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:34+00:00"
+  },
+  "action_scoreboard": {
+   "family": "Action Network",
+   "feeds": "multi-book game odds, sometimes public bet/money splits",
+   "files": 1,
+   "rows": 16,
+   "columns": null,
+   "cells": 192,
+   "bytes": 1078480,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:34+00:00"
+  },
+  "rss_news": {
+   "family": "RSS",
+   "feeds": "ESPN / Yahoo / CBS / ProFootballTalk / Google News headlines, dated and sourced (the intel pass reads these)",
+   "files": 1,
+   "rows": 347,
+   "columns": 6,
+   "cells": 2082,
+   "bytes": 149081,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T04:34+00:00"
+  }
+ },
+ "totals": {
+  "sources": 36,
+  "families": {
+   "nflverse": 13,
+   "nflverse/NGS": 3,
+   "nflverse/PFR": 5,
+   "nflverse/ESPN": 1,
+   "nflverse/OTC": 1,
+   "Sleeper": 7,
+   "ESPN": 3,
+   "Underdog": 1,
+   "Action Network": 1,
+   "RSS": 1
+  },
+  "files": 125,
+  "rows": 3472673,
+  "data_points": 182675659,
+  "bytes": 230199107,
+  "seasons_span": [
+   1980,
+   2026
   ]
+ },
+ "own_tables": {
+  "pbp_2021_2025.parquet": {
+   "rows": 176478,
+   "columns": 42
+  },
+  "prop_player_games.parquet": {
+   "rows": 58086,
+   "columns": 7
+  },
+  "xtd_2026.parquet": {
+   "rows": 595,
+   "columns": 44
+  },
+  "schedules.parquet": {
+   "rows": 7548,
+   "columns": 46
+  }
+ }
 }

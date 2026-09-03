@@ -45,7 +45,7 @@ PICK_FIELDS = ["name", "game", "cat", "side", "line", "price", "book", "our_num"
                "intel_hard", "mkt_ratio", "mkt_flag", "position", "offseason", "verdict", "score_mult", "line_move",
                "score_conviction", "score_trust", "wx_mult", "wx_wind", "wx_temp", "wx_roof",
                "n_books_mkt", "cons_line", "line_vs_cons", "form_gap", "last_season", "fair",
-               "market_lag", "thesis_kind", "cons_mean", "tilt", "off_market"]
+               "market_lag", "thesis_kind", "cons_mean", "tilt", "off_market", "ud_line", "ud_over", "ud_under", "proj_rw", "proj_espn"]
 
 
 def game_teams(game):

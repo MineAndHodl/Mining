@@ -203,5 +203,188 @@
    "tests: test_fresh_eyes_day2"
   ],
   "tomorrow": "grade the market-lag table's stability once a second snapshot/week exists (pooled table); rookies onto the market-role baseline; the 'book dispersion as signal' log now has cons_mean/off_market/tilt on every row \u2014 grade it after 4 weeks; re-check the receptions dispersion (.20) against DK's ladder now that catch-count form is off in Week 1"
+ },
+ {
+  "date": "2026-09-03",
+  "day": 3,
+  "brief": "Alex: the numbers tile is not impressive; pull in a ton more data (tweets/live updates, fantasy projections, PFF?); show massive data consumed, only good stuff makes it, no talk of what failed; constant iteration; be vaguer about the feature list; how do we gain confidence in TD scorers? Free where possible; organized, testable, aligned.",
+  "hats": {
+   "handicapper": [
+    "who is on the field is the purest role read: route participation, snap share, goal-line package inclusion (participation data, free, 2016-25)",
+    "a second market (Underdog's 3,800 NFL lines) as an opinion on every number and a free line-move feed",
+    "the beat-writer layer can be automatic: ESPN's core API carries dated RotoWire-style notes per player citing the beat source; RSS and Google News reach from here after all"
+   ],
+   "quant": [
+    "98 candidates through the feature lab: usage (routes, snaps, GL/RZ inclusion) won every market both seasons; efficiency (NGS separation/RYOE/CPOE/YAC), charting (FTN catchable/contested/drops/play-action/motion/RPO), PFR (YAC/contact, pressure) and opponent tendencies (man, blitz, box, pressure) all WASH",
+    "per-feature market-lag coefficients were unstable at n=30-80 (collinear role/form) \u2192 one \u03b2 per market on our total applied tilt",
+    "rest games (<10% snaps) poison a snap-share trend (Josh Allen Under 32.5 manufactured by a 1% week-18 game) \u2192 ignored for ROLE features only; yardage form keeps every game (measured day 2)",
+    "role tilt LOSES for rushing across the offseason in the weeks-1-3 evaluation (.579\u2192.51-.53) while receiving/catches/passing gain \u2192 rushing role ratio 0"
+   ],
+   "business": [
+    "the Model Room now counts what the model consumes (182.7M data points, 36 feeds, 479k plays broken down player by player, 2,277 beat reports, 2,708 prices, 108 signals on trial, 155\u2192173 checks) and shows The Watch (feeds diffed every 2h) \u2014 every number from data/data_ledger.json and data/monitor/status.json",
+    "no rejected-idea boxes or lines on the page; the wall is vaguer and grander; 'tested' lines say what was tried without the verdict",
+    "a scheduled task 'Desk: The Watch' every 2h republishes the room; emails only when a Card player has real news"
+   ]
+  },
+  "critiques": [
+   "Parkinson O21.5 rec yds: our 32.0 vs Underdog 21.5 / RotoWire 20.6 / ESPN 17.3 \u2014 our snap-trend tilt is alone against three outside reads; the second opinions are on the row for the loop to grade",
+   "the first market-lag implementation with six regressors flipped signs week to week \u2014 replaced with one \u03b2; the day-2 per-feature numbers were an artifact of n",
+   "the ESPN feed's 'will not play' preseason notes fired OUT gates on Allen/Geno/Lawrence; other-player mentions gated Samuel/Allgeier \u2192 clause-level, name-in-clause, preseason-excluded hard gates"
+  ],
+  "tested": {
+   "universe_lab": {
+    "n_candidates": 98,
+    "winners": [
+     "route_rate_l3",
+     "route_rate_d3",
+     "offense_pct_l3",
+     "offense_pct_d3",
+     "gl_snap_share_l3",
+     "gl_snap_share_d3",
+     "rz_snap_share_l3",
+     "rz_snap_share_d3",
+     "in10_snap_share_l3",
+     "in10_snap_share_d3",
+     "routes_l3",
+     "routes_d3"
+    ]
+   },
+   "role_features_joint": "route_rate_l3 + offense_pct_d3 (rest-excluded): strong-signal hit 2024/2025 rush .604/.618\u2192.605/.633, rec .600/.616\u2192.629/.658, receptions .625/.633\u2192.640/.668, pass .667/.608\u2192.688/.642",
+   "td_role": {
+    "winner_blend": 0.5,
+    "gain_brier_backs_sum": 0.00166,
+    "result": "WINS: snap inclusion improves the goal-line role read"
+   },
+   "market_lag_single_beta": {
+    "pass_yds": {
+     "n": 32,
+     "beta": 1.8523,
+     "lag": {
+      "form3": 0.0,
+      "form1": 0.0,
+      "role_rr": 0.0,
+      "role_snap_d": 0.0
+     }
+    },
+    "rec_yds": {
+     "n": 87,
+     "beta": 0.2755,
+     "lag": {
+      "form3": 0.724,
+      "form1": 0.724,
+      "role_rr": 0.724,
+      "role_snap_d": 0.724
+     }
+    },
+    "receptions": {
+     "n": 86,
+     "beta": 0.3644,
+     "lag": {
+      "form3": 0.636,
+      "form1": 0.636,
+      "role_rr": 0.636,
+      "role_snap_d": 0.636
+     }
+    },
+    "rush_yds": {
+     "n": 53,
+     "beta": 0.0399,
+     "lag": {
+      "form3": 0.96,
+      "form1": 0.96,
+      "role_rr": 0.96,
+      "role_snap_d": 0.96
+     }
+    }
+   }
+  },
+  "numbers": {
+   "universe": {
+    "sources": 36,
+    "families": {
+     "nflverse": 13,
+     "nflverse/NGS": 3,
+     "nflverse/PFR": 5,
+     "nflverse/ESPN": 1,
+     "nflverse/OTC": 1,
+     "Sleeper": 7,
+     "ESPN": 3,
+     "Underdog": 1,
+     "Action Network": 1,
+     "RSS": 1
+    },
+    "files": 125,
+    "rows": 3472673,
+    "data_points": 182675064,
+    "bytes": 230197738,
+    "seasons_span": [
+     1980,
+     2026
+    ]
+   },
+   "multifactor_validation": {
+    "2024": {
+     "rush_yds": {
+      "strong_hit": 0.605,
+      "recency_alone": 0.569,
+      "n_test": 2008
+     },
+     "rec_yds": {
+      "strong_hit": 0.629,
+      "recency_alone": 0.559,
+      "n_test": 3911
+     },
+     "receptions": {
+      "strong_hit": 0.64,
+      "recency_alone": 0.571,
+      "n_test": 3911
+     },
+     "pass_yds": {
+      "strong_hit": 0.688,
+      "recency_alone": 0.582,
+      "n_test": 600
+     }
+    },
+    "2025": {
+     "rush_yds": {
+      "strong_hit": 0.633,
+      "recency_alone": 0.565,
+      "n_test": 1948
+     },
+     "rec_yds": {
+      "strong_hit": 0.658,
+      "recency_alone": 0.571,
+      "n_test": 3946
+     },
+     "receptions": {
+      "strong_hit": 0.668,
+      "recency_alone": 0.584,
+      "n_test": 3946
+     },
+     "pass_yds": {
+      "strong_hit": 0.642,
+      "recency_alone": 0.537,
+      "n_test": 579
+     }
+    }
+   },
+   "card_after": "Stevenson O39.5, Henry O77.5, Douglas U20.5 rec, Taylor U78.5, Mayfield U247.5 (off-market), Gibbs U85.5, Parkinson O21.5 rec, Brown O57.5"
+  },
+  "verdict": "SHIPPED: data universe (36 feeds, ingest + inventory + derived tables + lab); ROLE features earned (route participation, snap trend; rest games ignored; rushing off across the offseason); goal-line package inclusion in xTD (blend .5); market lag as one \u03b2 per market; automatic beat feed with clause-level gates; second opinions (Underdog, RotoWire, ESPN) on every row; The Watch + 2h job; Model Room revamp. TESTED, not adopted: 86 efficiency/charting/opponent signals.",
+  "shipped": [
+   "src/ingest_universe.py",
+   "src/universe_features.py",
+   "src/universe_lab.py",
+   "src/td_role_validate.py",
+   "src/intel_feed.py",
+   "src/monitor.py",
+   "src/underdog.py",
+   "src/second_opinions.py",
+   "src/market_lag.py (\u03b2)",
+   "multifactor/recency/prop_board/xtd_model/refresh_data changes",
+   "DATA_UNIVERSE.md",
+   "tests: test_fresh_eyes_day3_universe"
+  ],
+  "tomorrow": "re-measure the market's lag on the ROLE tilt in-season (does the market price route participation?); grade Underdog vs books after 4 weeks; rookie baseline from draft capital + projections; FTN charting for red-zone TD conversion"
  }
 ]

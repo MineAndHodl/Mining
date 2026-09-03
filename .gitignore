@@ -22,3 +22,4 @@ output/_*.png
 data/*_window.parquet
 data/_td_env_window.json
 data/ranked_window.json
+data/universe/

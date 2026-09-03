@@ -74,6 +74,16 @@ def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False, ope
                        for g, w in (wx or {}).items() if not w.get("error")}
     print(f"weather: forecast for {len(weather_by_game)} games" + (f" (e.g. {next(iter(weather_by_game))}: {wf.weather_note(wx[next(iter(weather_by_game))])})" if weather_by_game else ""))
 
+    # 0c) BEAT INTEL FEED (free, automatic): ESPN/RotoWire player notes, RSS, Sleeper status and
+    #     trending, merged into this week's intel file before pricing (human reads are kept).
+    if not window_mode:
+        try:
+            import intel_feed, ledger as _lg
+            wk_guess = (weeks_played + 1) if weeks_played else 1
+            intel_feed.run(season, wk_guess, refresh=not cached)
+        except Exception as e:
+            print("intel feed skipped:", e)
+
     # 1) prop board (fixed skew correction), keep PICKs, attach rich reasons
     # cached = RE-PRICE the last fetched raw lines (model changes never cost credits); only if
     # no raw-line cache exists yet does it fall back to the last priced board.
@@ -204,6 +214,14 @@ def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False, ope
         bbp.build()
         print(f"LAST CALL: {len(out.get('games', []))} games in the window, {len(out.get('items', []))} items")
         return ranked
+    # 7b) second opinions on every row (Underdog's line, RotoWire and ESPN projections) — logged
+    #     for the grading loop, shown as a second read, never used to move a number
+    try:
+        import second_opinions
+        n_so = second_opinions.attach({**ranked, "pool": pool}, week=wk_week)
+        print(f"second opinions: Underdog lines on {n_so} rows")
+    except Exception as e:
+        print("second opinions skipped:", e)
     json.dump(ranked, open(f"{DATA}/ranked_board.json", "w"), indent=1)
     # 8) the ledger: freeze every number we put out (the grading loop's input). --open marks
     #    this run as the week's OFFICIAL open (the Tuesday card); any earlier build is a preview.

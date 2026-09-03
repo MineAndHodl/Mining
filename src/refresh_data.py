@@ -128,9 +128,43 @@ def refresh(season=None):
     refresh_schedules(season)
     w1 = refresh_pbp(season)
     w2 = refresh_player_games(season)
+    # the data universe for the current season (participation, snap counts, pbp) -> the ROLE
+    # features (route participation, snap-share trend, goal-line inclusion) the model earned
+    try:
+        refresh_universe(season)
+    except Exception as e:
+        print("universe refresh skipped:", e)
     # the xTD table is a cache of last-season shares; in-season it is rebuilt per week by td_board
     print(f"season state: {season}, weeks played {max(w1, w2)}")
     return season, max(w1, w2)
+
+
+def refresh_universe(season):
+    """Pull this season's participation / snap counts / pbp / players from the universe sources and
+    rebuild the derived player-game + team-game feature rows for this season (others kept)."""
+    import ingest_universe as iu, universe_features as uf
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    # per-season fetch (skips fresh files; a 404 means the season is not posted yet)
+    for name in ("participation", "snap_counts", "pbp"):
+        try:
+            spec = iu.SOURCES[name]; url = spec["url"].format(s=season); dest = iu._dest(name, season)
+            if not iu._fresh(dest, spec["fresh_hours"]):
+                r = iu.requests.get(url, headers=iu.UA, timeout=120)
+                if r.status_code == 200:
+                    open(dest, "wb").write(r.content); print(f"  universe {name} {season}: refreshed")
+        except Exception as e:
+            print(f"  universe {name} {season}: {e}")
+    if not os.path.exists(os.path.join(iu.UNI, f"pbp_{season}.parquet")) or not os.path.exists(os.path.join(iu.UNI, f"participation_{season}.parquet")):
+        print(f"  universe: no {season} participation/pbp yet — role features stay on last season")
+        return False
+    pg = uf.build_player_game([season], verbose=False); tg = uf.build_team_game([season], verbose=False)
+    for fn, new in (("universe_features_player_game.parquet", pg), ("universe_features_team_game.parquet", tg)):
+        path = os.path.join(DATA, fn)
+        cur = pd.read_parquet(path) if os.path.exists(path) else pd.DataFrame()
+        cur = cur[cur.season != season] if len(cur) else cur
+        pd.concat([cur, new], ignore_index=True).to_parquet(path, index=False)
+    print(f"  universe features rebuilt for {season}: {len(pg):,} player-games")
+    return True
 
 
 if __name__ == "__main__":

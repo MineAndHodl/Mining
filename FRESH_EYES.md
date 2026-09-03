@@ -82,7 +82,15 @@ Update IDEAS_LEDGER.md when an idea changes status. Update CLAUDE.md only for se
   zero-inflated component for the left tail. Measure the exit rate by position; test on
   weeks 1-18 with `feature_lab`-style held-out seasons.
 - **Rookie baseline**: no-history players onto the market-role baseline in weeks 0-3 so intel
-  and injuries can surface one (today they are silently REVIEW).
+  and injuries can surface one (today they are silently REVIEW). Day 3 adds the inputs: draft
+  capital (`draft_picks`), combine, RotoWire/ESPN projections, preseason notes.
+- **Market lag on the ROLE tilt in-season**: the weekly β now covers form + role together; once
+  games exist, check whether the market prices route participation as fast as it prices yards.
+- **Second market vs the books**: `ud_line` on every row from day 3 — after 4 weeks, does
+  Underdog's number lead the sportsbooks' move (a free sharp read) or follow it?
+- **Outside projections vs the market**: `proj_rw` / `proj_espn` logged; grade with CLV.
+- **FTN charting in the red zone**: contested/catchable rates on RZ targets, QB-sneak share as the
+  explicit vulture (the universe has it; the yardage lab found nothing, the TD model may).
 - **Kicker lane**: FG-range drive rate × distance make-rate × kicker; earn before shipping.
 - ~~Weather feed~~ DONE 2026-09-03 (`weather_feed.py`).
 - ~~Rest-game contamination of the form window~~ TESTED day 2: LOSES both seasons (partial
@@ -129,3 +137,12 @@ Update IDEAS_LEDGER.md when an idea changes status. Update CLAUDE.md only for se
   games are signal. Businessman: `post_copy.py` — Card, X teaser, free-pick thread, Touchdown
   Tax, line moves, report card, generated from the frozen numbers. Card 5O/3U → 3O/5U, rushing
   form is the Week-1 edge. Tests 136 → 155.
+- **2026-09-03 (day 3, Alex's data brief)** — Built the data universe (`DATA_UNIVERSE.md`): 36 free
+  feeds ingested and inventoried (183M data points), derived player-game / team-game tables, and a
+  98-candidate lab. Usage won, efficiency lost: route participation + snap-share trend adopted
+  (every market up, both seasons; rest games ignored for role; rushing role off across the
+  offseason); goal-line package inclusion adopted in xTD (both seasons). Market lag simplified to
+  one β per market. Beat intel automated from ESPN/RotoWire notes + RSS + Sleeper with clause-level
+  hard gates. Underdog's lines + RotoWire/ESPN projections logged on every row. The Watch (feeds
+  diffed every 2h, its own job). Model Room revamped: what the model consumes, the watch, no
+  rejected items. Tests 155 → 173.

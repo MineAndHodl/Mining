@@ -1,0 +1,84 @@
+{
+ "design": "in-season rolling weeks 4-18; GL rush share for backs = blend \u00d7 carry share + (1\u2212blend) \u00d7 goal-line snap inclusion \u00d7 team RB share of GL carries",
+ "by_season": {
+  "2024": {
+   "1.0": {
+    "n": 4073,
+    "brier": 0.1639,
+    "logloss": 0.51645,
+    "brier_backs": 0.18138,
+    "n_backs": 1120
+   },
+   "0.75": {
+    "n": 4073,
+    "brier": 0.1638,
+    "logloss": 0.5155,
+    "brier_backs": 0.18102,
+    "n_backs": 1120
+   },
+   "0.5": {
+    "n": 4073,
+    "brier": 0.16385,
+    "logloss": 0.51552,
+    "brier_backs": 0.18118,
+    "n_backs": 1120
+   },
+   "0.25": {
+    "n": 4073,
+    "brier": 0.16401,
+    "logloss": 0.516,
+    "brier_backs": 0.18177,
+    "n_backs": 1120
+   },
+   "0.0": {
+    "n": 4073,
+    "brier": 0.16426,
+    "logloss": 0.51679,
+    "brier_backs": 0.18269,
+    "n_backs": 1120
+   }
+  },
+  "2025": {
+   "1.0": {
+    "n": 4102,
+    "brier": 0.1589,
+    "logloss": 0.50331,
+    "brier_backs": 0.18157,
+    "n_backs": 1126
+   },
+   "0.75": {
+    "n": 4102,
+    "brier": 0.15864,
+    "logloss": 0.50199,
+    "brier_backs": 0.18064,
+    "n_backs": 1126
+   },
+   "0.5": {
+    "n": 4102,
+    "brier": 0.15849,
+    "logloss": 0.50165,
+    "brier_backs": 0.18011,
+    "n_backs": 1126
+   },
+   "0.25": {
+    "n": 4102,
+    "brier": 0.15845,
+    "logloss": 0.50178,
+    "brier_backs": 0.17995,
+    "n_backs": 1126
+   },
+   "0.0": {
+    "n": 4102,
+    "brier": 0.1585,
+    "logloss": 0.50224,
+    "brier_backs": 0.18012,
+    "n_backs": 1126
+   }
+  }
+ },
+ "verdict": {
+  "winner_blend": 0.5,
+  "gain_brier_backs_sum": 0.00166,
+  "result": "WINS: snap inclusion improves the goal-line role read"
+ }
+}

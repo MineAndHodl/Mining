@@ -44,6 +44,13 @@ POS_OK = ("RB", "WR", "TE", "QB", "FB")
 SHARE_PSEUDO_GAMES = 4.0      # player zone-share -> prior, weighted by games of data
 CONV_PSEUDO_OPPS = 25.0       # player conversion -> position x zone prior
 GL_YOY_STICKINESS = 0.37      # measured (5 seasons): slope of next-season GL share on last season's
+# GOAL-LINE PACKAGE INCLUSION (td_role_validate.py, in-season rolling 2024 + 2025): a back's share
+# of the team's goal-line SNAPS (participation data: who was on the field inside the 5) blended
+# half-and-half with his goal-line CARRY share beats carry share alone on backs' Brier in both
+# seasons (.18138 -> .18118, .18157 -> .18011). Carries inside the 5 are a handful of plays; being
+# on the field for them is observed every play. Inclusion × the team's RB share of GL carries
+# (QB sneaks take the rest) is the carry-share-equivalent.
+GL_INCLUSION_BLEND = 0.5      # weight on the carry share; 1 - this on the snap-inclusion share
 # Tested and NOT adopted (td_env_validate.py --stick): the goal-line role erodes through a season
 # (slope .65 in weeks 1-3, .48 weeks 4-9, .36 weeks 10-18), so a higher early-season stickiness
 # was tried — out-of-sample it was a wash (weeks 1-3 Brier .1715 vs .1714 across .29/.37/.60/.75).
@@ -153,6 +160,26 @@ def healthy_mask(ev):
     return e["_ok"].fillna(False).values
 
 
+def gl_inclusion(season, max_week=None):
+    """{(pid, team): goal-line snap inclusion} and {team: RB share of GL carries} for a season (to a week)."""
+    p = os.path.join(DATA, "universe_features_player_game.parquet")
+    if not os.path.exists(p):
+        return {}, {}
+    u = pd.read_parquet(p, columns=["pid", "season", "week", "posteam", "position", "gl_snaps", "team_gl", "gl_carries", "team_gl_carries"])
+    u = u[u.season == season]
+    if max_week is not None:
+        u = u[u.week <= max_week]
+    if u.empty:
+        return {}, {}
+    g = u.groupby(["pid", "posteam"]).agg(gl_snaps=("gl_snaps", "sum"), team_gl=("team_gl", "sum")).reset_index()
+    g["incl"] = g.gl_snaps / g.team_gl.replace(0, np.nan)
+    incl = {(r.pid, r.posteam): float(r.incl) for r in g.itertuples() if r.incl == r.incl}
+    rb = u[u.position.isin(["RB", "FB"])].groupby("posteam")["gl_carries"].sum()
+    tot = u.drop_duplicates(["posteam", "week"]).groupby("posteam")["team_gl_carries"].sum()
+    rb_frac = {t: float(rb.get(t, 0) / tot[t]) for t in tot.index if tot[t] and tot[t] == tot[t]}
+    return incl, rb_frac
+
+
 def player_zone_shares(ev, healthy_only=False, unhealthy_weight=1.0):
     """Per (player, team): share of the team's plays of each type in each zone, plus games.
     A goal-line vulture shows up as a non-lead back holding GL rush share. healthy_only drops
@@ -209,6 +236,7 @@ def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None
     lg = league_zone_profile(tzp)
     conv = conversion_priors(ev_all, players)
     shares = player_zone_shares(ev_latest, healthy_only=healthy_only, unhealthy_weight=unhealthy_weight)
+    gl_incl, rb_frac = gl_inclusion(latest)
     shares = shares.merge(players[["gsis_id", "position", "display_name"]], left_on="pid", right_on="gsis_id", how="left")
     shares = shares[shares.position.isin(POS_OK)]
 
@@ -250,6 +278,13 @@ def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None
                 g_typ = float(r["games"].iloc[0]) if len(r) else games
                 w = g_typ / (g_typ + SHARE_PSEUDO_GAMES)
                 share = w * share_obs + (1 - w) * own_share
+                # goal-line PACKAGE INCLUSION (measured, see GL_INCLUSION_BLEND): blend the sparse
+                # carry share with "was he on the field for the goal-line snaps"
+                if zone == "GL" and typ == "rush" and pos in ("RB", "FB"):
+                    gi = gl_incl.get((pid, team))
+                    if gi is not None:
+                        share = GL_INCLUSION_BLEND * share + (1 - GL_INCLUSION_BLEND) * gi * rb_frac.get(team, 0.75)
+                        feats["GL_inclusion"] = round(gi, 3)
                 # goal-line role is only ~29% sticky year over year: in week-1 mode, regress the
                 # GL share hard toward his general rush role (the honest prior for a new season)
                 if week1_mode and zone == "GL" and typ == "rush":

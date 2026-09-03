@@ -258,16 +258,25 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
             g0, _o = bf._game_ctx(b0["game"], bf.TEAM_FIX.get(pr0["team"], pr0["team"]), sched_rows, code2full)
             tot0 = (g0.get("implied_team_pts", 22) * 2) if g0 else 44.0
             bl0 = float(rr0["baseline"])
+            rmed0 = (model.get("role_med", {}).get(m0) or {}).get("role_rr", 0.0)
+            rrr0 = rr0.get("role_rr"); rsd0 = rr0.get("role_snap_d")
             lag_rows.append({"mkt": m0, "gap": float(pm.market_mean(m0, cl0, cf0)) - bl0, "total_c": tot0 - 44.0,
                              "base_c": bl0 - model.get("base_med", {}).get(m0, bl0),
-                             "form3": float(rr0["last3"]) - bl0, "form1": float(rr0["last1"]) - bl0})
-        applied = {m_: model.get("weights", {}).get(m_, {}).get("form3", 0.0) * mf.OFFSEASON_FORM_RATIO.get(m_, mf.OFFSEASON_FORM_DEFAULT)
-                   for m_ in {r_["mkt"] for r_ in lag_rows}}
+                             "form3": float(rr0["last3"]) - bl0, "form1": float(rr0["last1"]) - bl0,
+                             "role_rr": (float(rrr0) - rmed0) if rrr0 is not None and rrr0 == rrr0 else 0.0,
+                             "role_snap_d": float(rsd0) if rsd0 is not None and rsd0 == rsd0 else 0.0})
+        applied = {}
+        for m_ in {r_["mkt"] for r_ in lag_rows}:
+            w_ = model.get("weights", {}).get(m_, {}); fr_ = mf.OFFSEASON_FORM_RATIO.get(m_, mf.OFFSEASON_FORM_DEFAULT)
+            applied[m_] = {"form3": w_.get("form3", 0.0) * fr_, "form1": w_.get("form1", 0.0) * fr_,
+                           "role_rr": w_.get("role_rr", 0.0) * mf.OFFSEASON_ROLE_RATIO["role_rr"].get(m_, 0.5),
+                           "role_snap_d": w_.get("role_snap_d", 0.0) * mf.OFFSEASON_ROLE_RATIO["role_snap_d"].get(m_, 0.5)}
         fit_ = ml.fit(lag_rows, applied)
         wk_ = (int(recency_week) + 1) if recency_week is not None else 1
-        lag_factors = ml.update(int(recency_season) + (1 if recency_week is None else 0), wk_, fit_)
-        lag_factors = {m_: v_["lag_factor"] for m_, v_ in lag_factors.items()}
-        print("market lag:", {m_: (fit_[m_].get("coef", {}) or {}).get("form3") for m_ in fit_}, "-> form factor", lag_factors)
+        pooled_ = ml.update(int(recency_season) + (1 if recency_week is None else 0), wk_, fit_)
+        lag_factors = {m_: v_.get("lag", {}) for m_, v_ in pooled_.items()}
+        print("market lag β (share of our tilt the market already prices):", {m_: (fit_[m_].get("beta"), fit_[m_].get("ci90")) for m_ in fit_})
+        print("market lag factors:", {m_: (v_.get("form3") if v_ else None) for m_, v_ in lag_factors.items()})
     except Exception as _e:
         print("market lag skipped:", _e)
     out = []
@@ -300,9 +309,14 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
             if g and opp_team:
                 if mkt in ("rush_yds", "rush_att"): ddelta = def_vs.get("RB", {}).get(opp_team, 0.0)
                 elif mkt in ("rec_yds", "receptions"): ddelta = def_vs.get("WR", {}).get(opp_team, 0.0)
+            rmed = (model.get("role_med", {}).get(mkt) or {}).get("role_rr", 0.0)
+            _rrr = rr.get("role_rr"); _rsd = rr.get("role_snap_d")
             feats = {"form3": float(rr["last3"]) - baseline, "form1": float(rr["last1"]) - baseline,
                      "def_delta": ddelta, "total_c": total - 44.0, "home": home,
-                     "base_c": baseline - model.get("base_med", {}).get(mkt, baseline)}
+                     "base_c": baseline - model.get("base_med", {}).get(mkt, baseline),
+                     # ROLE (earned, universe_lab): route participation vs the market's typical player, snap-share trend
+                     "role_rr": (float(_rrr) - rmed) if _rrr is not None and _rrr == _rrr else 0.0,
+                     "role_snap_d": float(_rsd) if _rsd is not None and _rsd == _rsd else 0.0}
             # OFFSEASON RAIL (measured, multifactor.OFFSEASON_FORM_RATIO): when the "recent" games
             # are last season's finale (weeks 17-18 rest/backup noise), form predicts the residual
             # at only ~35-65% of its in-season strength. The model's single form weight is fit on
@@ -320,12 +334,15 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
             last_season = rr.get("last_season")
             gap = (cur_season - int(last_season)) if last_season is not None and last_season == last_season else (1 if recency_week is None else 0)
             if gap >= 2:
-                feats["form3"] = 0.0; feats["form1"] = 0.0
-            lag = 1.0
+                feats["form3"] = 0.0; feats["form1"] = 0.0; feats["role_rr"] = 0.0; feats["role_snap_d"] = 0.0
+            lag = 1.0; lagd = {}
             if gap >= 1:
                 ratio = mf.OFFSEASON_FORM_RATIO.get(mkt, mf.OFFSEASON_FORM_DEFAULT)
-                lag = float(lag_factors.get(mkt, 1.0))       # the market's lag on this tilt (measured)
-                feats["form3"] *= ratio * lag; feats["form1"] *= ratio * lag
+                lagd = lag_factors.get(mkt, {}) or {}       # the market's lag on each tilt (measured weekly)
+                lag = float(lagd.get("form3", 1.0))
+                feats["form3"] *= ratio * lag; feats["form1"] *= ratio * float(lagd.get("form1", 1.0))
+                feats["role_rr"] *= mf.OFFSEASON_ROLE_RATIO["role_rr"].get(mkt, 0.5) * float(lagd.get("role_rr", 1.0))
+                feats["role_snap_d"] *= mf.OFFSEASON_ROLE_RATIO["role_snap_d"].get(mkt, 0.5) * float(lagd.get("role_snap_d", 1.0))
                 # OFFSEASON ROLE BASELINE: with no current-season games, our baseline is last
                 # season's average — blind to the role changes the market has already priced (a
                 # backup now starting, a rookie's full role, a star's new QB). Every absurd Week-1
@@ -568,7 +585,8 @@ def reason(row, news=None):
     # name the factors doing the work, from their actual signed contributions to our number
     contrib = row.get("contrib") or {}
     LABEL = {"form3": "recent form", "form1": "last game", "def_delta": "the matchup",
-             "total_c": "the game total", "home": "the venue", "base_c": "mean-reversion"}
+             "total_c": "the game total", "home": "the venue", "base_c": "mean-reversion",
+             "role_rr": "his route participation", "role_snap_d": "his snap-share trend"}
     drivers = sorted([(f, v) for f, v in contrib.items() if abs(v) >= 0.4], key=lambda x: -abs(x[1]))[:3]
     mkt_num = row.get("market_num")
     kind = row.get("thesis_kind"); cmn = row.get("cons_mean"); nbm_ = row.get("n_books_mkt"); om_ = row.get("off_market"); tl_ = row.get("tilt")

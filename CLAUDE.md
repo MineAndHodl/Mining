@@ -97,6 +97,43 @@ The board is the product: every pick on it must be something a sharp would nod a
 - **Trust reads market breadth (`n_books_mkt`, day 2)**, not books at our shopped line (always 1
   for a best line — a 6-point artifact against every shopped pick). Home/away is read from the
   schedule row (the old string test never matched — home was 0 on every live row).
+- **THE DATA UNIVERSE (day 3, `DATA_UNIVERSE.md`, `ingest_universe.py`, `data/data_ledger.json`):** 36
+  free feeds reachable from the session — nflverse play-by-play, **participation (who was on the
+  field for every play, 2016-25)**, FTN charting, Next Gen Stats, PFR advanced, snap counts, depth
+  charts, rosters, injuries, contracts, draft/combine, officials, QBR, schedules; Sleeper (players,
+  trending, RotoWire projections), ESPN (core injuries = dated beat notes, fantasy projections,
+  news), Underdog lines, Action Network odds, RSS. 3.5M rows, 183M data points. Pull generously,
+  adopt stingily: `universe_features.py` → `universe_lab.py` (98 candidates, two held-out seasons).
+- **USAGE IS THE EDGE, EFFICIENCY IS NOT (day 3, `data/universe_lab.json`):** of 98 signals, only
+  role/usage won — route participation (share of team dropbacks on the field), offense snap %,
+  goal-line / red-zone / inside-10 snap inclusion. NGS separation, RYOE, CPOE, YAC-over-expected,
+  PFR contact/pressure, FTN catchable/contested/drops/play-action/motion/RPO, opponent man/blitz/
+  box/pressure: all WASH beyond form. Adopted `role_rr` (route participation, last 3 games, centered
+  per market) + `role_snap_d` (snap-share trend) as raw features (weights re-fit, 8 features):
+  strong-signal hit 2024/2025 rush .604/.618 → .605/.633, rec .600/.616 → .629/.658, receptions
+  .625/.633 → .640/.668, pass .667/.608 → .688/.642 (`data/multifactor_validation.json`). Games with
+  < 10% of the snaps are NOT role reads (rest / early exits) and are ignored for the role features
+  only (`REST_SNAP_PCT`); across the offseason the role tilt is on for pass-catching markets and OFF
+  for rushing (`OFFSEASON_ROLE_RATIO`, measured on weeks 1-3). In-season, `refresh_data.refresh_universe`
+  pulls this season's participation/snaps and rebuilds the role rows.
+- **Goal-line package inclusion (day 3, `td_role_validate.py`):** a back's share of the team's
+  goal-line SNAPS (on the field inside the 5) blended 50/50 with his goal-line carry share beats carry
+  share alone on backs' Brier in both seasons (.18138 → .18118, .18157 → .18011); `GL_INCLUSION_BLEND`.
+- **Market lag is ONE β per market (day 3):** per-feature coefficients at n = 30-80 were unstable;
+  the market's gap is regressed on OUR total applied tilt (form + role) — β = the share the market
+  already prices; lag = clip(1 − β, 0, 1) on every tilt in that market (Week 1: pass 0, receptions
+  .64, rec .72, rush .96), pooled weekly.
+- **Beat intel is automatic (day 3, `intel_feed.py`):** ESPN core injuries = dated RotoWire-style notes
+  per player with the cited beat source, plus RSS (ESPN/Yahoo/CBS/PFT/Google News), Sleeper status /
+  practice / trending — merged into the week's intel file every run; human reads win. Hard gates fire
+  only from a CLAUSE about this player (his name in it) that is not about the preseason.
+- **Second opinions on every row (day 3, `second_opinions.py`):** Underdog's line + prices (`ud_line`),
+  RotoWire (`proj_rw`) and ESPN (`proj_espn`) projections — logged in the ledger, shown as a "2nd mkt"
+  chip, never used to move a number until the loop grades them.
+- **The Watch (day 3, `monitor.py`, job "Desk: The Watch" every 2h):** diffs the fast feeds against
+  what it has seen (notes, headlines, status changes, trending, Underdog line moves, game odds moves)
+  → `data/monitor/feed.jsonl` + `status.json`; the Model Room shows the last check and the latest
+  events; emails only when a Card player has real news.
 - **Mean ≠ median on skewed yardage**, but the correction is modest for high-volume players;
   compare our mean to the market-implied mean, never to the line itself.
 - **Correlations are measured, not assumed:** QB-WR 0.696, two-WR 0.507, same-player
@@ -307,6 +344,12 @@ behind" otherwise. Runtime parquets are
 committed (the weekly run must reproduce from a fresh clone).
 Research/validation: `multifactor.py`, `recency.py`, `xtd_model.py`, `xtd_validate.py`,
 `correlation_lab.py`, `clv_engine.py`. Tests: `python3 tests/test_pipeline.py` (must be green).
+
+## The Model Room (Alex, day 3)
+It is a marketing page for gamblers, rooted in truth: show massive data consumed, only the good
+stuff, no rejected ideas or why, constant iteration, vaguer about the feature list. Every number
+comes from `data/data_ledger.json`, `data/monitor/status.json`, the validation JSONs, the ledger
+and git. Nothing simulated. `[tested]` lines say what was tried, never the verdict.
 
 ## Still owed
 - **Run the grading loop** (built 2026-09-02, unproven on live data): Week 1 grades Monday; after

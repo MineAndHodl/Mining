@@ -20,10 +20,10 @@ What this layer does with an intel file (data/player_intel_<season>_w<week>.json
     signals that predict winners get a weight. Until then they inform the reader and the
     trust, not the number. (Hard gates move the board now because they are facts.)
 
-How the file is produced: a weekly in-session pass (targeted web search per slate player,
-date-gated to the week, classified with the rules below and a human-quality read), or an
-automated fetch when a news API key exists (NEWS_API_KEY) — RSS from this environment was
-not reachable. Every item carries source, date and url so nothing is unattributed.
+How the file is produced: AUTOMATICALLY every run by intel_feed.py (ESPN/RotoWire dated player
+notes with the beat source they cite, RSS from ESPN/Yahoo/CBS/PFT/Google News, Sleeper injury
+status + practice + trending adds/drops), merged with any in-session human read (which wins).
+Every item carries source, date and url so nothing is unattributed.
 """
 import os, sys, json, re, datetime
 import numpy as np
@@ -36,7 +36,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); DATA = os.path.join(HERE, "..
 # --- classification rules: phrase -> (signal, value). Conservative; a human read can override.
 HARD_OUT = [r"ruled out", r"will not play", r"placed on (injured reserve|ir)\b", r"out for (the )?(week|game|season)",
             r"won't play", r"has been ruled out", r"downgraded to out"]
-HARD_LIMIT = [r"pitch count", r"snap (count|limit)", r"eas(e|ed|ing) (him )?(back )?in", r"limited role", r"on a (snap )?count"]
+HARD_LIMIT = [r"pitch count", r"on a snap count", r"snap limit", r"limited to \d+ snaps", r"eas(e|ed|ing) (him )?(back )?in", r"limited role", r"on a (snap )?count"]
 HEALTH_NEG = [r"limited (in|at) practice", r"did not practice", r"dnp\b", r"still (bothered|dealing|nursing)", r"setback",
               r"re-?aggravat", r"not 100", r"playing through", r"managing (a|the)", r"aggravat"]
 HEALTH_POS = [r"full (participant|practice)", r"no (injury )?designation", r"removed from (the )?injury report", r"fully healthy",
@@ -49,7 +49,9 @@ COACH_NEG = [r"committee", r"split (carries|reps|time)", r"timeshare", r"rotatio
 ROLE_POS = [r"promoted", r"moved up", r"first-?team", r"starter", r"depth chart .* (1|first)", r"took first-team reps"]
 ROLE_NEG = [r"second-?team", r"lost (his|the) (job|starting)", r"benched", r"depth chart .* (2|3|second|third)"]
 SITUATIONAL = [(r"contract year", 0.2), (r"revenge", 0.15), (r"return(s|ing) (from|to)", 0.1), (r"suspension", -0.3), (r"holdout", -0.4),
-               (r"trade (request|rumor)", -0.2)]
+               (r"trade (request|rumor)", -0.2),
+               # the crowd (Sleeper trending adds/drops, auto-fed): role news leaks here first — small, provisional
+               (r"sleeper trending add", 0.2), (r"sleeper trending drop", -0.25)]
 
 WEIGHTS = {"health": 0.35, "coach": 0.35, "role": 0.2, "situational": 0.1}
 
@@ -59,8 +61,33 @@ def _hits(text, pats):
     return [p for p in pats if re.search(p, t)]
 
 
-def classify_items(items, week_start, week_end):
-    """items: [{date 'YYYY-MM-DD', source, title, snippet, url}]. Returns the structured intel."""
+PRESEASON = re.compile(r"preseason|exhibition|training camp|joint practice", re.I)
+
+
+def _about_him(text, name):
+    """Sentences of `text` that are about THIS player: contain his last name (RotoWire notes open
+    with it: 'Allgeier could open...'), or the whole text when no name is known."""
+    if not name:
+        return [text]
+    last = name.split()[-1].lower()
+    first = name.split()[0].lower()
+    sents = re.split(r"(?<=[.!?])\s+", text)
+    mine = []
+    for x in sents:
+        if last not in x.lower() and first not in x.lower():
+            continue
+        # clause level: "Samuel has a key role with Ricky Pearsall (knee) out for the season" —
+        # the clause carrying a hard phrase must itself name him
+        clauses = re.split(r",|;|\bwith\b|\bwhile\b|\bas\b|\bafter\b|\bbecause\b", x)
+        mine.extend([c for c in clauses if last in c.lower() or first in c.lower()])
+    return mine
+
+
+def classify_items(items, week_start, week_end, name=None):
+    """items: [{date 'YYYY-MM-DD', source, title, snippet, url}]. Returns the structured intel.
+    HARD gates fire only from a sentence about THIS player (his name in it) that is not about the
+    preseason — "Allen will not play in Thursday's preseason finale" is rest, and "Schefter
+    reports Love won't play" inside Allgeier's note is about Love."""
     in_window = []
     for it in items:
         try:
@@ -74,10 +101,14 @@ def classify_items(items, week_start, week_end):
     for it in in_window:
         text = f"{it.get('title','')} {it.get('snippet','')}"
         src = it.get("source", "?"); date = str(it.get("date", ""))[:10]
-        if _hits(text, HARD_OUT):
+        own = [x for x in _about_him(text, name) if not PRESEASON.search(x)]
+        own_text = " ".join(own)
+        if own_text and _hits(own_text, HARD_OUT):
             hard = "OUT"; evidence.append(f"[{src} {date}] {it.get('title','')}")
-        elif _hits(text, HARD_LIMIT) and hard != "OUT":
+        elif own_text and _hits(own_text, HARD_LIMIT) and hard != "OUT":
             hard = "LIMITED"; evidence.append(f"[{src} {date}] {it.get('title','')}")
+        if PRESEASON.search(text) and not own_text:
+            continue                      # a preseason note with nothing about him: no soft signal either
         for pats, key, val in ((HEALTH_NEG, "health", -0.5), (HEALTH_POS, "health", 0.4), (COACH_POS, "coach", 0.5),
                                (COACH_NEG, "coach", -0.5), (ROLE_POS, "role", 0.5), (ROLE_NEG, "role", -0.6)):
             h = _hits(text, pats)
@@ -104,7 +135,7 @@ class PlayerIntel:
         for name, rec in self.raw.items():
             if name.startswith("_"): continue
             # a rec may carry a human 'read' (override) plus raw items
-            cls = classify_items(rec.get("items", []), *self.window)
+            cls = classify_items(rec.get("items", []), *self.window, name=name)
             if rec.get("read"):                       # human-quality read overrides rule hits
                 rd = rec["read"]
                 for k in cls["signals"]:

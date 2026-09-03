@@ -460,7 +460,7 @@ def test_fresh_eyes_day2():
     check("a missed season (gap >= 2) zeroes the form tilt and cuts trust", len(stale) == 0 or (all(abs((c or {}).get("form3", 0)) < 1e-9 for c in stale["contrib"]) and (stale["confidence"] <= 0.71).all()), f"n={len(stale)}")
     off = mf_rows[mf_rows.form_gap >= 1]
     check("under the market baseline the environment is not re-added (total/home contrib = 0)", len(off) > 0 and all(abs((c or {}).get("total_c", 0)) < 1e-9 and abs((c or {}).get("home", 0)) < 1e-9 for c in off["contrib"]))
-    lagf = ml.load_factors()
+    lagf = {m: (v.get("form3") if isinstance(v, dict) else v) for m, v in ml.load_factors().items()}
     check("market lag measured for the four markets (data/market_lag.json)", all(m in lagf for m in ("pass_yds", "rush_yds", "rec_yds", "receptions")), str(lagf))
     check("the market prices late-season QB form; it lags rushing form (pass factor < rush factor)", lagf.get("pass_yds", 1) < lagf.get("rush_yds", 0), str(lagf))
     if lagf.get("pass_yds", 1) == 0:
@@ -490,6 +490,54 @@ def test_fresh_eyes_day2():
     fe = _j.load(open(os.path.join(HERE, "..", "data", "fresh_eyes_log.json")))
     days = fe if isinstance(fe, list) else fe.get("days", [])
     check("fresh-eyes log has a day-2 entry with numbers and a verdict", any(str(x.get("date", "")).endswith("09-03") and x.get("verdict") and x.get("numbers") for x in days))
+
+
+def test_fresh_eyes_day3_universe():
+    """Day 3: the data universe — ingested, inventoried, tested; usage won; TD role read; the
+    automatic beat feed with clause-level hard gates; second opinions; the watch."""
+    print("\n-- fresh eyes day 3: data universe --")
+    import json as _j, multifactor as mf, recency as rc, player_intel as pi, xtd_model as xm, datetime as _dt
+    inv = _j.load(open(os.path.join(HERE, "..", "data", "data_ledger.json")))
+    check("data universe inventoried: 30+ feeds, 100M+ data points", inv["totals"]["sources"] >= 30 and inv["totals"]["data_points"] > 1e8, str(inv["totals"]))
+    u = pd.read_parquet(os.path.join(HERE, "..", "data", "universe_features_player_game.parquet"))
+    check("derived player-game table carries route participation, snap %, goal-line inclusion", all(c in u.columns for c in ("route_rate", "offense_pct", "gl_snap_share")) and len(u) > 30000)
+    w = _j.load(open(os.path.join(HERE, "..", "data", "multifactor_weights.json")))
+    check("the model has the two earned role features and their centering medians", all(f in w["features"] for f in mf.ROLE_FEATURES) and "role_med" in w and w["weights"]["rec_yds"].get("role_rr", 0) > 5)
+    lab = _j.load(open(os.path.join(HERE, "..", "data", "universe_lab.json")))
+    wins = [k for k, v in lab.items() if v.get("verdict") == "WINS"]
+    check("98 candidates tried; the winners are usage only (no efficiency / charting / opponent signal)", len(lab) >= 90 and wins and all(k.startswith(("route_rate", "offense_pct", "gl_snap", "rz_snap", "in10_snap", "routes")) for k in wins), str(wins)[:200])
+    mv = _j.load(open(os.path.join(HERE, "..", "data", "multifactor_validation.json")))
+    check("strong-signal hit rate >= 60% in every market, both held-out seasons, with the role features", all(v["strong_hit"] >= 0.60 for yr in mv["by_season"].values() for v in yr.values()), str({y: {m: v["strong_hit"] for m, v in r.items()} for y, r in mv["by_season"].items()}))
+    r = rc.build_recency(2025, None)
+    check("recency rows carry the role features", "role_rr" in r.columns and r.role_rr.notna().mean() > 0.9)
+    proj = pd.read_parquet(os.path.join(HERE, "..", "data", "projection_2026.parquet"))
+    pid = proj[proj.name == "Josh Allen"].player_id.iloc[0]
+    ja = r[(r.pid == pid)].iloc[0]
+    check("a 1%-snap rest game is not a role read (Allen's snap log has no sub-10% game)", all(x >= 0.10 for x in ja["snap_pct_log"]), str(ja["snap_pct_log"]))
+    check("rushing role tilt is OFF across the offseason; receiving stays on (measured on weeks 1-3)", mf.OFFSEASON_ROLE_RATIO["role_snap_d"]["rush_yds"] == 0.0 and mf.OFFSEASON_ROLE_RATIO["role_snap_d"]["rec_yds"] > 0.9)
+    tdr = _j.load(open(os.path.join(HERE, "..", "data", "td_role_validation.json")))
+    check("goal-line package inclusion beat carry share in both seasons and the model uses that blend", tdr["verdict"]["winner_blend"] is not None and abs(xm.GL_INCLUSION_BLEND - tdr["verdict"]["winner_blend"]) < 1e-9, str(tdr["verdict"]))
+    x = pd.read_parquet(os.path.join(HERE, "..", "data", "xtd_2026.parquet"))
+    check("the 2026 xTD table carries goal-line inclusion for backs", "GL_inclusion" in x.columns and x[x.position == "RB"]["GL_inclusion"].notna().mean() > 0.5)
+    W = (_dt.date(2026, 8, 20), _dt.date(2026, 9, 14))
+    allen = [{"date": "2026-08-25", "source": "Jay Skurski of The Buffalo News", "title": "Allen will not play in Thursday's preseason finale against the Steelers.", "snippet": "It comes as no surprise that Allen will be held out."}]
+    check("preseason rest is not an OUT (Allen will not play in the preseason finale)", pi.classify_items(allen, *W, name="Josh Allen")["hard"] is None)
+    calc = [{"date": "2026-08-31", "source": "rotowire", "title": "Calcaterra (back) was placed on injured reserve by the Eagles on Sunday with a designation to return.", "snippet": ""}]
+    check("an IR placement about THIS player is an OUT", pi.classify_items(calc, *W, name="Grant Calcaterra")["hard"] == "OUT")
+    deebo = [{"date": "2026-08-29", "source": "rotowire", "title": "Samuel didn't play in Thursday's preseason victory.", "snippet": "Samuel should have a key role with Ricky Pearsall (knee) out for the season."}]
+    check("another player's 'out for the season' in his note does not gate him", pi.classify_items(deebo, *W, name="Deebo Samuel")["hard"] is None)
+    I = pi.PlayerIntel(2026, 1)
+    check("the beat feed is automatic: 300+ board players carry dated, sourced items", sum(1 for v in I.by_key.values() if v["n_items"] > 0) >= 250, str(sum(1 for v in I.by_key.values() if v["n_items"] > 0)))
+    ml = _j.load(open(os.path.join(HERE, "..", "data", "market_lag.json")))
+    pooled = ml.get("pooled", {})
+    check("market lag: one β per market with every tilt scaled in [0, 1]", all("beta" in v and all(0 <= f <= 1 for f in v["lag"].values()) for v in pooled.values()) and len(pooled) >= 4)
+    d = _j.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    card = [r for r in d.get("recommended", []) if not r.get("kind")]
+    check("second opinions on the Card: Underdog's line on most picks, an outside projection on some", sum(1 for r in card if r.get("ud_line") is not None) >= len(card) // 2 and any(r.get("proj_rw") is not None for r in card))
+    st = _j.load(open(os.path.join(HERE, "..", "data", "monitor", "status.json")))
+    check("the watch is live: 300+ players watched, a last-check stamp, events by kind", st.get("players_watched", 0) >= 300 and st.get("last_check") and "by_kind_24h" in st)
+    html = open(os.path.join(HERE, "..", "output", "the-lab.html")).read()
+    check("the Model Room shows the universe (data points, the watch) and no rejected-idea boxes", "data points ingested" in html and "The watch" in html and "tested, no edge" not in html)
 
 
 def test_line_history_and_ledger_alignment():
@@ -575,7 +623,7 @@ if __name__ == "__main__":
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_fresh_eyes_day3_universe(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

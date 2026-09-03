@@ -30,6 +30,11 @@ def gather():
     fl = J("feature_lab.json") or {}; cva = J("cv_anchors.json") or {}; inj = J("injury_validation.json") or {}
     fe = J("fresh_eyes_log.json") or []; alt = J("alt_ladder_probe.json") or {}; rec = J("record.json") or {}
     fgf = J("full_game_form.json") or {}; mlg = J("market_lag.json") or {}
+    inv = J("data_ledger.json") or {}; ulab = J("universe_lab.json") or {}; mfv = J("multifactor_validation.json") or {}
+    tdr = J("td_role_validation.json") or {}
+    try: watch = json.load(open(os.path.join(DATA, "monitor", "status.json")))
+    except Exception: watch = {}
+    inv_t = inv.get("totals", {}); inv_s = inv.get("sources", {})
     try: n_pbp = len(pd.read_parquet(f"{DATA}/pbp_2021_2025.parquet", columns=["season"]))
     except Exception: n_pbp = 0
     try:
@@ -50,11 +55,25 @@ def gather():
     stars = tde.get("stars_realized", {})
     log = []
     def L(tag, text): log.append({"tag": tag, "text": text})
+    n_feeds = inv_t.get("sources", 0); n_pts = inv_t.get("data_points", 0); n_rows = inv_t.get("rows", 0)
+    part_rows = (inv_s.get("participation") or {}).get("rows", 0); ftn_rows = (inv_s.get("ftn_charting") or {}).get("rows", 0)
+    notes = (inv_s.get("espn_injuries") or {}).get("rows", 0) + (inv_s.get("rss_news") or {}).get("rows", 0)
+    proj_rows = (inv_s.get("espn_fantasy_proj") or {}).get("rows", 0) + (inv_s.get("sleeper_proj_week") or {}).get("rows", 0)
+    ud_rows = (inv_s.get("underdog_lines") or {}).get("rows", 0)
+    if n_pts: L("read", f"pulled {fmt_int(n_rows)} rows — {fmt_int(n_pts)} data points — from {n_feeds} feeds: play-by-play, player tracking, charting, snap counts, depth charts, injuries, contracts, draft and combine, officials, projections, prices")
     L("read", f"read {fmt_int(n_pbp)} NFL plays from the last {len(seasons)} seasons — every carry, every target, every red-zone snap")
+    if part_rows: L("read", f"broke {fmt_int(part_rows)} plays down to who was on the field, the formation, the personnel, the box count and the coverage")
+    if ftn_rows: L("read", f"charted {fmt_int(ftn_rows)} plays for motion, play action, RPOs, screens, blitzers, pressure, contested and catchable throws")
     L("read", f"built {fmt_int(n_pg)} player-games into one table — every player's real game log")
     L("learned", "recent form is the biggest edge in player props — strong signals hit 60–67% out of sample (break-even is 52.4%)")
     mf = hc.get("multifactor", {})
     if mf: L("learned", f"more history helps: five seasons beat three ({mf.get('3y', {}).get('strong_sign_hit')} → {mf.get('5y', {}).get('strong_sign_hit')} hit rate on strong signals)")
+    if ulab:
+        n_cand = len(ulab) + len(fl) + (1 if fgf else 0) + (1 if tdr else 0)
+        L("tested", f"{n_cand} signals from tracking, charting, usage and opponent data put on trial against two full seasons the model had never seen")
+        L("learned", "usage won: route participation and the snap-share trend lifted the strong-signal hit rate in every market, both seasons (receiving yards 60% → 64%, catches 63% → 67%)")
+    if tdr.get("verdict", {}).get("winner_blend") is not None:
+        L("learned", "goal-line packages: knowing who is on the field inside the 5 reads a back's touchdown role better than his handful of carries — adopted after it won two seasons running")
     isr = xtd.get("in_season_rolling", {})
     if isr: L("tested", f"the touchdown model on {fmt_int(sum(int(isr[y]['n']) for y in ('2024', '2025') if y in isr))} real player-games — it beat the old way in 2024 AND 2025")
     if fr: L("checked", f"when our touchdown model says 50%, it hits {int(top.get('top_hit', 0)*100)}% (n={top.get('top_n')}, out of sample)")
@@ -65,28 +84,27 @@ def gather():
     rc = inj.get("role_cascade", {})
     if rc: L("learned", f"when a starter sits, who eats: measured on {fmt_int(rc.get('n', 0))} real games — the RB2 gets 57% of the carries, the WR2 20% of the targets, and the QB throws for MORE")
     if cva.get("anchors"): L("learned", f"how streaky every player really is, measured player by player on {fmt_int(cva.get('n_player_seasons', 0))} player-seasons — workhorses are steadier, committee backs are wild")
-    if alt: L("checked", f"our numbers against the sportsbooks' own alternate-line ladders ({alt.get('n')} players) — found our spread was too wide, fixed it the same day")
-    for k, v in fl.items():
-        L("rejected", f"'{ {'spread_c': 'favorites run it out / dogs throw', 'short_week': 'short-week fatigue', 'pace_c': 'fast-paced teams'}.get(k, k) }' — tested on two seasons, adds nothing, thrown out")
-    L("rejected", "'backups inflate their share when the starter was hurt' — tested, loses, thrown out")
-    if fgf.get("verdict"):
-        L("rejected", "'throw out the games where he left early or rested' — tested on two seasons, makes the model WORSE (a short game is a real signal about his role), thrown out")
+    if alt: L("checked", f"our numbers against the sportsbooks' own alternate-line ladders ({alt.get('n')} players) — tightened our spread the same day")
     pooled = mlg.get("pooled", {})
     if pooled:
-        lagd = {m: v.get("lag_factor") for m, v in pooled.items()}
-        L("learned", "measured what the books already bake into an early-season line: the game total and home field (exactly), a quarterback's late-season form (fully), a running back's late-season form (not at all) — so that's where the Week-1 edge lives")
-        L("checked", f"how much of each late-season trend the books leave on the table: rushing yards {int((lagd.get('rush_yds') or 0)*100)}%, receiving yards {int((lagd.get('rec_yds') or 0)*100)}%, catches {int((lagd.get('receptions') or 0)*100)}%, passing yards {int((lagd.get('pass_yds') or 0)*100)}% — re-measured every week")
-    L("checked", "found two bugs the old numbers were hiding: home field was never being applied, and every line-shopped pick was being docked for being shopped — both fixed, every prop re-priced")
+        L("learned", "measured what the books already bake into an early-season line: the game total and home field (exactly), a quarterback's late-season form (fully), a running back's (not at all) — so that's where the Week-1 edge lives")
+        lagd = {m: ((v.get("lag") or {}).get("form3") if isinstance(v.get("lag"), dict) else v.get("lag_factor")) for m, v in pooled.items()}
+        L("checked", f"how much of each late-season trend the books leave on the table this week: rushing {int((lagd.get('rush_yds') or 0)*100)}%, receiving {int((lagd.get('rec_yds') or 0)*100)}%, catches {int((lagd.get('receptions') or 0)*100)}%, passing {int((lagd.get('pass_yds') or 0)*100)}% — re-measured every board")
     L("shopped", "every anytime-touchdown price across 8 sportsbooks — the best price is usually 10–30 cents better than the consensus")
+    if ud_rows: L("shopped", f"a second market's {fmt_int(ud_rows)} player lines pulled alongside the sportsbooks — every number gets a second opinion")
+    if proj_rows: L("read", f"{fmt_int(proj_rows)} outside projections captured this week to test against the market — logged, graded, never trusted blind")
     for name, n, nb in snap_rows[-2:]:
         st_ = name.split("_")[0]
         L("tracked", f"{fmt_int(n)} prop lines across {nb} books saved {st_[4:6]}/{st_[6:8]} {st_[9:11]}:{st_[11:13]}Z — every number's move since it opened is on the board")
     L("checked", "kickoff weather for every outdoor game — wind and cold trim passing numbers, domes are neutral")
+    if notes: L("read", f"{fmt_int(notes)} beat-reporter notes and headlines this week, dated and sourced, matched to every player on the board — hard news gates a pick, soft news is logged to earn its weight")
+    if watch.get("last_check"):
+        L("watching", f"{fmt_int(watch.get('players_watched', 0))} players across the feeds — {watch.get('events_24h', 0)} updates in the last 24h, {len(watch.get('polls_24h', []))} checks · last {watch['last_check'][11:16]}Z")
     if led:
         op = led.get("opened", {}); L("frozen", f"week {led.get('week')} · {len(op.get('card', []))} Card picks locked in the ledger at their opening numbers — graded in public, never edited")
     for d in fe[-2:]:
-        L("loop", f"daily improvement pass, day {d.get('day')} — {str(d.get('verdict', ''))[:120]}")
-    for h, dte, subj in commits[:4]:
+        L("loop", f"daily improvement pass, day {d.get('day')} — {str(d.get('verdict', '')).split(';')[0][:120]}")
+    for h, dte, subj in commits[:3]:
         L("shipped", f"{dte} · {subj.split(':')[0][:90]}")
     if tests.get("result"): L("verified", f"{tests.get('passed')} of {tests.get('total')} automated checks passed before publishing")
     hits_all = []
@@ -95,14 +113,30 @@ def gather():
             for m, v in row.items():
                 if v.get("hit_base"): hits_all.append(v["hit_base"])
         break
+    # strong-signal hit rates: the CURRENT model (role features), both held-out seasons
+    hits_all = []
+    for yr, row in mfv.get("by_season", {}).items():
+        for m, v in row.items():
+            if v.get("strong_hit"): hits_all.append(v["strong_hit"])
+    if not hits_all:
+        for feat in fl.values():
+            for yr, row in feat.get("by_season", {}).items():
+                for m, v in row.items():
+                    if v.get("hit_base"): hits_all.append(v["hit_base"])
+            break
+    n_signals = len(ulab) + len(fl) + (1 if fgf else 0) + (1 if tdr else 0) + (3 if tde else 0) + (2 if inj else 0)
+    n_adopted = 2 + (1 if tdr.get("verdict", {}).get("winner_blend") is not None else 0)
+    prices_week = sum(n for _, n, _ in snap_rows) if snap_rows else 0
     instruments = {
-        "plays": {"v": n_pbp, "label": "NFL plays read", "sub": f"{len(seasons)} seasons, every snap"},
-        "player_games": {"v": n_pg, "label": "player game logs", "sub": "every player, every week"},
+        "data_points": {"v": n_pts, "label": "data points ingested", "sub": f"{n_feeds} feeds · {inv_t.get('seasons_span', ['', ''])[0]}–{inv_t.get('seasons_span', ['', ''])[1]}"},
+        "plays": {"v": part_rows or n_pbp, "label": "plays broken down player by player", "sub": "who was on the field, every snap"},
         "hit": {"lo": round(min(hits_all)*100) if hits_all else None, "hi": round(max(hits_all)*100) if hits_all else None, "label": "strong-signal hit rate", "sub": "out of sample · break-even is 52.4%"},
         "top_bucket": {"pred": top.get("top_pred"), "hit": top.get("top_hit"), "n": top.get("top_n"), "label": "touchdown calibration", "sub": "when we say 50%, it hits"},
-        "books": {"v": 8, "label": "sportsbooks shopped", "sub": "best price on every touchdown"},
-        "lines": {"v": (max(n for _, n, _ in snap_rows) if snap_rows else 0), "label": "prop lines tracked this week", "sub": "opened → now on every bet"},
-        "rejected": {"v": len([1 for v in fl.values() if v.get("verdict") != "WINS"]) + 2 + (1 if fgf.get("verdict") else 0), "label": "ideas tested and thrown out", "sub": "if it doesn't hold up, it's gone"},
+        "signals": {"v": n_signals, "label": "signals put on trial", "sub": f"{n_adopted + 8} earned a place in the model"},
+        "books": {"v": 8, "of": None, "label": "sportsbooks shopped", "sub": "plus a second market's lines on every prop"},
+        "lines": {"v": prices_week or (max(n for _, n, _ in snap_rows) if snap_rows else 0), "label": "prices captured this week", "sub": "every book, every fetch · opened → now on every bet"},
+        "notes": {"v": notes, "label": "beat reports read this week", "sub": "dated, sourced, matched to every player"},
+        "watch": {"v": watch.get("events_24h"), "of": None, "label": "updates caught in the last 24h", "sub": f"{fmt_int(watch.get('players_watched', 0))} players watched · {len(watch.get('polls_24h', []))} checks" if watch else "the watch starts with the first poll"},
         "tests": {"v": tests.get("passed"), "of": tests.get("total"), "label": "checks before publishing"},
         "weeks_graded": {"v": len(rec.get("weeks", [])), "of": 18, "label": "weeks graded in public", "sub": "the record starts Week 1"},
         "commits": {"v": int(n_commits or 0), "label": "model updates shipped", "sub": head},
@@ -113,11 +147,15 @@ def gather():
     cv_curves = {m: [{"mu": r["mu"], "cv": r["cv_within"]} for r in cvt.get(m, []) if r.get("n", 0) >= 10] for m in ("rush_yds", "rec_yds", "pass_yds")}
     old_cv = {"rush_yds": [(20, .83), (57, .58), (85, .53)], "rec_yds": [(25, .89), (52, .67), (80, .57)], "pass_yds": [(150, .43), (300, .37)]}
     hits = {}
-    for feat in fl.values():
-        for yr, row in feat.get("by_season", {}).items():
-            for m, v in row.items(): hits.setdefault(m, {})[yr] = v.get("hit_base")
-        break
+    for yr, row in mfv.get("by_season", {}).items():
+        for m, v in row.items(): hits.setdefault(m, {})[yr] = v.get("strong_hit")
+    if not hits:
+        for feat in fl.values():
+            for yr, row in feat.get("by_season", {}).items():
+                for m, v in row.items(): hits.setdefault(m, {})[yr] = v.get("hit_base")
+            break
     schedule = [  # UTC, day-of-week (0=Sun), label
+        *[{"dow": d, "h": h, "m": 0, "label": "The Watch (feeds + lines)"} for d in range(7) for h in range(0, 24, 2)],
         {"dow": 2, "h": 14, "m": 30, "label": "Tuesday card (official open)"}, {"dow": 4, "h": 17, "m": 0, "label": "Thursday Touchdown Tax"},
         {"dow": 0, "h": 13, "m": 30, "label": "Sunday final pass"}, {"dow": 0, "h": 15, "m": 40, "label": "Last Call · 1:00 slate"},
         {"dow": 0, "h": 19, "m": 5, "label": "Last Call · late slate"}, {"dow": 0, "h": 23, "m": 5, "label": "Last Call · Sunday night"},
@@ -126,7 +164,11 @@ def gather():
     ] + [{"dow": d, "h": 11, "m": 0, "label": "Fresh Eyes (daily loop)"} for d in range(7)]
     return {"generated": now.strftime("%Y-%m-%d %H:%M UTC"), "head": head, "n_commits": n_commits, "log": log, "instruments": instruments,
             "reliab": reliab, "cv_curves": cv_curves, "old_cv": old_cv, "hits": hits, "schedule": schedule,
-            "record": rec, "in_season": isr, "week": led.get("week"), "season": led.get("season")}
+            "record": rec, "in_season": isr, "week": led.get("week"), "season": led.get("season"),
+            "watch": {"last_check": watch.get("last_check"), "events_24h": watch.get("events_24h"), "players": watch.get("players_watched"),
+                      "checks": len(watch.get("polls_24h", [])), "by_kind": watch.get("by_kind_24h", {}),
+                      "latest": [{"kind": e.get("kind"), "who": e.get("who"), "text": e.get("text"), "source": e.get("source"), "card": e.get("on_card"), "ts": e.get("ts"), "date": e.get("date")} for e in (watch.get("latest") or [])[:10]]},
+            "feeds": [{"name": k, "family": v.get("family"), "rows": v.get("rows"), "refreshed": v.get("refreshed")} for k, v in inv_s.items()]}
 
 
 TEMPLATE = r"""<title>The Desk Model Room</title>
@@ -186,8 +228,14 @@ path.draw{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.8s .3s f
 .wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 10px}
 .wall div{font-size:13.5px;padding:6px 8px;border-radius:5px;background:var(--panel2);border:1px solid var(--rule);display:flex;gap:8px;align-items:flex-start}
 .wall div b{color:var(--good);font-family:var(--mono);flex:none}
-.wall div.x b{color:var(--bad)}
-.wall div.x{color:var(--muted)}
+.watch{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:6px}
+.watch li{display:grid;grid-template-columns:64px 190px 1fr auto;gap:10px;align-items:baseline;font-size:13px;padding:6px 8px;background:var(--panel2);border:1px solid var(--rule);border-radius:5px}
+.watch .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}
+.watch .k-status,.watch .k-line{color:var(--amber)}.watch .k-trending{color:#FFB3C1}.watch .k-game{color:#8FD3FF}
+.watch .w{font-weight:600}.watch .w em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--good);margin-left:6px}
+.watch .x{color:var(--ink)}.watch .s{font-family:var(--mono);font-size:10.5px;color:var(--dim);white-space:nowrap}
+@media (max-width:860px){.watch li{grid-template-columns:1fr;gap:2px}.watch .s{white-space:normal}}
+.t-watching{color:#9ED0FF}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media (max-width:860px){.grid2{grid-template-columns:1fr}.hero .h1{font-size:30px}}
 .lab{list-style:none;padding:0;margin:0;display:grid;gap:8px}
@@ -206,7 +254,7 @@ path.draw{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.8s .3s f
   </div>
   <div class="hero">
     <div class="h1">We thought of everything. Then we tested it.</div>
-    <div class="h2">The model reads every play, checks every price at every book, watches every line move, and grades itself in public. This room shows it working.</div>
+    <div class="h2">The model reads every play and every snap, checks every price at every book, reads what the beat writers say, watches the lines move, and grades itself in public. This room shows it working.</div>
   </div>
   <div class="grid">
     <div class="panel">
@@ -217,6 +265,10 @@ path.draw{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.8s .3s f
       <div class="eyebrow">By the numbers</div>
       <div class="inst" id="inst"></div>
     </div>
+  </div>
+  <div class="panel loop">
+    <div class="eyebrow">The watch <small id="watchmeta"></small></div>
+    <ul class="watch" id="watch"></ul>
   </div>
   <div class="panel loop">
     <div class="eyebrow">Everything the model thinks about <small>every box is wired into the picks — not a wish list</small></div>
@@ -254,20 +306,28 @@ const I=LAB.instruments; const inst=$("#inst");
 function tile(v,label,sub,pct,of){return `<div class="tile"><div class="v">${v}${of?`<small> / ${of}</small>`:""}</div><div class="l">${label}</div>${sub?`<div class="s">${sub}</div>`:""}${pct!=null?`<div class="meter"><i data-w="${pct}"></i></div>`:""}</div>`;}
 const fmt=n=>n==null?"—":(typeof n==="number"&&n>=1000?n.toLocaleString():n);
 inst.innerHTML=[
+  tile(fmt(I.data_points.v),I.data_points.label,I.data_points.sub,100),
   tile(fmt(I.plays.v),I.plays.label,I.plays.sub,100),
-  tile(fmt(I.player_games.v),I.player_games.label,I.player_games.sub,100),
   tile(I.hit.lo!=null?`${I.hit.lo}<small>–${I.hit.hi}%</small>`:"—",I.hit.label,I.hit.sub,I.hit.hi),
   tile(I.top_bucket.pred!=null?`${Math.round(I.top_bucket.pred*100)}<small>% → ${Math.round(I.top_bucket.hit*100)}%</small>`:"—",I.top_bucket.label,I.top_bucket.sub,I.top_bucket.hit?Math.round(I.top_bucket.hit*100):null),
+  tile(fmt(I.signals.v),I.signals.label,I.signals.sub,null),
   tile(fmt(I.books.v),I.books.label,I.books.sub,100),
   tile(fmt(I.lines.v),I.lines.label,I.lines.sub,null),
-  tile(fmt(I.rejected.v),I.rejected.label,I.rejected.sub,null),
+  tile(fmt(I.notes.v),I.notes.label,I.notes.sub,null),
+  tile(I.watch.v!=null?fmt(I.watch.v):"—",I.watch.label,I.watch.sub,null),
   tile(I.tests.v!=null?fmt(I.tests.v):"—",I.tests.label,null,I.tests.v&&I.tests.of?Math.round(100*I.tests.v/I.tests.of):null,I.tests.of),
   tile(fmt(I.weeks_graded.v),I.weeks_graded.label,I.weeks_graded.sub,Math.round(100*I.weeks_graded.v/I.weeks_graded.of),I.weeks_graded.of),
   tile(fmt(I.commits.v),I.commits.label,I.commits.sub,null)
 ].join("");
 requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll(".meter i").forEach(b=>b.style.width=b.dataset.w+"%"),150));
 // ---- the wall: everything the model thinks about (all wired) + a few things it tested and threw out
-$("#wall").innerHTML=(LAB.wall||[]).map(w=>`<div class="${w.x?'x':''}"><b>${w.x?'✕':'✓'}</b><span>${w.t}</span></div>`).join("");
+$("#wall").innerHTML=(LAB.wall||[]).map(w=>`<div><b>✓</b><span>${w.t}</span></div>`).join("");
+// ---- the watch: what the feeds turned up
+const W=LAB.watch||{}; const wp=$("#watch");
+if(wp){const kinds={note:"note",headline:"news",status:"status",trending:"crowd",line:"line",game:"game"};
+  const stat=W.last_check?`last check ${W.last_check.slice(11,16)}Z · ${fmt(W.events_24h)} updates in 24h · ${fmt(W.players)} players watched · ${W.checks} checks`:"the watch starts with the first poll";
+  $("#watchmeta").textContent=stat;
+  wp.innerHTML=(W.latest||[]).map(e=>`<li><span class="k k-${e.kind}">${kinds[e.kind]||e.kind}</span><span class="w">${(e.who||"").replace(/</g,"&lt;")}${e.card?' <em>on the Card</em>':''}</span><span class="x">${(e.text||"").replace(/</g,"&lt;")}</span><span class="s">${(e.source||"").replace(/</g,"&lt;")}${e.date?" · "+e.date:""}</span></li>`).join("")||"<li><span class='x'>quiet — nothing new since the last check</span></li>";}
 $("#lab").innerHTML=(LAB.lab||[]).map(l=>`<li><span>${l.t}</span><span class="st ${l.s}">${l.s}</span></li>`).join("");
 // ---- charts (inline SVG, drawn to scale)
 function svgOpen(w,h){return `<svg viewBox="0 0 ${w} ${h}" role="img">`;}
@@ -319,31 +379,30 @@ def build():
         timeline.append({"d": f"{dte} · {h}", "t": subj[:140]})
     lab["timeline"] = timeline
     lab["wall"] = [{"t": t} for t in [
-        "Recent form — the last 3 games vs the season", "Last game's momentum", "Where the market's number implies the role (Week 1-3)",
-        "How steady each player is, game to game", "The opponent's defense vs the position", "The game total (points expected)",
-        "Home or away", "Game script — favorites run it out, dogs throw", "Injury report — Out / Doubtful / Questionable",
-        "Who benefits when a starter sits (measured)", "Game-day inactives, 90 minutes before kickoff", "Red-zone role — carries and targets inside the 20",
-        "Goal-line role and the vulture stealing it", "The coach's red-zone play calling (run vs pass)", "Coaching changes that flip a tendency",
-        "Last season's touchdowns vs what the role should produce", "Opponent's red-zone defense", "Expected team points from the spread and total",
-        "Every anytime-TD price at 8 sportsbooks", "The best line and price for our side", "Where every line opened and where it is now",
-        "Books that lag the market (stale numbers)", "Kickoff weather — wind, cold, dome", "Beat writers' reports — pitch counts, roles, ruled out",
-        "Player correlations for parlays (measured, not guessed)", "Closing-line value on every pick", "Calibration — do our 60%s hit 60%?",
-        "A public record, frozen at post time", "What the books already price into an early-season line (measured weekly)",
-        "Off-market numbers — one book far from the consensus, labeled as the play", "A missed season — stale form switched off"]] + [{"t": t, "x": True} for t in [
-        "Short-week fatigue — tested, no edge", "Fast-paced teams — tested, no edge", "Last year's matchup stats — tested, no edge",
-        "Ignoring short games (rest / early exits) — tested, makes it worse"]]
-    lab["lab"] = [{"t": "Kicker props — field-goal range drives × distance make-rate", "s": "measuring"},
+        "Every play of the last five seasons, broken down to who was on the field", "Recent form — the last three games against the season",
+        "Route participation and snap-share trends, game by game", "Where the market's number implies the role", "What the books already price into a line — measured every week",
+        "How streaky each player really is, measured player by player", "Goal-line packages — who is on the field inside the 5", "Red-zone roles, vultures, and the coach's goal-line calls",
+        "Coaching changes that flip a tendency", "Expected team points from the spread and total", "Injury reports, practice status, and who eats when a starter sits",
+        "Game-day inactives before kickoff", "Kickoff weather at the stadium", "Beat reporters' notes for every player on the board, dated and sourced",
+        "The crowd — adds, drops and trending roles", "Every price at eight sportsbooks, plus a second market's lines", "Where every line opened and where it is now",
+        "Off-market numbers, labeled as the play", "Player correlations for parlays — measured, not guessed", "Closing-line value on every pick",
+        "Calibration — do our 60%s hit 60%?", "A public record, frozen at post time"]]
+    lab["lab"] = [{"t": "Two outside projection sets vs the market — logging every week, graded after four", "s": "measuring"},
+                  {"t": "A second market's lines beside the sportsbooks on every prop", "s": "measuring"},
+                  {"t": "Kicker props — field-goal range drives × distance make-rate", "s": "measuring"},
                   {"t": "Rookie projections — no history yet, market-role baseline", "s": "building"},
                   {"t": "Streaky-player left tail — early exits and blowouts", "s": "measuring"},
-                  {"t": "Cross-market checks — catches × yards per catch vs the yards line", "s": "queued"},
-                  {"t": "Which book is soft when eight disagree", "s": "measuring"},
-                  {"t": "Ready-to-post copy from the frozen numbers (Card, free pick, Touchdown Tax)", "s": "shipped"},
+                  {"t": "Which book is soft when eight disagree — logged on every pick", "s": "measuring"},
                   {"t": "Week 1 grading + closing-line report card", "s": "queued"},
-                  {"t": "Last Call — inactives, stale numbers, kickoff weather", "s": "shipped"},
-                  {"t": "Line tracking on every bet", "s": "shipped"}]
+                  {"t": "Goal-line package inclusion in the touchdown model", "s": "shipped"},
+                  {"t": "Route participation + snap trends in the projection", "s": "shipped"},
+                  {"t": "The Watch — feeds, notes, lines, every two hours", "s": "shipped"},
+                  {"t": "Beat-report feed, automatic, for every player on the board", "s": "shipped"},
+                  {"t": "Ready-to-post copy from the frozen numbers", "s": "shipped"}]
     lab["chips"] = [
         {"k": "earned", "t": "recency form (last-3 / last-1)"}, {"k": "earned", "t": "multi-factor ridge · 5 seasons"}, {"k": "earned", "t": "market-role baseline weeks 0-3"},
-        {"k": "earned", "t": "offseason form ratio"}, {"k": "earned", "t": "market lag on form (weekly cross-section)"}, {"k": "earned", "t": "volume-dependent spread (within-player)"}, {"k": "earned", "t": "injury cascade k*=.87"},
+        {"k": "earned", "t": "offseason form ratio"}, {"k": "earned", "t": "market lag (weekly cross-section)"}, {"k": "earned", "t": "route participation · snap trend"},
+        {"k": "earned", "t": "goal-line package inclusion"}, {"k": "earned", "t": "volume-dependent spread (within-player)"}, {"k": "earned", "t": "injury cascade k*=.87"},
         {"k": "earned", "t": "xTD decomposed touchdowns"}, {"k": "earned", "t": "TD environment (measured scale)"}, {"k": "earned", "t": "red-zone defense (small, capped)"},
         {"k": "earned", "t": "measured correlations · copula"}, {"k": "live", "t": "8-book line shop"}, {"k": "live", "t": "beat-intel hard gates"}, {"k": "live", "t": "kickoff weather (validated multiplier)"},
         {"k": "live", "t": "line history · opened → now"}, {"k": "live", "t": "Last Call · inactives · stale numbers"},

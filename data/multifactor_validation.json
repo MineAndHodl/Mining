@@ -1,0 +1,58 @@
+{
+ "features": [
+  "form3",
+  "form1",
+  "def_delta",
+  "total_c",
+  "home",
+  "base_c",
+  "role_rr",
+  "role_snap_d"
+ ],
+ "by_season": {
+  "2024": {
+   "rush_yds": {
+    "strong_hit": 0.605,
+    "recency_alone": 0.569,
+    "n_test": 2008
+   },
+   "rec_yds": {
+    "strong_hit": 0.629,
+    "recency_alone": 0.559,
+    "n_test": 3911
+   },
+   "receptions": {
+    "strong_hit": 0.64,
+    "recency_alone": 0.571,
+    "n_test": 3911
+   },
+   "pass_yds": {
+    "strong_hit": 0.688,
+    "recency_alone": 0.582,
+    "n_test": 600
+   }
+  },
+  "2025": {
+   "rush_yds": {
+    "strong_hit": 0.633,
+    "recency_alone": 0.565,
+    "n_test": 1948
+   },
+   "rec_yds": {
+    "strong_hit": 0.658,
+    "recency_alone": 0.571,
+    "n_test": 3946
+   },
+   "receptions": {
+    "strong_hit": 0.668,
+    "recency_alone": 0.584,
+    "n_test": 3946
+   },
+   "pass_yds": {
+    "strong_hit": 0.642,
+    "recency_alone": 0.537,
+    "n_test": 579
+   }
+  }
+ }
+}

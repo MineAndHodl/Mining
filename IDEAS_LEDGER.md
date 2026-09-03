@@ -76,6 +76,30 @@ the run), **REJECTED** (tested, lost), **BLOCKED** (needs something only Alex ca
     (≤280), the free-pick thread, the Touchdown Tax, line moves, the Monday report card — all
     generated from the frozen numbers, so a post can never say what the model didn't.
 
+### 0c. Alex's data brief, day 3 (2026-09-03) — "pull in a ton more data… constant monitoring… PFF?"
+17. **The data universe** (`DATA_UNIVERSE.md`): 36 free feeds reachable from the session, ingested
+    (`ingest_universe.py`), inventoried (`data/data_ledger.json`: 3.5M rows, 183M data points),
+    turned into per-player-game / per-team-game signals (`universe_features.py`) and put through
+    the lab (`universe_lab.py`, 98 candidates). Participation data (who was on the field for every
+    play) is the crown jewel and it is free.
+18. **Usage won, efficiency lost**: route participation + snap-share trend EARNED (every market,
+    both seasons); goal-line package inclusion EARNED in xTD (both seasons). Next Gen Stats, PFR
+    contact/pressure, FTN charting and opponent tendencies: tested, no edge beyond form + usage.
+19. **Tweets / live updates**: the X API is pay-per-use ($0.005/read; ~$60/mo for a curated beat
+    list) — optional. The free path is live now: ESPN's core API carries dated RotoWire-style
+    notes per player that cite the beat source, plus RSS (ESPN/Yahoo/CBS/PFT/Google News) and
+    Sleeper status/trending → the beat-intel layer is automatic (`intel_feed.py`) and The Watch
+    (`monitor.py`, every 2h) logs what changed and republishes the Model Room.
+20. **Different fantasy projections**: RotoWire (via Sleeper) and ESPN weekly projections captured
+    and logged on every row (`proj_rw`, `proj_espn`); graded by the loop before they can move a
+    number. FantasyPros needs a key; not needed.
+21. **PFF grades**: $200/yr (PFF Pro) for API access; grades are opinions on top of charting we
+    already hold free (FTN + participation). Not bought. If ever bought, it goes through the lab.
+22. **A second market**: Underdog's 3,800 NFL lines pulled every 2h — `ud_line` on every row, the
+    "2nd mkt" chip on the board, Underdog line moves in the watch. Graded after 4 weeks.
+23. **The Model Room**: counts what the model consumes (data points, plays broken down, beat
+    reports, prices, signals on trial, checks), shows The Watch, no rejected boxes, vaguer wall.
+
 ## 1. Product lanes
 | Idea (Alex) | Status | Where / note |
 |---|---|---|
