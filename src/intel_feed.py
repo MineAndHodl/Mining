@@ -131,6 +131,14 @@ def build_items(board_names=None):
                    ([f"practice: {prac}"] if isinstance(prac, str) and prac not in ("None", "nan") else [])
             add(nm, {"date": nd or datetime.date.today().isoformat(), "source": "sleeper", "title": "Sleeper: " + ", ".join(bits),
                      "snippet": notes if isinstance(notes, str) and notes not in ("None", "nan") else "", "url": None, "feed": "sleeper_status"})
+    # ---- Coach press conferences (coach_feed): quotes and coach-speak about board players ---------
+    try:
+        import coach_feed as cfd
+        for k, rec in cfd.items(players=set(keys.values())).items():
+            for it in rec["items"]:
+                add(rec["name"], it)
+    except Exception as _e:
+        print("coach feed items skipped:", _e)
     # ---- Sleeper trending adds / drops --------------------------------------------------------
     for kind, label in (("sleeper_trending", "trending add"), ("sleeper_drops", "trending drop")):
         fs = sorted(glob.glob(os.path.join(UNI, kind, "*.json")))
@@ -171,13 +179,19 @@ def merge_into_week(season, week, items, window=None, write=True):
     return path, n_new, cur
 
 
-def refresh_sources():
+def refresh_sources(coaches=True):
     try:
         import ingest_universe as iu
         for n in ("espn_injuries", "rss_news", "sleeper_players", "sleeper_trending", "sleeper_drops"):
             iu.fetch(n, verbose=False)
     except Exception as e:
         print("intel feed: source refresh skipped:", e)
+    if coaches:
+        try:
+            import coach_feed as cfd
+            cfd.refresh(verbose=True)
+        except Exception as e:
+            print("intel feed: coach feed skipped:", e)
 
 
 def run(season, week, dry=False, refresh=True):

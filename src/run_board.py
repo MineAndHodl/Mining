@@ -156,6 +156,14 @@ def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False, ope
                                                                         for lst in ranked["by_category"].values() for x in lst)]}
 
     # 5) factor scorecards on everything shown (tabs + the slate)
+    # 6b) second opinions on every row (Underdog's line, RotoWire and ESPN projections) — logged
+    #     for the grading loop, shown as a second read and as profile levers, never used to move a number
+    try:
+        import second_opinions
+        n_so = second_opinions.attach({**ranked, "pool": pool}, week=(weeks_played + 1) if weeks_played else 1)
+        print(f"second opinions: Underdog lines on {n_so} rows")
+    except Exception as e:
+        print("second opinions skipped:", e)
     bf.attach_all(ranked)
     gs = ranked.get("grading", {})
     print(f"grades: {gs.get('grade_counts')} | recommended {gs.get('n_recommended')} "
@@ -214,14 +222,6 @@ def run(key=None, days=14, rebuild_games=False, cached=False, refresh=False, ope
         bbp.build()
         print(f"LAST CALL: {len(out.get('games', []))} games in the window, {len(out.get('items', []))} items")
         return ranked
-    # 7b) second opinions on every row (Underdog's line, RotoWire and ESPN projections) — logged
-    #     for the grading loop, shown as a second read, never used to move a number
-    try:
-        import second_opinions
-        n_so = second_opinions.attach({**ranked, "pool": pool}, week=wk_week)
-        print(f"second opinions: Underdog lines on {n_so} rows")
-    except Exception as e:
-        print("second opinions skipped:", e)
     json.dump(ranked, open(f"{DATA}/ranked_board.json", "w"), indent=1)
     # 8) the ledger: freeze every number we put out (the grading loop's input). --open marks
     #    this run as the week's OFFICIAL open (the Tuesday card); any earlier build is a preview.

@@ -1,4 +1,4 @@
-# Post copy — 2026 week 1 · generated 2026-09-03T05:15+00:00
+# Post copy — 2026 week 1 · generated 2026-09-03T08:08+00:00
 
 ## card_full
 
@@ -8,8 +8,8 @@ THE DESK — Week 1 Card (8 plays)
 ▸ DeMario Douglas UNDER 20.5 rec yds (-118 BetRivers) · A- · 1u — we make it 58%, the market 50%
 ▸ Jonathan Taylor UNDER 78.5 rush yds (-114 DraftKings) · A- · 1u — we make it 59%, the market 50%
 ▸ Baker Mayfield UNDER 247.5 pass yds (-117 BetRivers) · A- · 1u — we make it 58%, the market 50%
-▸ Colby Parkinson OVER 21.5 rec yds (-116 DraftKings) · A- · 1u — we make it 57%, the market 51%
 ▸ Jahmyr Gibbs UNDER 85.5 rush yds (-111 DraftKings) · A- · 1u — we make it 57%, the market 50%
+▸ Colby Parkinson OVER 21.5 rec yds (-116 DraftKings) · A- · 1u — we make it 57%, the market 51%
 ▸ Chase Brown OVER 57.5 rush yds (-114 FanDuel) · A- · 1u — we make it 57%, the market 50%
 Rail: every Card play is ≥57% to hit on our numbers (avg edge +8.1%). Sizes are units, not confidence theater. Graded Monday at the price posted.
 
@@ -47,9 +47,9 @@ TOUCHDOWN TAX — Week 1
 
 ▸ Davante Adams anytime TD (+143 BetRivers) · 47% for us
 ▸ George Pickens anytime TD (+160 Fanatics) · 42% for us
-▸ Brock Bowers anytime TD (+185 Fanatics) · 39% for us
+▸ Brock Bowers anytime TD (+185 Fanatics) · 38% for us
 
-Pays ~17:1 (+1701). Cashes 8% of the time on our numbers (fair +1194) — +39% expected return if the edges are real.
+Pays ~17:1 (+1701). Cashes 7% of the time on our numbers (fair +1238) — +35% expected return if the edges are real.
 
 No stars on purpose: last year's 1-TD-a-game guys score in ~51% of next season's games and get priced at 64-76%. The value is the plus-money scorers. Small stake, real edge.
 

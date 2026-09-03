@@ -100,6 +100,21 @@ the run), **REJECTED** (tested, lost), **BLOCKED** (needs something only Alex ca
 23. **The Model Room**: counts what the model consumes (data points, plays broken down, beat
     reports, prices, signals on trial, checks), shows The Watch, no rejected boxes, vaguer wall.
 
+### 0d. Alex's follow-ups, day 4 (2026-09-03)
+24. **Receivers and QBs in the TD model** — they always were (WR 237, TE 128, QB 75, RB 149 in the
+    xTD table: zone target shares, QB rush shares, position conversion priors). Added for catchers:
+    red-zone inclusion × targets per route (EARNED, both seasons); calibration refit; per-position
+    calibration checked (all corrected by the recal).
+25. **Efficiency on the sliders** — the PROFILE block (`player_profile.py`): tracking & charting
+    percentiles among position peers + Second Market, Outside Projections, The Crowd, Pace & Pass
+    Rate. Labeled profile, logged on every pick, does not move the number. Marketable and true.
+26. **Beat feed for every position** — patterns broadened (WR/TE/QB/K + coach-speak); hard gates
+    hardened after the broadening manufactured false OUTs (preseason, conditionals, past seasons,
+    other players' clauses).
+27. **Coach press conferences** — `coach_feed.py`: Google News → team-site transcripts / local papers
+    / ESPN → quotes about board players → intel, the watch, the Model Room. Free. OCs next (no
+    coordinator table in the schedule; needs a coach map).
+
 ## 1. Product lanes
 | Idea (Alex) | Status | Where / note |
 |---|---|---|

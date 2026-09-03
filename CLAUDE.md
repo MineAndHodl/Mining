@@ -130,6 +130,34 @@ The board is the product: every pick on it must be something a sharp would nod a
 - **Second opinions on every row (day 3, `second_opinions.py`):** Underdog's line + prices (`ud_line`),
   RotoWire (`proj_rw`) and ESPN (`proj_espn`) projections — logged in the ledger, shown as a "2nd mkt"
   chip, never used to move a number until the loop grades them.
+- **Pass-catchers' red-zone role (day 4, `td_role_validate.py --receivers`):** zone target share blended
+  75/25 with an inclusion-based share (red-zone snap inclusion × targets per route, normalized across the
+  team's catchers) beats the observed share on WR/TE Brier in both seasons (.16032 → .16020, .15139 →
+  .15106); `RZ_INCLUSION_BLEND`. A share change is a calibration change: `CAL` refit to (.079, .777),
+  top bucket .50 → .53 out of sample. QBs (75), WRs (237), TEs (128), RBs (149) are all in the xTD table;
+  raw in-season under-prediction by position (QB .13 → .18 realized, TE .12 → .17) is what the linear
+  recalibration corrects.
+- **Player profile levers (day 4, `player_profile.py`):** every pick carries a PROFILE block — tracking &
+  charting percentiles among position peers (separation, YAC over expected, rush yards over expected,
+  after contact, broken tackles, stacked boxes, catchable/contested balls, drops, CPOE, depth of target,
+  pressure faced, bad throws, red-zone snaps, goal-line package) plus the READS (Second Market =
+  Underdog vs our line, Outside Projections = RotoWire/ESPN vs the line, The Crowd = Sleeper trending,
+  Pace & Pass Rate). Shown as player-direction sliders under the scorecard, labeled as profile; logged
+  with every pick; **they do not move the number** (the lab showed efficiency adds nothing to usage).
+- **Coach press conferences (day 4, `coach_feed.py`):** per head coach (from the schedule), Google News
+  RSS → Google's own link decode → the article → body text (team-site CMS or generic paragraphs, nav
+  stripped) → every sentence naming a board player, tagged `quote` when the coach is speaking (a
+  transcript, or the coach's surname + a speech verb in the sentence or its neighbours). Items flow into
+  the intel file (source "Coach X · outlet"), the watch (kind "coach") and the Model Room. Week 1: 126
+  articles, 248 coach quotes.
+- **Intel patterns cover every position (day 4)** — receivers (primary target, slot/X, red-zone option),
+  tight ends (blocking/inline role = negative), QBs (named starter, competition, benched, designed runs),
+  kickers (lost the job) — and coach-speak (game-time decision, no restrictions, get him the ball,
+  committee, hot hand). HARD GATES: IR / season-ending / suspension always; other OUT/LIMITED phrases
+  only when the item is dated inside game week (≤7 days before kickoff); never from a conditional
+  ("in the event that"), a past-season clause ("recovering from season-ending injuries in 2025"), a
+  preseason note, or a clause about another player (splitters: with/while/as/after/because/following/
+  due to/given/behind).
 - **The Watch (day 3, `monitor.py`, job "Desk: The Watch" every 2h):** diffs the fast feeds against
   what it has seen (notes, headlines, status changes, trending, Underdog line moves, game odds moves)
   → `data/monitor/feed.jsonl` + `status.json`; the Model Room shows the last check and the latest

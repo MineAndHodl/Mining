@@ -105,6 +105,8 @@ SOURCES = {
                           "feeds": "multi-book game odds, sometimes public bet/money splits", "family": "Action Network"},
     "rss_news":         {"url": None, "seasons": None, "fresh_hours": 1, "kind": "rss",
                          "feeds": "ESPN / Yahoo / CBS / ProFootballTalk / Google News headlines, dated and sourced (the intel pass reads these)", "family": "RSS"},
+    "coach_feed":       {"url": None, "seasons": None, "fresh_hours": 2, "kind": "coach",
+                         "feeds": "the 32 head coaches' press conferences — transcripts and quotes (team sites, local papers, ESPN via Google News), every sentence about a board player", "family": "Coaches"},
 }
 
 RSS_FEEDS = {
@@ -243,6 +245,11 @@ def fetch(name, force=False, season=None, week=None, verbose=True):
                                      "athlete_ref": ath, "espn_id": ath.rstrip("/").split("/")[-1].split("?")[0] if ath else None})
                 df = pd.DataFrame(rows); df.to_parquet(p, index=False); out.append((p, len(df)))
                 if verbose: print(f"  {name}: {len(df):,} injury rows")
+            elif kind == "coach":
+                import coach_feed as cfd
+                idx = cfd.refresh(verbose=False) if force or not _fresh(os.path.join(UNI, "coach_feed", "index.json"), spec["fresh_hours"]) else (json.load(open(os.path.join(UNI, "coach_feed", "index.json"))) if os.path.exists(os.path.join(UNI, "coach_feed", "index.json")) else {})
+                out.append((os.path.join(UNI, "coach_feed", "index.json"), len(idx)))
+                if verbose: print(f"  coach feed: {len(idx)} articles indexed")
             elif kind == "rss":
                 d = os.path.join(UNI, "rss"); os.makedirs(d, exist_ok=True)
                 stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M")
@@ -284,6 +291,7 @@ def inventory(write=True):
         kind = spec.get("kind", "parquet")
         files = sorted(glob.glob(os.path.join(UNI, f"{name}_*.parquet")) + glob.glob(os.path.join(UNI, f"{name}.parquet")) +
                        glob.glob(os.path.join(UNI, name, "*.json")) + (glob.glob(os.path.join(UNI, "rss", "*.parquet")) if kind == "rss" else []) +
+                       (glob.glob(os.path.join(UNI, "coach_feed", "*.txt")) if kind == "coach" else []) +
                        glob.glob(os.path.join(UNI, f"{name}.json")))
         rows = cells = b = 0; cols = None; seasons = set(); latest = None
         for f in files:
@@ -299,6 +307,10 @@ def inventory(write=True):
                         try:
                             seasons |= set(pd.read_parquet(f, columns=["season"])["season"].dropna().astype(int).unique().tolist())
                         except Exception: pass
+                except Exception: pass
+            elif f.endswith(".txt"):
+                try:
+                    n = len(open(f).read().split()); rows += 1; cells += n      # one article; its words as data points
                 except Exception: pass
             else:
                 try:

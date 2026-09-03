@@ -24,6 +24,7 @@ sys.path.insert(0, HERE)
 from names import norm_name
 
 FAST = ["espn_injuries", "rss_news", "sleeper_players", "sleeper_trending", "sleeper_drops", "underdog_lines", "action_scoreboard", "espn_news"]
+COACHES = True            # also poll the coaches' press conferences (Google News -> team sites / papers)
 MAX_AGE_DAYS = 7          # an item older than this is history, not an update
 
 
@@ -63,6 +64,23 @@ def poll(dry=False, refresh=True):
     names, card = _board(); keys = {norm_name(n): n for n in names}
     now = _now(); ts = now.isoformat(timespec="minutes")
     events = []
+    # --- coaches' press conferences: new quotes about board players ----------------------------
+    try:
+        import coach_feed as cfd
+        if refresh and COACHES:
+            cfd.refresh(verbose=False)
+        seen_c = set(state.get("seen_coach", []))
+        for k, rec in cfd.items(players=names).items():
+            for it in rec["items"]:
+                sig = f"{it.get('url')}|{(it.get('title') or '')[:60]}"
+                if sig in seen_c: continue
+                seen_c.add(sig)
+                if not it.get("quote") and not it.get("coach_speak"): continue
+                events.append({"ts": ts, "kind": "coach", "who": rec["name"], "on_card": rec["name"] in card, "text": (it.get("title") or "")[:280],
+                               "source": it.get("source"), "url": it.get("url"), "date": it.get("date"), "quote": bool(it.get("quote"))})
+        state["seen_coach"] = sorted(seen_c)[-20000:]
+    except Exception as e:
+        print("coach feed:", e)
     def ev(kind, who, text, source=None, url=None, extra=None):
         events.append({"ts": ts, "kind": kind, "who": who, "on_card": who in card, "text": text[:280], "source": source, "url": url, **(extra or {})})
     # --- player notes (ESPN core injuries feed) ------------------------------------------------
@@ -189,7 +207,7 @@ def poll(dry=False, refresh=True):
     except Exception: pass
     status = {"last_check": ts, "polls_24h": polls, "events_24h": len(recent), "events_total": sum(1 for _ in open(FEED)) if os.path.exists(FEED) else 0,
               "players_watched": len(names), "card_players": len(card), "feeds": feeds,
-              "by_kind_24h": {k: sum(1 for e in recent if e["kind"] == k) for k in ("note", "headline", "status", "trending", "line", "game")},
+              "by_kind_24h": {k: sum(1 for e in recent if e["kind"] == k) for k in ("note", "headline", "coach", "status", "trending", "line", "game")},
               "latest": sorted(recent, key=lambda e: (e.get("date") or e["ts"][:10], e["ts"]), reverse=True)[:14]}
     json.dump(status, open(STATUS, "w"), indent=1)
     print(f"watch: {len(events)} new events · {len(recent)} in 24h · watching {len(names)} players ({len(card)} on the Card) · {len(polls)} checks in 24h")

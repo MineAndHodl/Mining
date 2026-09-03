@@ -251,8 +251,8 @@
   "env_intercept": -0.717,
   "k_star": 1.0,
   "recal_xtd": [
-   0.085,
-   0.741
+   0.079,
+   0.777
   ],
   "recal_old": [
    0.055,
@@ -397,47 +397,47 @@
  },
  "final_recal": {
   "recal_xtd": [
-   0.085,
-   0.741
+   0.079,
+   0.777
   ],
   "recal_old": [
    0.055,
    0.916
   ],
   "blend_w0.45": {
-   "brier": 0.1649,
-   "logloss": 0.5067,
-   "top_n": 150,
-   "top_pred": 0.5,
-   "top_hit": 0.533
+   "brier": 0.1647,
+   "logloss": 0.5062,
+   "top_n": 159,
+   "top_pred": 0.502,
+   "top_hit": 0.547
   },
   "blend_w0.55": {
-   "brier": 0.1649,
-   "logloss": 0.5066,
-   "top_n": 148,
-   "top_pred": 0.501,
-   "top_hit": 0.541
+   "brier": 0.1647,
+   "logloss": 0.5061,
+   "top_n": 162,
+   "top_pred": 0.502,
+   "top_hit": 0.531
   },
   "blend_w0.65": {
-   "brier": 0.1649,
-   "logloss": 0.5067,
-   "top_n": 146,
-   "top_pred": 0.501,
-   "top_hit": 0.541
+   "brier": 0.1647,
+   "logloss": 0.506,
+   "top_n": 165,
+   "top_pred": 0.502,
+   "top_hit": 0.527
   },
   "blend_w0.75": {
-   "brier": 0.165,
-   "logloss": 0.5069,
-   "top_n": 149,
-   "top_pred": 0.501,
-   "top_hit": 0.544
+   "brier": 0.1647,
+   "logloss": 0.5062,
+   "top_n": 169,
+   "top_pred": 0.503,
+   "top_hit": 0.521
   },
   "blend_w1.0": {
-   "brier": 0.1654,
-   "logloss": 0.5082,
-   "top_n": 160,
-   "top_pred": 0.5,
-   "top_hit": 0.537
+   "brier": 0.1651,
+   "logloss": 0.5072,
+   "top_n": 184,
+   "top_pred": 0.504,
+   "top_hit": 0.516
   }
  }
 }

@@ -1,11 +1,12 @@
 {
- "last_check": "2026-09-03T05:19+00:00",
+ "last_check": "2026-09-03T08:10+00:00",
  "polls_24h": [
   "2026-09-03T05:13+00:00",
-  "2026-09-03T05:19+00:00"
+  "2026-09-03T05:19+00:00",
+  "2026-09-03T08:10+00:00"
  ],
- "events_24h": 298,
- "events_total": 298,
+ "events_24h": 630,
+ "events_total": 630,
  "players_watched": 509,
  "card_players": 8,
  "feeds": {
@@ -45,6 +46,7 @@
  "by_kind_24h": {
   "note": 203,
   "headline": 61,
+  "coach": 332,
   "status": 0,
   "trending": 34,
   "line": 0,
@@ -52,155 +54,158 @@
  },
  "latest": [
   {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Ryan Flournoy",
-   "on_card": false,
-   "text": "Flournoy is listed as the Cowboys' third wide receiver on the depth chart behind CeeDee Lamb and George Pickens.",
-   "source": "rotowire/espn",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/5083754?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
-  },
-  {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Jake Ferguson",
-   "on_card": false,
-   "text": "Ferguson did not play in any of the Cowboys' three preseason games.",
-   "source": "rotowire/espn",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4242355?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
-  },
-  {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Dak Prescott",
-   "on_card": false,
-   "text": "Prescott didn't log any snaps during the Cowboys' three-game preseason schedule.",
-   "source": "rotowire/espn",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/2577417?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
-  },
-  {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Brock Bowers",
-   "on_card": false,
-   "text": "Bowers will open the 2026 season working with Kirk Cousins as his quarterback after the veteran was named the Week 1 starter Wednesday, Ryan McFadden of ESPN.com reports.",
-   "source": "Ryan McFadden of ESPN.com",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4432665?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
-  },
-  {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Davante Adams",
-   "on_card": false,
-   "text": "Adams didn't suit up for any of the Rams' three-game preseason schedule.",
-   "source": "rotowire/espn",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/16800?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
-  },
-  {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Greg Dulcich",
-   "on_card": false,
-   "text": "Dulcich did not record a target across his two preseason games.",
-   "source": "rotowire/espn",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4367209?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
-  },
-  {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Jordan Mason",
-   "on_card": false,
-   "text": "Mason and Aaron Jones are listed as co-starting running backs on the Vikings' unofficial depth chart following cutdown day Sunday, Rob Kleifield of the team's official site reports.",
-   "source": "Rob Kleifield of the team's official site",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/4360569?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
-  },
-  {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Aaron Jones",
-   "on_card": false,
-   "text": "Jones and Jordan Mason are listed as co-starting running backs on the Vikings' unofficial depth chart following cut-down day Sunday, Rob Kleifield of the team's official site reports.",
-   "source": "Rob Kleifield of the team's official site",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/3042519?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
-  },
-  {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
    "who": "Chris Godwin",
    "on_card": false,
-   "text": "Buccaneers general manager Jason Licht praised Godwin on Monday for his consistency and veteran leadership, Brianna Dix of the team's official site reports.",
-   "source": "Brianna Dix of the team's official site",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/3116165?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
+   "text": "HC Bowles discussed WR Chris Godwin Jr.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
   },
   {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Darren Waller",
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Chris Godwin",
    "on_card": false,
-   "text": "Waller, who signed with the Panthers on Aug. 12, took part in team drills with the first-team offense Wednesday as the coaching staff looks to get him fully incorporated ahead of Week 1, Kassidy Hill of the team's official site reports.",
-   "source": "Kassidy Hill of the team's official site",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/2576925?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
+   "text": "Hear from Tampa Bay Buccaneers WR Chris Godwin Jr.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
   },
   {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "note",
-   "who": "Dalton Schultz",
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Chris Godwin",
    "on_card": false,
-   "text": "Schultz did not play in any of the Texans' three preseason games.",
-   "source": "rotowire/espn",
-   "url": "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/athletes/3117256?lang=en&region=us",
-   "status": "Active",
-   "date": "2026-09-03"
+   "text": "General Manager Jason Licht addressed the media on Tuesday afternoon and fielded a variety of questions, speaking on the playmaking ability of Ayden Garnes, Chris Godwin Jr.'s impact on the offense and the depth at outside linebacker",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
   },
   {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "headline",
-   "who": "Quinshon Judkins",
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Bauer Sharp",
    "on_card": false,
-   "text": "Mike Hall moves past training camp incident with Quinshon Judkins",
-   "source": "rss:yahoo",
-   "url": "https://sports.yahoo.com/articles/mike-hall-moves-past-training-022101229.html",
-   "date": "2026-09-03"
+   "text": "looking sharp going into the season, practice squad updates and getting in shape for week one.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
   },
   {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "headline",
-   "who": "Jordan Love",
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Bauer Sharp",
    "on_card": false,
-   "text": "Packers QB Jordan Love hoping to throw more",
-   "source": "rss:yahoo",
-   "url": "https://sports.yahoo.com/articles/packers-qb-jordan-love-hoping-021923115.html",
-   "date": "2026-09-03"
+   "text": "Hear from Tampa Bay Buccaneers K Chase McLaughlin, QB Jake Browning and TE Bauer Sharp as they speak to the media following Wednesday's Preseason Week 2 practice.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
   },
   {
-   "ts": "2026-09-03T05:13+00:00",
-   "kind": "headline",
-   "who": "Jahmyr Gibbs",
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Bauer Sharp",
+   "on_card": false,
+   "text": "HC Bowles discussed rookie TE Bauer Sharp's athleticism, OLB Rueben Bain Jr.'s work ethic and the competition for backup quarterback.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
+  },
+  {
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Baker Mayfield",
    "on_card": true,
-   "text": "Brad Holmes: Long-term plans for Sam LaPorta, Brian Branch haven&#39;t changed",
-   "source": "rss:yahoo",
-   "url": "https://sports.yahoo.com/articles/brad-holmes-long-term-plans-010302405.html",
-   "date": "2026-09-03"
+   "text": "HC Bowles discussed QB Baker Mayfield's comfortability with OC Zac Robinson's offense, the team's roster decisions and grasping the scheme going into the regular season.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
+  },
+  {
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Baker Mayfield",
+   "on_card": true,
+   "text": "Tampa Bay Buccaneers Quarterback Baker Mayfield spoke to the media following Tuesday's joint practice vs.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
+  },
+  {
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Baker Mayfield",
+   "on_card": true,
+   "text": "QB Mayfield discussed the roster's depth, the growth in the quarterback room and the final preseason game on Friday.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
+  },
+  {
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Baker Mayfield",
+   "on_card": true,
+   "text": "QB Mayfield discussed RB Kenny Gainwell's versatility, the evolution of Todd Bowles' defense and the Bucs' new look front seven.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
+  },
+  {
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Baker Mayfield",
+   "on_card": true,
+   "text": "The roster is (mostly) set for the 2026 season but there are still some questions to be answered regarding the Bucs' offense, including how ready Jalon Daniels is to be Baker Mayfield's backup, the roles of some of the receivers and more",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
+  },
+  {
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Tez Johnson",
+   "on_card": false,
+   "text": "& WR Tez Johnson as they speak to the media after Tuesday's Preseason Week 3 practice.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
+  },
+  {
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Tez Johnson",
+   "on_card": false,
+   "text": "Hear from Tampa Bay Buccaneers WR Kam Johnson & CB Benjamin Morrison as they speak to the media after Thursday's Preseason Week 2 practice.",
+   "source": "Coach Todd Bowles \u00b7 Tampa Bay Buccaneers",
+   "url": "https://www.buccaneers.com/video/todd-bowles-on-preseason-finale-vs-jacksonville-press-conference",
+   "date": "2026-09-03",
+   "quote": true
+  },
+  {
+   "ts": "2026-09-03T08:10+00:00",
+   "kind": "coach",
+   "who": "Bryce Lance",
+   "on_card": false,
+   "text": "Over the course of training camp and preseason play, a group of young receivers\u00e2\u0080\u0094notably rookies Barion Brown , Bryce Lance and Jordyn Tyson \u00e2\u0080\u0094took full advantage of their snaps.",
+   "source": "Sports Illustrated (re: Kellen Moore)",
+   "url": "https://www.si.com/nfl/saints/onsi/saints-hc-kellen-moore-reveals-his-thoughts-on-travis-etienne-new-additions-01m1jargvmtn",
+   "date": "2026-09-03",
+   "quote": false
   }
  ]
 }

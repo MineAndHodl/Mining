@@ -35,25 +35,41 @@ HERE = os.path.dirname(os.path.abspath(__file__)); DATA = os.path.join(HERE, "..
 
 # --- classification rules: phrase -> (signal, value). Conservative; a human read can override.
 HARD_OUT = [r"ruled out", r"will not play", r"placed on (injured reserve|ir)\b", r"out for (the )?(week|game|season)",
-            r"won't play", r"has been ruled out", r"downgraded to out"]
-HARD_LIMIT = [r"pitch count", r"on a snap count", r"snap limit", r"limited to \d+ snaps", r"eas(e|ed|ing) (him )?(back )?in", r"limited role", r"on a (snap )?count"]
+            r"won't play", r"has been ruled out", r"downgraded to out", r"will miss (the|this) (game|week|opener)", r"suspended for", r"\bis out\b(?! of )"]
+HARD_LIMIT = [r"pitch count", r"on a snap count", r"snap limit", r"limited to \d+ snaps", r"eas(e|ed|ing) (him )?(back )?in", r"limited role", r"on a (snap )?count",
+              r"play(ing)? (a )?(reduced|limited) (number of )?snaps", r"lost the starting"]
+# ---- soft signals, every position (WR/TE/QB/K as much as RB) --------------------------------------
 HEALTH_NEG = [r"limited (in|at) practice", r"did not practice", r"dnp\b", r"still (bothered|dealing|nursing)", r"setback",
-              r"re-?aggravat", r"not 100", r"playing through", r"managing (a|the)", r"aggravat"]
-HEALTH_POS = [r"full (participant|practice)", r"no (injury )?designation", r"removed from (the )?injury report", r"fully healthy",
-              r"100 ?%", r"no restrictions", r"good to go", r"cleared"]
-COACH_POS = [r"featured", r"feature (him|back)", r"loves (him|what)", r"expanded role", r"bigger role", r"more (touches|carries|targets|work)",
+              r"re-?aggravat", r"not 100", r"playing through", r"managing (a|the)", r"aggravat", r"game-?time decision", r"day-?to-?day",
+              r"questionable", r"doubtful", r"soreness", r"tightness", r"walking boot", r"did not finish", r"left (the game|practice) (early|with)",
+              r"concussion protocol", r"has not practiced", r"hasn'?t practiced", r"didn'?t practice", r"held out of practice", r"missed practice"]
+HEALTH_POS = [r"full (participant|practice|go)", r"no (injury )?designation", r"removed from (the )?injury report", r"fully healthy",
+              r"100 ?%", r"no restrictions", r"good to go", r"cleared", r"back at practice", r"returned to practice", r"on track", r"ready to roll",
+              r"no limitations", r"practiced in full", r"expected to play", r"will play", r"is active", r"activated"]
+COACH_POS = [r"featured", r"feature (him|back)", r"loves (him|what)", r"expanded role", r"bigger role", r"more (touches|carries|targets|work|snaps|involved)",
              r"bell ?cow", r"workhorse", r"lead back", r"go-?to", r"focal point", r"emphasi[sz]", r"get him the ball", r"heavy dose",
-             r"a lot of (him|work)", r"increased (role|usage|workload)", r"starting", r"named the starter", r"wr1\b", r"no\.? ?1 (receiver|option)"]
-COACH_NEG = [r"committee", r"split (carries|reps|time)", r"timeshare", r"rotation", r"share (the )?(load|backfield)", r"reduced role",
-             r"fewer (touches|targets|snaps)", r"backup", r"demoted", r"behind ", r"third-?down back", r"change-?of-?pace", r"decoy"]
-ROLE_POS = [r"promoted", r"moved up", r"first-?team", r"starter", r"depth chart .* (1|first)", r"took first-team reps"]
-ROLE_NEG = [r"second-?team", r"lost (his|the) (job|starting)", r"benched", r"depth chart .* (2|3|second|third)"]
+             r"a lot of (him|work)", r"increased (role|usage|workload)", r"starting", r"named the starter", r"wr1\b", r"no\.? ?1 (receiver|option|target)",
+             r"primary (target|option|receiver|back)", r"first[- ]read", r"every-?down", r"three-?down", r"three-?down back", r"full-?time", r"big part",
+             r"lean on (him)?", r"our guy", r"designed (runs|packages)", r"red-?zone (target|option|role|threat)", r"goal-?line (role|back|package)",
+             r"slot role", r"x receiver", r"move (tight end|te)\b", r"unlock", r"weapon", r"play-?caller (loves|trusts)", r"trust (him|in him)",
+             r"more (designed )?(runs|carries) for", r"rushing (package|attempts) for", r"target(s|ed) (him )?(early|often|a lot)"]
+COACH_NEG = [r"committee", r"split (carries|reps|time|snaps|work)", r"timeshare", r"rotation", r"rotat(e|ing) (in|with)", r"share (the )?(load|backfield|targets|work)",
+             r"reduced role", r"fewer (touches|targets|snaps|carries)", r"backup", r"demoted", r"behind ", r"third-?down back", r"change-?of-?pace", r"decoy",
+             r"hot hand", r"spell (him)?", r"blocking (role|tight end)", r"inline (role|blocker)", r"fourth (receiver|option|wr)", r"wr4\b", r"depth (piece|player)",
+             r"situational", r"package player", r"gadget", r"limited (snaps|role|package)", r"game manager", r"check-?down", r"run-?heavy (plan|approach|game plan)",
+             r"conservative", r"quarterback competition", r"qb competition", r"competition (for|at) (the )?(starting|qb)", r"benched", r"pulled"]
+ROLE_POS = [r"promoted", r"moved up", r"first-?team", r"starter", r"depth chart .* (1|first)", r"took first-team reps", r"with the (ones|starters|first team)",
+            r"listed as (the|a) starter", r"top of the depth chart", r"named (the )?(starting|starter)", r"will start", r"is starting", r"gets the start",
+            r"opening[- ]day starter", r"wr1\b", r"rb1\b", r"te1\b", r"qb1\b", r"kicker (job|competition) (won|is his)"]
+ROLE_NEG = [r"second-?team", r"lost (his|the) (job|starting)", r"benched", r"depth chart .* (2|3|second|third)", r"with the (twos|second team|backups)",
+            r"listed (as )?(a )?backup", r"rb2\b", r"wr3\b", r"te2\b", r"qb2\b", r"lost the (kicking|starting) (job|competition)", r"healthy scratch",
+            r"inactive", r"practice squad", r"waived", r"released", r"traded"]
 SITUATIONAL = [(r"contract year", 0.2), (r"revenge", 0.15), (r"return(s|ing) (from|to)", 0.1), (r"suspension", -0.3), (r"holdout", -0.4),
-               (r"trade (request|rumor)", -0.2),
+               (r"trade (request|rumor)", -0.2), (r"new (offensive coordinator|oc|play-?caller|scheme|system)", 0.0), (r"weather|wind|rain|snow", 0.0),
                # the crowd (Sleeper trending adds/drops, auto-fed): role news leaks here first — small, provisional
                (r"sleeper trending add", 0.2), (r"sleeper trending drop", -0.25)]
 
-WEIGHTS = {"health": 0.35, "coach": 0.35, "role": 0.2, "situational": 0.1}
+WEIGHTS = {"health": 0.35, "coach": 0.35, "role": 0.2, "situational": 0.1, "crowd": 0.0}   # crowd: shown, not weighted
 
 
 def _hits(text, pats):
@@ -62,6 +78,10 @@ def _hits(text, pats):
 
 
 PRESEASON = re.compile(r"preseason|exhibition|training camp|joint practice", re.I)
+CONDITIONAL = re.compile(r"\b(if|in the event|should|were to|would|could|unless|in case|whether)\b", re.I)
+PAST = re.compile(r"recovering from|coming off|last season|last year|a year ago|in 202[0-5]\b|'s (2024|2025) season|(2024|2025) (injury|tear|surgery)", re.I)
+IR_ALWAYS = [r"placed on (injured reserve|ir)\b", r"out for the season", r"season-?ending", r"suspended for"]
+HARD_WINDOW_DAYS = 7      # other OUT/LIMITED phrases count only inside game week (else camp / preseason talk)
 
 
 def _about_him(text, name):
@@ -78,7 +98,7 @@ def _about_him(text, name):
             continue
         # clause level: "Samuel has a key role with Ricky Pearsall (knee) out for the season" —
         # the clause carrying a hard phrase must itself name him
-        clauses = re.split(r",|;|\bwith\b|\bwhile\b|\bas\b|\bafter\b|\bbecause\b", x)
+        clauses = re.split(r",|;|\bwith\b|\bwhile\b|\bas\b|\bafter\b|\bbecause\b|\bfollowing\b|\bdue to\b|\bgiven\b|\bbehind\b", x)
         mine.extend([c for c in clauses if last in c.lower() or first in c.lower()])
     return mine
 
@@ -96,16 +116,22 @@ def classify_items(items, week_start, week_end, name=None):
             continue
         if week_start <= d <= week_end:
             in_window.append(it)
-    sig = {"health": 0.0, "coach": 0.0, "role": 0.0, "situational": 0.0}
+    sig = {"health": 0.0, "coach": 0.0, "role": 0.0, "situational": 0.0, "crowd": 0.0}
     hard = None; evidence = []
     for it in in_window:
         text = f"{it.get('title','')} {it.get('snippet','')}"
         src = it.get("source", "?"); date = str(it.get("date", ""))[:10]
-        own = [x for x in _about_him(text, name) if not PRESEASON.search(x)]
+        own = [x for x in _about_him(text, name) if not PRESEASON.search(x) and not CONDITIONAL.search(x) and not PAST.search(x)]
         own_text = " ".join(own)
-        if own_text and _hits(own_text, HARD_OUT):
+        try:
+            in_game_week = (week_end - datetime.date.fromisoformat(date)).days <= HARD_WINDOW_DAYS
+        except Exception:
+            in_game_week = False
+        if own_text and _hits(own_text, IR_ALWAYS):
             hard = "OUT"; evidence.append(f"[{src} {date}] {it.get('title','')}")
-        elif own_text and _hits(own_text, HARD_LIMIT) and hard != "OUT":
+        elif own_text and in_game_week and _hits(own_text, HARD_OUT):
+            hard = "OUT"; evidence.append(f"[{src} {date}] {it.get('title','')}")
+        elif own_text and in_game_week and _hits(own_text, HARD_LIMIT) and hard != "OUT":
             hard = "LIMITED"; evidence.append(f"[{src} {date}] {it.get('title','')}")
         if PRESEASON.search(text) and not own_text:
             continue                      # a preseason note with nothing about him: no soft signal either
@@ -117,6 +143,9 @@ def classify_items(items, week_start, week_end, name=None):
         for pat, val in SITUATIONAL:
             if re.search(pat, text.lower()):
                 sig["situational"] += val
+        # the crowd, as its own lever (also a small situational nudge above)
+        if re.search(r"sleeper trending add", text.lower()): sig["crowd"] += 0.5
+        if re.search(r"sleeper trending drop", text.lower()): sig["crowd"] -= 0.5
     sig = {k: float(np.clip(v, -1, 1)) for k, v in sig.items()}
     composite = sum(WEIGHTS[k] * sig[k] for k in sig)
     # de-dupe evidence, keep order

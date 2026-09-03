@@ -146,3 +146,11 @@ Update IDEAS_LEDGER.md when an idea changes status. Update CLAUDE.md only for se
   hard gates. Underdog's lines + RotoWire/ESPN projections logged on every row. The Watch (feeds
   diffed every 2h, its own job). Model Room revamped: what the model consumes, the watch, no
   rejected items. Tests 155 → 173.
+- **2026-09-03 (day 4, Alex's follow-ups)** — Receivers/QBs were already in the TD model; what was
+  missing was a less noisy catcher role: red-zone inclusion × targets-per-route, blend .75, wins both
+  seasons → adopted, calibration refit. The tracking & charting signals that lost in the lab now live on
+  every pick as PROFILE levers (percentiles among peers) with the reads (second market, outside
+  projections, the crowd, pace) — honest label, logged, unweighted. Coach press conferences: 32 coaches
+  → Google News → transcripts/quotes → intel + the watch (126 articles, 248 quotes in week 1). Intel
+  patterns for every position; hard gates hardened (game-week dating, IR-always, no conditionals/past/
+  other-player clauses). Tests 173 → 192.

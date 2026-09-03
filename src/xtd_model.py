@@ -51,6 +51,12 @@ GL_YOY_STICKINESS = 0.37      # measured (5 seasons): slope of next-season GL sh
 # on the field for them is observed every play. Inclusion × the team's RB share of GL carries
 # (QB sneaks take the rest) is the carry-share-equivalent.
 GL_INCLUSION_BLEND = 0.5      # weight on the carry share; 1 - this on the snap-inclusion share
+# PASS-CATCHERS (td_role_validate.py --receivers, in-season rolling 2024 + 2025): the zone TARGET
+# share blended 75/25 with an inclusion-based share — his red-zone snap inclusion × his targets per
+# route, normalized across the team's catchers — beats the observed share alone on WR/TE Brier in
+# both seasons (.16032 -> .16020, .15139 -> .15106). Same idea as the backs: red-zone targets are a
+# handful of plays; being on the field for them, and how often he is targeted per route, are not.
+RZ_INCLUSION_BLEND = 0.75     # weight on the observed zone target share; 1 - this on the inclusion share
 # Tested and NOT adopted (td_env_validate.py --stick): the goal-line role erodes through a season
 # (slope .65 in weeks 1-3, .48 weeks 4-9, .36 weeks 10-18), so a higher early-season stickiness
 # was tried — out-of-sample it was a wash (weeks 1-3 Brier .1715 vs .1714 across .29/.37/.60/.75).
@@ -161,23 +167,32 @@ def healthy_mask(ev):
 
 
 def gl_inclusion(season, max_week=None):
-    """{(pid, team): goal-line snap inclusion} and {team: RB share of GL carries} for a season (to a week)."""
+    """{(pid, team): goal-line snap inclusion}, {team: RB share of GL carries}, and
+    {(pid, team): inclusion-based red-zone TARGET share} (rz inclusion × targets per route,
+    normalized across the team's pass-catchers) for a season (to a week)."""
     p = os.path.join(DATA, "universe_features_player_game.parquet")
     if not os.path.exists(p):
-        return {}, {}
-    u = pd.read_parquet(p, columns=["pid", "season", "week", "posteam", "position", "gl_snaps", "team_gl", "gl_carries", "team_gl_carries"])
+        return {}, {}, {}
+    u = pd.read_parquet(p, columns=["pid", "season", "week", "posteam", "position", "gl_snaps", "team_gl", "gl_carries", "team_gl_carries",
+                                    "rz_snaps", "team_rz", "tgt", "routes"])
     u = u[u.season == season]
     if max_week is not None:
         u = u[u.week <= max_week]
     if u.empty:
-        return {}, {}
-    g = u.groupby(["pid", "posteam"]).agg(gl_snaps=("gl_snaps", "sum"), team_gl=("team_gl", "sum")).reset_index()
+        return {}, {}, {}
+    g = u.groupby(["pid", "posteam"]).agg(gl_snaps=("gl_snaps", "sum"), team_gl=("team_gl", "sum"), rz_snaps=("rz_snaps", "sum"),
+                                          team_rz=("team_rz", "sum"), tgt=("tgt", "sum"), routes=("routes", "sum")).reset_index()
     g["incl"] = g.gl_snaps / g.team_gl.replace(0, np.nan)
     incl = {(r.pid, r.posteam): float(r.incl) for r in g.itertuples() if r.incl == r.incl}
     rb = u[u.position.isin(["RB", "FB"])].groupby("posteam")["gl_carries"].sum()
     tot = u.drop_duplicates(["posteam", "week"]).groupby("posteam")["team_gl_carries"].sum()
     rb_frac = {t: float(rb.get(t, 0) / tot[t]) for t in tot.index if tot[t] and tot[t] == tot[t]}
-    return incl, rb_frac
+    g["pos"] = g.pid.map(u.drop_duplicates("pid").set_index("pid")["position"])
+    g["w_rz"] = ((g.rz_snaps / g.team_rz.replace(0, np.nan)) * (g.tgt / g.routes.replace(0, np.nan))).fillna(0.0)
+    catch = g[g.pos.isin(["WR", "TE", "RB", "FB"])]
+    tsum = catch.groupby("posteam")["w_rz"].sum()
+    rz_share = {(r.pid, r.posteam): float(r.w_rz / tsum[r.posteam]) for r in catch.itertuples() if tsum.get(r.posteam, 0) > 0}
+    return incl, rb_frac, rz_share
 
 
 def player_zone_shares(ev, healthy_only=False, unhealthy_weight=1.0):
@@ -236,7 +251,7 @@ def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None
     lg = league_zone_profile(tzp)
     conv = conversion_priors(ev_all, players)
     shares = player_zone_shares(ev_latest, healthy_only=healthy_only, unhealthy_weight=unhealthy_weight)
-    gl_incl, rb_frac = gl_inclusion(latest)
+    gl_incl, rb_frac, rz_incl_share = gl_inclusion(latest)
     shares = shares.merge(players[["gsis_id", "position", "display_name"]], left_on="pid", right_on="gsis_id", how="left")
     shares = shares[shares.position.isin(POS_OK)]
 
@@ -285,6 +300,12 @@ def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None
                     if gi is not None:
                         share = GL_INCLUSION_BLEND * share + (1 - GL_INCLUSION_BLEND) * gi * rb_frac.get(team, 0.75)
                         feats["GL_inclusion"] = round(gi, 3)
+                # pass-catchers: red-zone inclusion × targets per route (measured, RZ_INCLUSION_BLEND)
+                if typ == "target" and zone in ("GL", "IN10", "RZ") and pos in ("WR", "TE", "RB", "FB"):
+                    rs = rz_incl_share.get((pid, team))
+                    if rs is not None:
+                        share = RZ_INCLUSION_BLEND * share + (1 - RZ_INCLUSION_BLEND) * rs
+                        feats["RZ_inclusion_share"] = round(rs, 3)
                 # goal-line role is only ~29% sticky year over year: in week-1 mode, regress the
                 # GL share hard toward his general rush role (the honest prior for a new season)
                 if week1_mode and zone == "GL" and typ == "rush":
@@ -329,7 +350,9 @@ def build_xtd(data_seasons, target_season=None, current_team=None, env_mult=None
 # linear recalibration, refit WITH the environment multiplier applied (td_env_validate.py:
 # --final: fit 2022->23 + 2023->24, test 2024->25; top bucket pred .50 / hit .54). The earlier (0.084, 0.812)
 # was fit at env=1 and then applied under a mis-scaled multiplier -> stars under-priced.
-CAL = {"a": 0.085, "b": 0.741}
+# Refit 2026-09-03 (day 4) after the goal-line / red-zone inclusion blends changed the raw shares:
+# top bucket (>=.45) pred .502 -> hit .531 out of sample (n=162) at the .55 blend.
+CAL = {"a": 0.079, "b": 0.777}
 def p_atd(xtd):
     raw = 1 - np.exp(-np.asarray(xtd, dtype=float))
     return np.clip(CAL["a"] + CAL["b"] * raw, 0.02, 0.85)

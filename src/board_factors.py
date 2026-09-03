@@ -131,10 +131,39 @@ def _load_td_stats():
     return _TD_STATS
 
 
+_PROFILES = None
+def _profiles():
+    """The tracking & charting profile (player_profile.py), built once per run."""
+    global _PROFILES
+    if _PROFILES is None:
+        try:
+            import player_profile as pp, refresh_data as rd
+            season, wk = rd.season_state()
+            _PROFILES = (pp.Profiles(season, wk), pp.team_context(season, wk))
+        except Exception as e:
+            print("profiles unavailable:", e); _PROFILES = (None, {})
+    return _PROFILES
+
+
+def _attach_profile(pick, pr, team_code):
+    try:
+        import player_profile as pp
+        P, tc = _profiles()
+        mkt = pick.get("cat", pick.get("mkt", "")); side = pick.get("side", "Over")
+        prof = P.profile(pick.get("name", ""), mkt, side, pr.get("position")) if P else {}
+        rd_ = pp.reads(pick, tc.get(team_code) if tc else None)
+        pick["profile"] = {**prof, **rd_}
+    except Exception as e:
+        pick["profile"] = pick.get("profile") or {}
+    return pick
+
+
 def attach_to_pick(pick, ctx):
     """Compute + attach a scorecard to a single prop pick dict (mutates + returns it).
     Anytime-TD picks get a TD-SPECIFIC scale (red-zone role, finishing, scoring env, regression),
-    not the generic yardage factors — the levers have to fit the market."""
+    not the generic yardage factors — the levers have to fit the market. Every pick also gets
+    the PROFILE block (tracking & charting percentiles + the second market, outside projections,
+    the crowd, pace) — descriptive levers that do not move the number."""
     proj_map, sched_rows, code2full, adp, def_vs = ctx
     key = _norm_name(pick.get("name", ""))
     pr = proj_map.get(key, {})
@@ -142,6 +171,7 @@ def attach_to_pick(pick, ctx):
     mkt = pick.get("cat", pick.get("mkt", ""))
     g, opp = _game_ctx(pick.get("game"), team_code, sched_rows, code2full)
     script = {"team_spread": g["team_spread"], "implied_team_pts": g["implied_team_pts"]} if g else None
+    _attach_profile(pick, pr, team_code)
 
     if mkt == "anytime_td":
         td = _load_td_stats().get(key)

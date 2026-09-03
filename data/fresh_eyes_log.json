@@ -386,5 +386,97 @@
    "tests: test_fresh_eyes_day3_universe"
   ],
   "tomorrow": "re-measure the market's lag on the ROLE tilt in-season (does the market price route participation?); grade Underdog vs books after 4 weeks; rookie baseline from draft capital + projections; FTN charting for red-zone TD conversion"
+ },
+ {
+  "date": "2026-09-03",
+  "day": 4,
+  "brief": "Alex: are receivers/QBs in the TD model with relevant metrics? put the efficiency stuff on the sliders for marketability (grouped, honest); the beat feed must cover every position; coach press conferences / transcripts; another day of analysis.",
+  "hats": {
+   "handicapper": [
+    "red-zone package inclusion \u00d7 targets-per-route for pass-catchers \u2014 the same 'who is on the field' idea that won for backs",
+    "coaches tell you the plan every week in the presser: 'get him the ball', 'game-time decision', 'committee' \u2014 team sites publish full transcripts; Google News indexes them within hours"
+   ],
+   "quant": [
+    "the TD model already priced QBs (75) and WR/TE (365) \u2014 what was missing for catchers was a less noisy zone target share; validated blend .75 (WR/TE Brier .16032\u2192.16020, .15139\u2192.15106)",
+    "changing the raw shares moves the calibration: recal refit (.079/.777; top bucket .50\u2192.53 out of sample)",
+    "the broadened intel patterns manufactured hard gates from preseason talk, conditionals, past seasons and other players' clauses \u2192 gates need game-week dating, IR-always, no conditionals/past, clause splitters on 'following/due to/given/behind'"
+   ],
+   "business": [
+    "the tracking & charting profile on every pick (Next Gen, charting, PFR percentiles among position peers) + Second Market, Outside Projections, The Crowd, Pace & Pass Rate \u2014 labeled as profile, logged, not weighted",
+    "the Model Room reads the coaches: 126 articles, 248 coach quotes about board players this week"
+   ]
+  },
+  "critiques": [
+   "'Mike Hall moves past incident with Judkins' matched Breece Hall by surname \u2014 last-name matches now need the full name somewhere in the article",
+   "generic article extraction pulled nav text and captions (NBC) \u2014 strip script/nav/header/footer/aside, drop short fragments",
+   "the first receiver blend dropped the Touchdown Tax (stars pulled toward the team-normalized inclusion share) until the calibration was refit \u2014 a share change is a calibration change"
+  ],
+  "tested": {
+   "td_role_receivers": {
+    "winner_blend": 0.75,
+    "gain_brier_catchers_sum": 0.00045,
+    "result": "WINS: red-zone inclusion \u00d7 targets-per-route improves the catcher role read"
+   },
+   "recal": [
+    0.079,
+    0.777
+   ],
+   "top_bucket": {
+    "brier": 0.1647,
+    "logloss": 0.5061,
+    "top_n": 162,
+    "top_pred": 0.502,
+    "top_hit": 0.531
+   },
+   "calibration_by_position_2025": {
+    "QB": {
+     "n": 401,
+     "pred": 0.1322,
+     "hit": 0.1771,
+     "brier": 0.14344
+    },
+    "RB": {
+     "n": 1077,
+     "pred": 0.2556,
+     "hit": 0.2813,
+     "brier": 0.18231
+    },
+    "WR": {
+     "n": 1679,
+     "pred": 0.1737,
+     "hit": 0.1983,
+     "brier": 0.1519
+    },
+    "TE": {
+     "n": 896,
+     "pred": 0.1324,
+     "hit": 0.192,
+     "brier": 0.15042
+    }
+   },
+   "coach_feed": {
+    "articles": 127,
+    "quotes": 229,
+    "transcripts": 13
+   }
+  },
+  "numbers": {
+   "card": "unchanged (Stevenson O, Henry O, Douglas U, Taylor U, Mayfield U off-market, Gibbs U, Parkinson O, Brown O)",
+   "touchdown_tax": "Adams .468 / Pickens .417 / Bowers .383 \u2192 +1701",
+   "tests": "173 \u2192 192"
+  },
+  "verdict": "SHIPPED: player profile levers (tracking & charting + reads) on every pick; red-zone inclusion \u00d7 TPRR for pass-catchers in xTD (blend .75, wins both seasons) + calibration refit; coach press-conference feed (Google News \u2192 team sites/papers \u2192 transcripts \u2192 quotes) into intel, the watch and the Model Room; intel patterns for every position with hardened hard gates.",
+  "shipped": [
+   "src/player_profile.py",
+   "src/coach_feed.py",
+   "xtd_model RZ_INCLUSION_BLEND + CAL refit",
+   "player_intel patterns + gates",
+   "board_factors/_attach_profile",
+   "template renderProfile",
+   "monitor coach events",
+   "ingest_universe coach_feed",
+   "tests: test_fresh_eyes_day4_profile_coaches"
+  ],
+  "tomorrow": "grade the profile levers once weeks exist (which tracking percentile predicts CLV?); OC pressers (coordinators aren't in the schedule table \u2014 add a coach map); end-zone target share from pbp (air_yards \u2265 yardline) for the TD model; kicker lane"
  }
 ]

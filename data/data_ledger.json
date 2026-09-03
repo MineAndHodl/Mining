@@ -1,5 +1,5 @@
 {
- "built": "2026-09-03T05:19+00:00",
+ "built": "2026-09-03T08:10+00:00",
  "sources": {
   "pbp": {
    "family": "nflverse",
@@ -495,10 +495,22 @@
    "seasons": null,
    "n_seasons": 0,
    "refreshed": "2026-09-03T04:34+00:00"
+  },
+  "coach_feed": {
+   "family": "Coaches",
+   "feeds": "the 32 head coaches' press conferences \u2014 transcripts and quotes (team sites, local papers, ESPN via Google News), every sentence about a board player",
+   "files": 129,
+   "rows": 481,
+   "columns": null,
+   "cells": 133775,
+   "bytes": 1053828,
+   "seasons": null,
+   "n_seasons": 0,
+   "refreshed": "2026-09-03T08:04+00:00"
   }
  },
  "totals": {
-  "sources": 36,
+  "sources": 37,
   "families": {
    "nflverse": 13,
    "nflverse/NGS": 3,
@@ -509,12 +521,13 @@
    "ESPN": 3,
    "Underdog": 1,
    "Action Network": 1,
-   "RSS": 1
+   "RSS": 1,
+   "Coaches": 1
   },
-  "files": 125,
-  "rows": 3472673,
-  "data_points": 182675659,
-  "bytes": 230199107,
+  "files": 254,
+  "rows": 3473154,
+  "data_points": 182810029,
+  "bytes": 231255207,
   "seasons_span": [
    1980,
    2026
@@ -531,7 +544,7 @@
   },
   "xtd_2026.parquet": {
    "rows": 595,
-   "columns": 44
+   "columns": 45
   },
   "schedules.parquet": {
    "rows": 7548,

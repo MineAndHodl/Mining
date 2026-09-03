@@ -56,6 +56,7 @@ ingested, no test yet · **PAID** not pulled.
 | ESPN news API + RSS (ESPN, Yahoo, CBS, ProFootballTalk, Google News queries) | headlines, dated | hourly | intel feed (matched to board players), the watch | LIVE |
 | **Underdog Fantasy** pick'em lines | 3,800+ NFL player lines a week: yards, receptions, attempts, anytime/first TD, 1Q/1H splits, longest play — with prices | 2h | **a second market**: `ud_line` on every row, line-move feed in the watch, the "2nd mkt" chip on the board | LOGGED (grade after 4 weeks: does it lead the books?) |
 | Action Network public scoreboard | multi-book game odds (10 book ids), public bet/money split fields (populate in-week) | 2h | games lane; a free public-money read when it fills | LOGGED (watch) |
+| **Coach press conferences** (`coach_feed.py`) | the 32 head coaches' pressers — team-site transcripts, local papers, ESPN — found via Google News RSS, links decoded, articles read, every sentence about a board player kept and tagged as a quote when the coach is speaking | 2h (the watch) | the beat-intel layer (coach intent, health nuance, hard gates), the watch | LIVE |
 | The Odds API (key) | 8 books' props, alt lines, TD prices, game lines | per run (credits) | the whole board | LIVE |
 | Open-Meteo | kickoff-hour forecast at the stadium | per run | weather multiplier | LIVE |
 

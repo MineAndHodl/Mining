@@ -540,6 +540,51 @@ def test_fresh_eyes_day3_universe():
     check("the Model Room shows the universe (data points, the watch) and no rejected-idea boxes", "data points ingested" in html and "The watch" in html and "tested, no edge" not in html)
 
 
+def test_fresh_eyes_day4_profile_coaches():
+    """Day 4: the tracking & charting profile on every pick; pass-catcher red-zone inclusion in
+    xTD (validated both seasons) + a refit calibration; the coach press-conference feed; intel
+    patterns for every position with hard gates that survive preseason talk, conditionals, past
+    seasons and other-player clauses."""
+    print("\n-- fresh eyes day 4: profile levers, receivers' TD role, coach feed --")
+    import json as _j, xtd_model as xm, player_intel as pi, datetime as _dt, player_profile as pp
+    d = _j.load(open(os.path.join(HERE, "..", "data", "ranked_board.json")))
+    card = [r for r in d.get("recommended", []) if not r.get("kind")]
+    check("every Card pick carries a profile block (tracking & charting + the reads)", card and all(len([v for v in (r.get("profile") or {}).values() if v is not None]) >= 3 for r in card))
+    tds = d.get("by_category", {}).get("anytime_td", [])[:5]
+    check("TD picks carry red-zone snaps / goal-line package levers", tds and all(any(k in (r.get("profile") or {}) for k in ("Red-Zone Snaps", "Goal-Line Package")) for r in tds))
+    P = pp.Profiles(2026, 0)
+    hen = P.profile("Derrick Henry", "rush_yds", "Over", "RB")
+    check("profile percentiles are among position peers and flip for the side", "Stacked Boxes Faced" in hen and P.profile("Derrick Henry", "rush_yds", "Under", "RB")["Stacked Boxes Faced"] == -hen["Stacked Boxes Faced"])
+    rv = _j.load(open(os.path.join(HERE, "..", "data", "td_role_validation_receivers.json")))
+    check("pass-catchers: red-zone inclusion × targets-per-route beat the observed share in both seasons; the model uses that blend", rv["verdict"]["winner_blend"] is not None and abs(xm.RZ_INCLUSION_BLEND - rv["verdict"]["winner_blend"]) < 1e-9, str(rv["verdict"]))
+    x = pd.read_parquet(os.path.join(HERE, "..", "data", "xtd_2026.parquet"))
+    check("the 2026 xTD table carries the red-zone inclusion share for catchers", "RZ_inclusion_share" in x.columns and x[x.position.isin(["WR", "TE"])]["RZ_inclusion_share"].notna().mean() > 0.5)
+    tde = _j.load(open(os.path.join(HERE, "..", "data", "td_env_validation.json")))
+    check("the TD calibration was refit after the role changes and the model uses it (top bucket ~.50 -> .53 out of sample)", abs(xm.CAL["a"] - tde["decision"]["recal_xtd"][0]) < 1e-9 and abs(xm.CAL["b"] - tde["decision"]["recal_xtd"][1]) < 1e-9 and tde["final_recal"]["blend_w0.55"]["top_hit"] >= 0.50)
+    cal = rv["by_season"]["2025"]["calibration_by_position"]
+    check("QBs, RBs, WRs and TEs are all priced by the TD model (raw under-prediction corrected by the recalibration)", all(k in cal for k in ("QB", "RB", "WR", "TE")) and all(v["n"] > 300 for v in cal.values()))
+    idx_p = os.path.join(HERE, "..", "data", "universe", "coach_feed", "index.json")
+    if os.path.exists(idx_p):
+        idx = _j.load(open(idx_p))
+        check("coach press conferences read: 50+ articles resolved and 50+ coach quotes about board players", sum(1 for e in idx.values() if e.get("file")) >= 50 and sum(int(e.get("quotes") or 0) for e in idx.values()) >= 50)
+    raw = _j.load(open(os.path.join(HERE, "..", "data", "player_intel_2026_w1.json")))
+    check("the week's intel file carries coach-feed items", any(it.get("feed") == "coach" for k, v in raw.items() if not k.startswith("_") for it in v.get("items", [])))
+    W = (_dt.date(2026, 8, 20), _dt.date(2026, 9, 14))
+    def cls(name, title, date="2026-09-09"):
+        return pi.classify_items([{"date": date, "source": "t", "title": title, "snippet": ""}], *W, name=name)
+    check("receiver coach-speak reads: 'primary red-zone target, get him the ball' supports", cls("Drake London", "London will be the primary target in the red zone, Morris said; we want to get him the ball early.")["signals"]["coach"] > 0)
+    check("tight end 'blocking role / inline snaps' opposes", cls("Kyle Pitts", "Pitts is going to have more of a blocking role and inline snaps this year.")["signals"]["coach"] < 0)
+    check("QB 'named the starter, no restrictions' supports (role + health)", (lambda c: c["signals"]["role"] > 0 and c["signals"]["health"] > 0)(cls("Geno Smith", "Smith was named the Week 1 starter; no restrictions after the knee cleanup.")))
+    check("kicker 'lost the kicking job' opposes", cls("Jake Elliott", "Elliott lost the kicking job to the rookie, Sirianni confirmed.")["signals"]["role"] < 0)
+    check("'game-time decision' is a health negative, not an OUT", (lambda c: c["hard"] is None and c["signals"]["health"] < 0)(cls("Josh Allen", "Allen (shoulder) is a game-time decision Sunday, McDermott said.")))
+    check("a preseason-week 'will not play' (dated before game week) is not an OUT", cls("Jonathan Taylor", "Steichen said Daniel Jones and Jonathan Taylor will not play.", date="2026-08-28")["hard"] is None)
+    check("'recovering from season-ending injuries in 2025' is not an OUT", cls("George Kittle", "Kittle and Bosa are both recovering from season-ending injuries in 2025.")["hard"] is None)
+    check("a conditional ('in the event that he is out') is not an OUT", cls("Alvin Kamara", "In the event that Kamara is out to begin the season, Miller would start.")["hard"] is None)
+    check("an in-week 'ruled out' about him IS an OUT", cls("Alvin Kamara", "Kamara (ankle) has been ruled out for Sunday's opener, the team announced.")["hard"] == "OUT")
+    html = open(os.path.join(HERE, "..", "output", "the-lab.html")).read()
+    check("the Model Room reads the coaches and shows the profile on the wall", "what the coaches said" in html.lower() and "tracking & charting profile" in html.lower())
+
+
 def test_line_history_and_ledger_alignment():
     """Every bet knows where it opened and where it is now; the ledger is aligned with the product."""
     print("\n-- line history + ledger alignment --")
@@ -623,7 +668,7 @@ if __name__ == "__main__":
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_fresh_eyes_day3_universe(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_fresh_eyes_day3_universe(); test_fresh_eyes_day4_profile_coaches(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)

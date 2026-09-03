@@ -98,6 +98,12 @@ def gather():
         L("tracked", f"{fmt_int(n)} prop lines across {nb} books saved {st_[4:6]}/{st_[6:8]} {st_[9:11]}:{st_[11:13]}Z — every number's move since it opened is on the board")
     L("checked", "kickoff weather for every outdoor game — wind and cold trim passing numbers, domes are neutral")
     if notes: L("read", f"{fmt_int(notes)} beat-reporter notes and headlines this week, dated and sourced, matched to every player on the board — hard news gates a pick, soft news is logged to earn its weight")
+    try:
+        cidx = json.load(open(os.path.join(DATA, "universe", "coach_feed", "index.json")))
+        n_art = sum(1 for e in cidx.values() if e.get("file")); n_q = sum(int(e.get("quotes") or 0) for e in cidx.values()); n_tr = sum(1 for e in cidx.values() if e.get("transcript") and e.get("file"))
+        if n_art: L("read", f"what the coaches said: {n_art} press-conference transcripts and write-ups from all 32 teams this week ({n_tr} full transcripts) — {fmt_int(n_q)} coach quotes about players on the board, read into every pick")
+    except Exception:
+        pass
     if watch.get("last_check"):
         L("watching", f"{fmt_int(watch.get('players_watched', 0))} players across the feeds — {watch.get('events_24h', 0)} updates in the last 24h, {len(watch.get('polls_24h', []))} checks · last {watch['last_check'][11:16]}Z")
     if led:
@@ -384,7 +390,9 @@ def build():
         "How streaky each player really is, measured player by player", "Goal-line packages — who is on the field inside the 5", "Red-zone roles, vultures, and the coach's goal-line calls",
         "Coaching changes that flip a tendency", "Expected team points from the spread and total", "Injury reports, practice status, and who eats when a starter sits",
         "Game-day inactives before kickoff", "Kickoff weather at the stadium", "Beat reporters' notes for every player on the board, dated and sourced",
-        "The crowd — adds, drops and trending roles", "Every price at eight sportsbooks, plus a second market's lines", "Where every line opened and where it is now",
+        "The crowd — adds, drops and trending roles", "What the coaches said this week — every press conference, every quote about a player on the board",
+        "Player tracking & charting profile on every pick — separation, yards over expected, contact, pressure, catchable and contested balls",
+        "Every price at eight sportsbooks, plus a second market's lines", "Where every line opened and where it is now",
         "Off-market numbers, labeled as the play", "Player correlations for parlays — measured, not guessed", "Closing-line value on every pick",
         "Calibration — do our 60%s hit 60%?", "A public record, frozen at post time"]]
     lab["lab"] = [{"t": "Two outside projection sets vs the market — logging every week, graded after four", "s": "measuring"},
@@ -398,11 +406,13 @@ def build():
                   {"t": "Route participation + snap trends in the projection", "s": "shipped"},
                   {"t": "The Watch — feeds, notes, lines, every two hours", "s": "shipped"},
                   {"t": "Beat-report feed, automatic, for every player on the board", "s": "shipped"},
+                  {"t": "Coach press conferences — transcripts and quotes, every team, every week", "s": "shipped"},
+                  {"t": "Red-zone package inclusion for pass-catchers in the touchdown model", "s": "shipped"},
                   {"t": "Ready-to-post copy from the frozen numbers", "s": "shipped"}]
     lab["chips"] = [
         {"k": "earned", "t": "recency form (last-3 / last-1)"}, {"k": "earned", "t": "multi-factor ridge · 5 seasons"}, {"k": "earned", "t": "market-role baseline weeks 0-3"},
         {"k": "earned", "t": "offseason form ratio"}, {"k": "earned", "t": "market lag (weekly cross-section)"}, {"k": "earned", "t": "route participation · snap trend"},
-        {"k": "earned", "t": "goal-line package inclusion"}, {"k": "earned", "t": "volume-dependent spread (within-player)"}, {"k": "earned", "t": "injury cascade k*=.87"},
+        {"k": "earned", "t": "goal-line package inclusion"}, {"k": "earned", "t": "red-zone inclusion × targets per route"}, {"k": "earned", "t": "volume-dependent spread (within-player)"}, {"k": "earned", "t": "injury cascade k*=.87"},
         {"k": "earned", "t": "xTD decomposed touchdowns"}, {"k": "earned", "t": "TD environment (measured scale)"}, {"k": "earned", "t": "red-zone defense (small, capped)"},
         {"k": "earned", "t": "measured correlations · copula"}, {"k": "live", "t": "8-book line shop"}, {"k": "live", "t": "beat-intel hard gates"}, {"k": "live", "t": "kickoff weather (validated multiplier)"},
         {"k": "live", "t": "line history · opened → now"}, {"k": "live", "t": "Last Call · inactives · stale numbers"},
