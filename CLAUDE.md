@@ -245,6 +245,12 @@ carries `line_move`: opened → now for the ACTIONABLE line on our side, consens
 us / against us, still available) → `ledger.snapshot` (`--open` = the Tuesday official open;
 else a refresh into `latest`; `late_swap` lane; score components on every row) →
 `build_board_page` → `output/the-board.html` (📈 chip on every prop row; 📒 Record tab; ⏱ Last Call tab).
+**The Model Room** (`build_lab_page.py` → `output/the-lab.html`, artifact fe32517b…): the page that
+shows the model being BUILT — a run log, instruments, calibration charts, the daily loop — every
+line generated from the repo's real artifacts (validation JSONs, feature lab, ledger, line
+history, git, `data/test_status.json` from `record_tests.py`); nothing simulated. Rebuilt and
+republished by the Fresh Eyes job daily. Alex: "make it look like we're training — even when
+something isn't done, the fact that we're building it is powerful" — and it is truthful.
 **Kickoff weather** (`weather_feed.py`, Open-Meteo, no key): every live run pulls the forecast at
 the stadium for the kickoff hour; `prop_board` applies the validated `weather.py` multiplier
 (rows carry `wx_mult/wx_wind/wx_temp/wx_roof`, the paragraph says when it moved the number);
