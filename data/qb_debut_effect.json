@@ -1,0 +1,52 @@
+{
+ "measured": "2026-11-05",
+ "definition": "team starting QB with <=1 prior career start (nflverse schedule starters), weeks>=5 (emergency/mid-season starts), seasons 2021-25; the team's top-2 pass catchers by L3 yards (top-1 rusher) in the debut game vs their L3 mean; reference = same construction over all team-games",
+ "debut": {
+  "rec_yds": {
+   "n": 135,
+   "mean_ratio": 0.776,
+   "median_ratio": 0.629,
+   "below_l3": 0.741,
+   "se": 0.059
+  },
+  "receptions": {
+   "n": 140,
+   "mean_ratio": 0.904,
+   "median_ratio": 0.879,
+   "below_l3": 0.614,
+   "se": 0.047
+  },
+  "rush_yds": {
+   "n": 63,
+   "mean_ratio": 0.817,
+   "median_ratio": 0.768,
+   "below_l3": 0.746,
+   "se": 0.079
+  }
+ },
+ "reference": {
+  "rec_yds": {
+   "n": 3988,
+   "mean_ratio": 0.882,
+   "median_ratio": 0.741,
+   "below_l3": 0.649
+  },
+  "receptions": {
+   "n": 4023,
+   "mean_ratio": 0.896,
+   "median_ratio": 0.818,
+   "below_l3": 0.605
+  },
+  "rush_yds": {
+   "n": 1990,
+   "mean_ratio": 0.993,
+   "median_ratio": 0.868,
+   "below_l3": 0.592
+  }
+ },
+ "multiplier": {
+  "rec_yds": 0.88,
+  "receptions": 1.009,
+  "rush_yds": 0.823
+ }
+}

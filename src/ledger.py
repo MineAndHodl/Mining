@@ -41,7 +41,7 @@ ABBR = {"Arizona Cardinals":"ARI","Atlanta Falcons":"ATL","Baltimore Ravens":"BA
 
 PICK_FIELDS = ["name", "game", "cat", "side", "line", "price", "book", "our_num", "market_num", "model_p", "edge",
                "score", "grade", "grade_sized", "units", "recommended", "rail", "thesis", "confidence", "n_books",
-               "shop_adv", "contrib", "inj_lean", "inj_status", "role_mult", "role_note", "intel_lean", "intel_signals",
+               "shop_adv", "contrib", "inj_lean", "inj_status", "role_mult", "role_note", "qb_mult", "qb_note", "intel_lean", "intel_signals",
                "intel_hard", "mkt_ratio", "mkt_flag", "position", "offseason", "verdict", "score_mult", "line_move",
                "score_conviction", "score_trust", "wx_mult", "wx_wind", "wx_temp", "wx_roof",
                "n_books_mkt", "cons_line", "line_vs_cons", "form_gap", "last_season", "fair",

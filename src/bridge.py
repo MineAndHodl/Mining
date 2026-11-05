@@ -177,6 +177,10 @@ def yardage_bridge(pick):
     if abs(rm - 1.0) >= 0.0005:
         d = cur * (rm - 1.0)
         steps.append({"label": "Injury cascade", "delta": round(d, 2), "kind": "mult", "note": f"×{rm:.3f}" + (f" — {pick.get('role_note')}" if pick.get("role_note") else "")}); cur += d
+    qm = _f(pick.get("qb_mult"), 1.0)
+    if abs(qm - 1.0) >= 0.0005:
+        d = cur * (qm - 1.0)
+        steps.append({"label": "Debut QB", "delta": round(d, 2), "kind": "mult", "note": f"×{qm:.3f}" + (f" — {pick.get('qb_note')}" if pick.get("qb_note") else "")}); cur += d
     unexplained = round(our - cur, 2)
     if abs(unexplained) >= 0.05:
         steps.append({"label": "Rounding", "delta": unexplained, "kind": "residual"})

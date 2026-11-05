@@ -1,0 +1,61 @@
+{
+ "weeks": [
+  {
+   "season": 2026,
+   "week": 1,
+   "card": {
+    "w": 5,
+    "l": 3,
+    "push": 0,
+    "void": 0,
+    "units": 1.07,
+    "units_flat": 1.07,
+    "hit": 0.625,
+    "clv_avg": null
+   },
+   "pool": {
+    "w": 69,
+    "l": 66,
+    "push": 0,
+    "void": 7,
+    "units": 0.04,
+    "units_flat": -0.86,
+    "hit": 0.511,
+    "clv_avg": null
+   },
+   "late_swap": {
+    "w": 0,
+    "l": 0,
+    "push": 0,
+    "void": 0,
+    "units": 0,
+    "units_flat": 0,
+    "hit": null,
+    "clv_avg": null
+   },
+   "stack": "LOSS",
+   "stack_units": -0.25,
+   "tax": "LOSS",
+   "tax_units": -0.25,
+   "sgps": [
+    [
+     "LOSS",
+     1,
+     8
+    ],
+    [
+     "LOSS",
+     1,
+     9
+    ]
+   ],
+   "games_clv": null
+  }
+ ],
+ "card_season": {
+  "w": 5,
+  "l": 3,
+  "push": 0,
+  "units": 1.07
+ }
+}

@@ -194,6 +194,29 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
         INJ = il.InjuryLayer(season=int(recency_season) + (1 if recency_week is None else 0))
     except Exception as _e:
         INJ = None; print("injury layer unavailable:", _e)
+    # QB DEBUT LEVER (measured, qb_debut.py): a first/second-career-start QB cuts his top targets'
+    # receiving yards and his lead back's rushing yards (catch counts unchanged) — the model's own
+    # baseline and form cannot see it, so it is applied as a multiplier after the projection.
+    try:
+        import qb_debut as qd
+        QBD = qd.QbDebut(season=int(recency_season) + (1 if recency_week is None else 0),
+                         week=(1 if recency_week is None else int(recency_week) + 1))
+    except Exception as _e:
+        QBD = None; print("qb debut lever unavailable:", _e)
+    # the lever's scope is what was measured: each team's top-2 pass catchers and lead back by last-3 yards
+    top_targets, lead_backs = set(), set()
+    try:
+        pid2team = dict(zip(proj["player_id"], proj["team"])) if "player_id" in proj.columns else {}
+        pid2pos = dict(zip(proj["player_id"], proj["position"])) if "player_id" in proj.columns else {}
+        rr_ = rec[rec["n_games"] >= 2].copy() if "n_games" in rec.columns else rec.copy()
+        rr_["team"] = rr_["pid"].map(pid2team); rr_["pos"] = rr_["pid"].map(pid2pos)
+        rr_ = rr_[rr_["team"].notna()]
+        for tm_, g_ in rr_[(rr_["mkt"] == "rec_yds") & (rr_["pos"].isin(["WR", "TE", "RB"]))].groupby("team"):
+            top_targets.update(g_.sort_values("last3", ascending=False)["pid"].head(2).tolist())
+        for tm_, g_ in rr_[(rr_["mkt"] == "rush_yds") & (rr_["pos"] == "RB")].groupby("team"):
+            lead_backs.update(g_.sort_values("last3", ascending=False)["pid"].head(1).tolist())
+    except Exception as _e:
+        print("qb debut scope not resolved:", _e)
     # PLAYER INTEL: beat/pundit read per player (the model is the prior, the player is the bet).
     # Hard facts gate now; soft signals inform the reader/trust and are logged to earn a weight.
     try:
@@ -395,6 +418,11 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
         role_mult, role_note = (INJ.role_multiplier(b["name"], mkt) if INJ else (1.0, None))
         if role_mult != 1.0:
             our_mu = our_mu * role_mult
+        # debut QB: measured discount on the skill players of a first-time starter
+        _pid = rr.get("pid") if (src == "multifactor" and isinstance(rr, dict)) else None
+        qb_mult, qb_note = (QBD.multiplier(team, mkt, pos, top_target=(_pid in top_targets), lead_back=(_pid in lead_backs)) if QBD else (1.0, None))
+        if qb_mult != 1.0:
+            our_mu = our_mu * qb_mult
         p = price_ou(mkt, our_mu, b["line"], b["over_price"], b["under_price"])
         conf = float(pr["confidence"]) if pr is not None and "confidence" in pr else 0.2
         if gap is not None and gap >= 2: conf *= 0.7    # missed a season: the form read is unmeasurable, trust cut
@@ -422,6 +450,7 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                     "over_price_kept": b["over_price"], "under_price_kept": b["under_price"],
                     "inj_status": (own_inj or {}).get("status"), "inj_detail": (own_inj or {}).get("injury"),
                     "role_mult": role_mult, "role_note": role_note,
+                    "qb_mult": round(float(qb_mult), 3), "qb_note": qb_note,
                     "inj_lean": inj_lean, "inj_note": inj_note,
                     "intel_lean": (INTEL.lean(b["name"], p["side"]) if INTEL else None),
                     "intel_note": (INTEL.note(b["name"]) if INTEL else None),
@@ -652,8 +681,11 @@ def reason(row, news=None):
     # injury context: the role cascade (a teammate out feeds him) or his own status
     inj_line = ""
     rn = row.get("role_note"); st = row.get("inj_status")
+    qn = row.get("qb_note"); qm = row.get("qb_mult")
+    if qn and isinstance(qn, str) and qm is not None and qm == qm and abs(float(qm) - 1.0) >= 0.005:
+        inj_line += f" Quarterback angle: {qn} — that trims our number {abs(float(qm) - 1) * 100:.0f}% before pricing."
     if rn and isinstance(rn, str):
-        inj_line = f" Injury angle: {rn}."
+        inj_line += f" Injury angle: {rn}."
     elif st in ("Doubtful", "Questionable"):
         det = row.get("inj_detail") or "injury"
         inj_line = (f" Injury note: he's listed {st} ({det}). Questionable players who play produce like healthy ones "

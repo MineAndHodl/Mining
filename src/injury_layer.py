@@ -87,7 +87,10 @@ class InjuryLayer:
     def _roles_from_last_season(self):
         """Rank each team's WRs/TEs/RBs by last-season share; apply 2026 team overrides."""
         pbp = pd.read_parquet(f"{DATA}/pbp_2021_2025.parquet")
-        pbp = pbp[pbp.season == pbp.season.max()]
+        # the most recent season AT OR BEFORE this layer's season: in-season that is this season's
+        # own usage (the table carries current-season games after refresh_data); a 2025 layer
+        # must not read 2026 roles
+        pbp = pbp[pbp.season == min(int(self.season), int(pbp.season.max()))]
         players = pd.read_parquet(f"{DATA}/players_cache.parquet")
         pos = dict(zip(players.gsis_id, players.position)); nm = dict(zip(players.gsis_id, players.display_name))
         u, team, _ = rm.player_game_usage(pbp)

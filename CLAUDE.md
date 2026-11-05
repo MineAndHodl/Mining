@@ -165,6 +165,21 @@ The board is the product: every pick on it must be something a sharp would nod a
   what it has seen (notes, headlines, status changes, trending, Underdog line moves, game odds moves)
   → `data/monitor/feed.jsonl` + `status.json`; the Model Room shows the last check and the latest
   events; emails only when a Card player has real news.
+- **Debut-QB lever (Nov 5 2026, `qb_debut.py`, `data/qb_debut_effect.json`) — the first in-season
+  improvement, measured on emergency starters (QB with ≤1 prior career start, week 5+, 2021-25):** the
+  team's top-2 pass catchers' receiving yards come in at .776× their last-3 average vs .882× in an
+  ordinary week (n=135) → ×0.879 on rec_yds; receptions do NOT move (.904 vs .896, n=140 — the debut
+  offense is check-downs: catch counts hold, yards per catch collapse); the lead back's rushing yards
+  .817× vs .993× (n=63) → ×0.823 on rush_yds. The multifactor model is blind to a QB change by
+  construction (own baseline + own form), so it is a multiplier after the projection, a "Debut QB" bar
+  in the bridge, a line in the paragraph, and a frozen ledger field (`qb_mult`, `qb_note`). Starter =
+  the schedule's posted QB or `data/qb_starters_<season>_w<wk>.json` from the beat. GAMES: a home dog
+  of 6+ starting a debut QB covered 34-18 (65%, n=53; mid-season 27-12; 2020+ 16-6) and big road
+  favorites (9+) fail to cover 58% all-era but the fade is era-unstable (40% in 2013-19, 62% 2020+) —
+  reported as a lean, never a Card pick. No total edge once the number is already ≤42 (49.5% over).
+- **Week 1 2026 graded (Nov 5, `data/record.json`):** Card 5-3, +1.07u; pool n=135 hit 51.1% flat (−0.86u);
+  A- 73% (n=15), B+ 51% (n=35), B 47% (n=73). Weeks 2-8 were never priced (the scheduled jobs never
+  pushed; no line history exists for them) — the calibration sample restarts from Week 9.
 - **Mean ≠ median on skewed yardage**, but the correction is modest for high-volume players;
   compare our mean to the market-implied mean, never to the line itself.
 - **Correlations are measured, not assumed:** QB-WR 0.696, two-WR 0.507, same-player
