@@ -1,0 +1,95 @@
+{
+ "measured": "2026-11-08",
+ "definition": "slope of next-game residual (y_{t+1} - season mean through t-1) on last-game deviation (y_t - that mean), by the TEAM's volume in game t relative to its season median; 2021-25 regular season",
+ "by_market": {
+  "rush_yds": {
+   "team volume <=55%": {
+    "n": 66,
+    "slope": 0.383
+   },
+   "55-80%": {
+    "n": 539,
+    "slope": 0.259
+   },
+   "80-120% (normal)": {
+    "n": 1612,
+    "slope": 0.257
+   },
+   "120-150%": {
+    "n": 549,
+    "slope": 0.281
+   },
+   ">=150% (inflated)": {
+    "n": 163,
+    "slope": 0.211
+   }
+  },
+  "pass_yds": {
+   "team volume <=55%": {
+    "n": 10,
+    "slope": null
+   },
+   "55-80%": {
+    "n": 205,
+    "slope": 0.224
+   },
+   "80-120% (normal)": {
+    "n": 1061,
+    "slope": 0.19
+   },
+   "120-150%": {
+    "n": 237,
+    "slope": 0.337
+   },
+   ">=150% (inflated)": {
+    "n": 41,
+    "slope": 0.308
+   }
+  },
+  "receptions": {
+   "team volume <=55%": {
+    "n": 64,
+    "slope": 0.142
+   },
+   "55-80%": {
+    "n": 1023,
+    "slope": 0.179
+   },
+   "80-120% (normal)": {
+    "n": 5546,
+    "slope": 0.205
+   },
+   "120-150%": {
+    "n": 1270,
+    "slope": 0.174
+   },
+   ">=150% (inflated)": {
+    "n": 218,
+    "slope": 0.127
+   }
+  },
+  "rec_yds": {
+   "team volume <=55%": {
+    "n": 63,
+    "slope": -0.029
+   },
+   "55-80%": {
+    "n": 976,
+    "slope": 0.127
+   },
+   "80-120% (normal)": {
+    "n": 5221,
+    "slope": 0.165
+   },
+   "120-150%": {
+    "n": 1220,
+    "slope": 0.166
+   },
+   ">=150% (inflated)": {
+    "n": 211,
+    "slope": 0.145
+   }
+  }
+ },
+ "rec_yds_share_note": "target-share deviation predicts +53 yds per 10% share in normal games, +8.7 in team low-pass games (n=63): with <=55% of usual attempts neither yards nor share carry information"
+}

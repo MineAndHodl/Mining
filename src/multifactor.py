@@ -34,13 +34,31 @@ def _defense_maps():
     return out
 
 
+USE_FORM_WEIGHTS = True    # UPGRADE_PLAN §2 — set False to reproduce the raw-form model (A/B in form_weights_ab.py)
+
+
 def build_features(pg=None):
     pg = pg if pg is not None else pd.read_parquet(f"{DATA}/prop_player_games.parquet")
     pg = pg.sort_values(["pid", "mkt", "season", "week"]).copy()
-    g = pg.groupby(["pid", "mkt"])
-    pg["baseline"] = g["y"].transform(lambda s: s.shift(1).expanding(min_periods=4).mean())
-    pg["last3"] = g["y"].transform(lambda s: s.shift(1).rolling(3).mean())
-    pg["last1"] = g["y"].transform(lambda s: s.shift(1))
+    if USE_FORM_WEIGHTS:
+        # OPPORTUNITY-AWARE FORM (form_weights.py, UPGRADE_PLAN §2): a game the TEAM played with <= 55% of
+        # its usual pass attempts (monsoon, blowout, QB loss) carries no information about a receiver's
+        # next game (measured slope -.03 vs +.165) — weight 0 for rec/pass yards, .7 for receptions,
+        # rushing untouched. The window rolls back past the excluded game instead of reading a zero.
+        import form_weights as fw
+        pg = fw.attach_weights(pg)
+        base = np.full(len(pg), np.nan); l3 = np.full(len(pg), np.nan); l1 = np.full(len(pg), np.nan)
+        pos = {k: v for k, v in zip(pg.index, range(len(pg)))}
+        for _, d in pg.groupby(["pid", "mkt"], sort=False):
+            b_, t3_, t1_ = fw.weighted_form(d["y"].to_numpy(float), d["w"].to_numpy(float))
+            idx = [pos[i] for i in d.index]
+            base[idx] = b_; l3[idx] = t3_; l1[idx] = t1_
+        pg["baseline"] = base; pg["last3"] = l3; pg["last1"] = l1
+    else:
+        g = pg.groupby(["pid", "mkt"])
+        pg["baseline"] = g["y"].transform(lambda s: s.shift(1).expanding(min_periods=4).mean())
+        pg["last3"] = g["y"].transform(lambda s: s.shift(1).rolling(3).mean())
+        pg["last1"] = g["y"].transform(lambda s: s.shift(1))
     pg["resid"] = pg["y"] - pg["baseline"]
     pg["form3"] = pg["last3"] - pg["baseline"]
     pg["form1"] = pg["last1"] - pg["baseline"]
@@ -194,6 +212,8 @@ def fit_walk_forward(pg=None, test_season=2025, l2=1.0):
         hit_rec = (np.sign(te["form3"]) == np.sign(actual_resid)).mean()
         results[mkt] = {"weights": {f: round(float(wi), 2) for f, wi in zip(RAW_FEATURES, w)},
                         "ens_hit_strong": round(float(hit_ens), 3), "recency_hit": round(float(hit_rec), 3),
+                        "mae_ens": round(float(np.mean(np.abs(actual_resid - pred))), 3),
+                        "mae_baseline": round(float(np.mean(np.abs(actual_resid))), 3),
                         "n_test": int(len(te))}
     return results
 

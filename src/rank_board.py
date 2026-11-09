@@ -243,7 +243,7 @@ def build_ranked(prop_board=None, td_board=None, games=None, top=10, adp=None):
                          "tilt": _nn(r.get("tilt")), "off_market": _nn(r.get("off_market")),
                          "inj_status": _nn(r.get("inj_status")), "inj_detail": _nn(r.get("inj_detail")),
                          "role_mult": _nn(r.get("role_mult")), "role_note": _nn(r.get("role_note")),
-                         "qb_mult": _nn(r.get("qb_mult")), "qb_note": _nn(r.get("qb_note")),
+                         "qb_mult": _nn(r.get("qb_mult")), "qb_note": _nn(r.get("qb_note")), "form_excluded": r.get("form_excluded"),
                          "inj_lean": _nn(r.get("inj_lean")), "inj_note": _nn(r.get("inj_note")),
                          "intel_lean": _nn(r.get("intel_lean")), "intel_note": _nn(r.get("intel_note")),
                          "intel_signals": r.get("intel_signals"), "intel_hard": _nn(r.get("intel_hard")),

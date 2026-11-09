@@ -1,0 +1,132 @@
+{
+ "measured": "2026-11-08",
+ "note": "walk-forward A/B of opportunity-aware form weights (form_weights.py) vs raw form; ridge l2=10; strong = top 40% |pred|",
+ "results": {
+  "raw_2024": {
+   "rush_yds": {
+    "ens_hit_strong": 0.605,
+    "recency_hit": 0.569,
+    "mae_ens": 18.5,
+    "mae_baseline": 19.168,
+    "n_test": 2008
+   },
+   "rec_yds": {
+    "ens_hit_strong": 0.629,
+    "recency_hit": 0.559,
+    "mae_ens": 18.94,
+    "mae_baseline": 19.589,
+    "n_test": 3911
+   },
+   "receptions": {
+    "ens_hit_strong": 0.64,
+    "recency_hit": 0.571,
+    "mae_ens": 1.41,
+    "mae_baseline": 1.476,
+    "n_test": 3911
+   },
+   "pass_yds": {
+    "ens_hit_strong": 0.688,
+    "recency_hit": 0.582,
+    "mae_ens": 65.773,
+    "mae_baseline": 68.079,
+    "n_test": 600
+   }
+  },
+  "raw_2025": {
+   "rush_yds": {
+    "ens_hit_strong": 0.633,
+    "recency_hit": 0.565,
+    "mae_ens": 17.946,
+    "mae_baseline": 18.455,
+    "n_test": 1948
+   },
+   "rec_yds": {
+    "ens_hit_strong": 0.658,
+    "recency_hit": 0.571,
+    "mae_ens": 18.836,
+    "mae_baseline": 19.672,
+    "n_test": 3946
+   },
+   "receptions": {
+    "ens_hit_strong": 0.668,
+    "recency_hit": 0.584,
+    "mae_ens": 1.363,
+    "mae_baseline": 1.447,
+    "n_test": 3946
+   },
+   "pass_yds": {
+    "ens_hit_strong": 0.642,
+    "recency_hit": 0.537,
+    "mae_ens": 64.567,
+    "mae_baseline": 67.08,
+    "n_test": 579
+   }
+  },
+  "weighted_2024": {
+   "rush_yds": {
+    "ens_hit_strong": 0.605,
+    "recency_hit": 0.569,
+    "mae_ens": 18.5,
+    "mae_baseline": 19.168,
+    "n_test": 2008
+   },
+   "rec_yds": {
+    "ens_hit_strong": 0.632,
+    "recency_hit": 0.564,
+    "mae_ens": 18.939,
+    "mae_baseline": 19.607,
+    "n_test": 3907
+   },
+   "receptions": {
+    "ens_hit_strong": 0.64,
+    "recency_hit": 0.574,
+    "mae_ens": 1.41,
+    "mae_baseline": 1.477,
+    "n_test": 3911
+   },
+   "pass_yds": {
+    "ens_hit_strong": 0.671,
+    "recency_hit": 0.583,
+    "mae_ens": 65.912,
+    "mae_baseline": 68.169,
+    "n_test": 600
+   }
+  },
+  "weighted_2025": {
+   "rush_yds": {
+    "ens_hit_strong": 0.633,
+    "recency_hit": 0.565,
+    "mae_ens": 17.946,
+    "mae_baseline": 18.455,
+    "n_test": 1948
+   },
+   "rec_yds": {
+    "ens_hit_strong": 0.658,
+    "recency_hit": 0.572,
+    "mae_ens": 18.853,
+    "mae_baseline": 19.73,
+    "n_test": 3942
+   },
+   "receptions": {
+    "ens_hit_strong": 0.669,
+    "recency_hit": 0.585,
+    "mae_ens": 1.364,
+    "mae_baseline": 1.448,
+    "n_test": 3946
+   },
+   "pass_yds": {
+    "ens_hit_strong": 0.634,
+    "recency_hit": 0.544,
+    "mae_ens": 64.71,
+    "mae_baseline": 67.205,
+    "n_test": 579
+   }
+  }
+ },
+ "verdict": {
+  "rec_yds": "ADOPTED (weight 0 in team low-pass anomaly games)",
+  "receptions": "ADOPTED (weight .7)",
+  "pass_yds": "REJECTED (walk-forward worse both seasons; raw window kept)",
+  "rush_yds": "not applied (rushing keeps its information at every team volume)"
+ }
+}

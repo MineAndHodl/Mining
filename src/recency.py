@@ -60,17 +60,23 @@ def build_recency(through_season=2025, through_week=None):
     else:
         pg = pg[pg.season <= through_season]
     roles = role_recency(through_season, through_week)
+    # OPPORTUNITY-AWARE FORM (form_weights.py): team low-volume anomaly games (monsoon, blowout, QB loss)
+    # are skipped in the window for receiving/passing yards (weight 0), down-weighted for receptions.
+    import form_weights as fw
+    pg = fw.attach_weights(pg)
     rows = []
     for (pid, mkt), d in pg.groupby(["pid", "mkt"]):
         d = d.sort_values(["season", "week"])
-        ys = d["y"].to_numpy(dtype=float)
+        ys = d["y"].to_numpy(dtype=float); wts = d["w"].to_numpy(dtype=float)
         if len(ys) < 4:
             continue
-        baseline = float(np.mean(ys[-16:])) if len(ys) >= 8 else float(np.mean(ys))
+        live = fw.summarize_live(ys, wts, d["season"].to_numpy(), d["week"].to_numpy())
+        if live is None:
+            continue
+        baseline, last3, last1, n_counted, excluded = live
         recent = ys[-RECENT_N:]
-        w = 0.5 ** (np.arange(len(recent))[::-1] / HALFLIFE)   # most-recent heaviest
-        form = float(np.average(recent, weights=w))
-        last3 = float(np.mean(ys[-3:])); last1 = float(ys[-1])   # for the multi-factor features
+        w = 0.5 ** (np.arange(len(recent))[::-1] / HALFLIFE) * np.where(wts[-RECENT_N:] > 0, wts[-RECENT_N:], 0.0)
+        form = float(np.average(recent, weights=w)) if w.sum() > 0 else last3
         # when his window ends: the season/week of his most recent game. The board decides PER
         # PLAYER whether the form window crosses the offseason (half-strength, measured) or is
         # older than one offseason (a missed season: unmeasurable, so form is not applied).
@@ -78,7 +84,8 @@ def build_recency(through_season=2025, through_week=None):
                      "last3": round(last3, 1), "last1": round(last1, 1),
                      "trend": round(form - baseline, 1), "n_games": len(ys),
                      "last_season": int(d["season"].iloc[-1]), "last_week": int(d["week"].iloc[-1]),
-                     "log": [round(float(x), 1) for x in ys[-RECENT_N:]], **(roles.get(pid) or {})})
+                     "log": [round(float(x), 1) for x in ys[-RECENT_N:]],
+                     "form_excluded": [f"{s}w{wk}" for s, wk in excluded[-3:]] or None, **(roles.get(pid) or {})})
     r = pd.DataFrame(rows)
     # trend strength percentile within each market (the validated edge lives in the top quartile)
     for mkt in r["mkt"].unique():

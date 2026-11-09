@@ -451,6 +451,7 @@ def price_prop_board(board, projections, weather_by_game=None, recency_season=20
                     "inj_status": (own_inj or {}).get("status"), "inj_detail": (own_inj or {}).get("injury"),
                     "role_mult": role_mult, "role_note": role_note,
                     "qb_mult": round(float(qb_mult), 3), "qb_note": qb_note,
+                    "form_excluded": (rr.get("form_excluded") if (src == "multifactor" and isinstance(rr, dict)) else None),
                     "inj_lean": inj_lean, "inj_note": inj_note,
                     "intel_lean": (INTEL.lean(b["name"], p["side"]) if INTEL else None),
                     "intel_note": (INTEL.note(b["name"]) if INTEL else None),
@@ -681,6 +682,11 @@ def reason(row, news=None):
     # injury context: the role cascade (a teammate out feeds him) or his own status
     inj_line = ""
     rn = row.get("role_note"); st = row.get("inj_status")
+    fx = row.get("form_excluded")
+    if isinstance(fx, (list, tuple)) and len(fx):
+        wk_ = [str(x).split("w")[-1] for x in fx]
+        inj_line += (f" Form note: his Week {' and '.join(wk_)} {'game is' if len(wk_) == 1 else 'games are'} not counted as form — "
+                     f"the team barely threw (a weather/blowout anomaly; measured to carry no signal about the next game), so the window rolls back a game.")
     qn = row.get("qb_note"); qm = row.get("qb_mult")
     if qn and isinstance(qn, str) and qm is not None and qm == qm and abs(float(qm) - 1.0) >= 0.005:
         inj_line += f" Quarterback angle: {qn} — that trims our number {abs(float(qm) - 1) * 100:.0f}% before pricing."

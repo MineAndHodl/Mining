@@ -177,6 +177,19 @@ The board is the product: every pick on it must be something a sharp would nod a
   of 6+ starting a debut QB covered 34-18 (65%, n=53; mid-season 27-12; 2020+ 16-6) and big road
   favorites (9+) fail to cover 58% all-era but the fade is era-unstable (40% in 2013-19, 62% 2020+) —
   reported as a lean, never a Card pick. No total edge once the number is already ≤42 (49.5% over).
+- **OPPORTUNITY-AWARE FORM (Nov 8 2026, `form_weights.py`, `data/form_anomaly_effect.json`, `UPGRADE_PLAN.md`) —
+  Alex: "we shouldn't cut their receivers because it was a monsoon."** A raw total is team volume × share ×
+  efficiency; when the TEAM's volume is forced by the environment (TB Week 8: 4 pass attempts in the rain;
+  a 42-7 blowout; a mid-game QB loss) the form window reads it as a change in the player. Measured 2021-25
+  (slope of next-game residual on last-game deviation): a receiving-yards game with the team at ≤55% of its
+  usual attempts predicts NOTHING (−.029 vs +.165 normal, n=63; target share dies too, +8.7 vs +53 per 10%);
+  receptions keep ~70% (.142/.205); rushing keeps its information at every team volume (+.21 at ≥150%).
+  → weight 0 for receiving yards, .7 receptions, rushing untouched; passing yards TRIED by analogy and REJECTED
+  by the walk-forward A/B (.688→.671 / .642→.634 — a QB's low-attempt game is usually his own exit); the
+  window rolls back past the game, the baseline ignores it, the row carries `form_excluded`, the paragraph
+  says so. Different from the rejected `full_game_form` test (PLAYER opportunity <50% — a role signal): this
+  keys off the TEAM's volume — the cause, not the symptom. Walk-forward A/B in `data/form_weights_ab.json`.
+  The structural fix (team volume × share × efficiency projected separately) is UPGRADE_PLAN §3.
 - **Week 1 2026 graded (Nov 5, `data/record.json`):** Card 5-3, +1.07u; pool n=135 hit 51.1% flat (−0.86u);
   A- 73% (n=15), B+ 51% (n=35), B 47% (n=73). Weeks 2-8 were never priced (the scheduled jobs never
   pushed; no line history exists for them) — the calibration sample restarts from Week 9.
@@ -413,6 +426,10 @@ comes from `data/data_ledger.json`, `data/monitor/status.json`, the validation J
 and git. Nothing simulated. `[tested]` lines say what was tried, never the verdict.
 
 ## Still owed
+- **UPGRADE_PLAN.md (Nov 8):** §3 opportunity-decomposed projection (T5 challenger, walk-forward vs raw form);
+  §4 general QB-quality delta (replaces debut-only lever); §5 every hand-fed pick into the ledger + Monday
+  grading; §6 Odds API key / DK execution book / merge the branch / 2026 role read from snap counts;
+  §7 games model from the measured trends.
 - **From the bridge:** the breakeven line per pick ("edge gone at L*"), the range chip on the Card
   row, the bridge in one line in the post copy, an early-exit left-tail mixture as a T4 challenger.
 - **Run the grading loop** (built 2026-09-02, unproven on live data): Week 1 grades Monday; after

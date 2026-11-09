@@ -631,6 +631,36 @@ def test_bridge():
     check("the Model Room shows one pick all the way down", "How a number is reached" in lab and '"bridge_example"' in lab)
 
 
+def test_form_weights():
+    """UPGRADE_PLAN §2: opportunity-aware form — a TEAM low-volume anomaly game (monsoon / blowout / QB loss)
+    is skipped in the receiving/passing-yards form window (measured: no signal, data/form_anomaly_effect.json),
+    down-weighted for receptions, untouched for rushing; mirrors the raw rolling math when nothing is flagged."""
+    print("\n-- opportunity-aware form (team-anomaly weights) --")
+    import form_weights as fw, numpy as np, json as _j
+    tv = fw.team_volume()
+    tb8 = tv[(tv.season == 2026) & (tv.posteam == "TB") & (tv.week == 8)]
+    check("TB Week 8 2026 (4 pass attempts in the rain) is a team low-pass anomaly", len(tb8) == 1 and bool(tb8.anomaly_lowpass.iloc[0]), str(tb8[["pa", "pa_med"]].to_dict("records")))
+    check("anomalies are rare (~1% of team-games) — this is not a blanket exclusion", 0.003 < tv.anomaly_lowpass.mean() < 0.03, f"{tv.anomaly_lowpass.mean():.3%}")
+    ys = np.array([50, 60, 70, 80, 90, 0, 40.0]); ones = np.ones(7); w0 = ones.copy(); w0[5] = 0.0
+    b1, l3a, l1a = fw.weighted_form(ys, ones); b0, l3b, l1b = fw.weighted_form(ys, w0)
+    check("with every weight 1 the math is the raw shift(1) rolling/expanding form", abs(l3a[6] - np.mean([80, 90, 0])) < 1e-9 and l1a[6] == 0.0 and abs(b1[6] - np.mean(ys[:6])) < 1e-9)
+    check("a zero-weight game is skipped: the window rolls back past it, the baseline ignores it", abs(l3b[6] - np.mean([70, 80, 90])) < 1e-9 and l1b[6] == 90.0 and abs(b0[6] - np.mean([50, 60, 70, 80, 90])) < 1e-9)
+    check("weights by market: rec yards 0, receptions .7, passing and rushing 1 (passing REJECTED by the walk-forward A/B)", fw.WEIGHT_IN_ANOMALY["rec_yds"] == 0.0 and fw.WEIGHT_IN_ANOMALY["pass_yds"] == 1.0 and fw.WEIGHT_IN_ANOMALY["receptions"] == 0.7 and fw.WEIGHT_IN_ANOMALY["rush_yds"] == 1.0)
+    ab = _j.load(open(os.path.join(HERE, "..", "data", "form_weights_ab.json")))["results"]
+    check("walk-forward A/B on file: receiving yards not worse in either season, passing yards worse (hence excluded from the rule)",
+          ab["weighted_2024"]["rec_yds"]["ens_hit_strong"] >= ab["raw_2024"]["rec_yds"]["ens_hit_strong"] - 0.002 and ab["weighted_2025"]["rec_yds"]["ens_hit_strong"] >= ab["raw_2025"]["rec_yds"]["ens_hit_strong"] - 0.002
+          and ab["weighted_2024"]["pass_yds"]["ens_hit_strong"] < ab["raw_2024"]["pass_yds"]["ens_hit_strong"])
+    import recency as rc
+    pl = pd.read_parquet(os.path.join(HERE, "..", "data", "players_cache.parquet")).set_index("gsis_id").display_name
+    rec = rc.build_recency(through_season=2026, through_week=9); rec["name"] = rec.pid.map(pl)
+    g = rec[(rec.name == "Chris Godwin Jr.") & (rec.mkt == "rec_yds")]
+    check("Godwin's receiving-yards window names the excluded Tampa games and his last-1 is not the monsoon zero", len(g) == 1 and g.iloc[0]["form_excluded"] and "2026w8" in g.iloc[0]["form_excluded"] and g.iloc[0]["last1"] != 0.0, str(g[["last1", "last3", "form_excluded"]].to_dict("records")))
+    gi = rec[(rec.name == "Bucky Irving") & (rec.mkt == "rush_yds")]
+    check("Irving's rushing window is untouched (rushing keeps its information at every team volume)", len(gi) == 1 and not gi.iloc[0]["form_excluded"])
+    eff = _j.load(open(os.path.join(HERE, "..", "data", "form_anomaly_effect.json")))
+    check("the measurement is on file: rec_yds anomaly slope ~0 vs ~.165 normal", abs(eff["by_market"]["rec_yds"]["team volume <=55%"]["slope"]) < 0.08 and eff["by_market"]["rec_yds"]["80-120% (normal)"]["slope"] > 0.12)
+
+
 def test_line_history_and_ledger_alignment():
     """Every bet knows where it opened and where it is now; the ledger is aligned with the product."""
     print("\n-- line history + ledger alignment --")
@@ -714,7 +744,7 @@ if __name__ == "__main__":
     test_implied_devig(); test_props_anchor(); test_conviction()
     test_offmarket_synthetic(); test_totals_sign(); test_crossbook_props()
     test_factor_scorecard(); test_whale_missile_discipline()
-    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_fresh_eyes_day3_universe(); test_fresh_eyes_day4_profile_coaches(); test_owner_in_the_loop(); test_bridge(); test_line_history_and_ledger_alignment(); test_last_call_and_weather()
+    test_qc_fixes(); test_primetime_sgp_structure(); test_injury_layer(); test_player_intel(); test_selection_over_pool(); test_td_shopping_and_stack(); test_td_environment(); test_ledger_and_grader(); test_games_lane(); test_fresh_eyes_day1(); test_fresh_eyes_day2(); test_fresh_eyes_day3_universe(); test_fresh_eyes_day4_profile_coaches(); test_owner_in_the_loop(); test_bridge(); test_line_history_and_ledger_alignment(); test_last_call_and_weather(); test_form_weights()
     key = os.environ.get("ODDS_API_KEY")
     if key and not a.offline:
         test_live(key)
