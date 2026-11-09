@@ -1,103 +1,9 @@
 {
- "taken_at": "2026-09-03T03:33+00:00",
+ "taken_at": "2026-11-09T00:00+00:00",
  "games": {
-  "New England Patriots @ Seattle Seahawks": {
-   "roof": "outdoors",
-   "kickoff_utc": "2026-09-10T00:20+00:00",
-   "stadium": "Lumen Field",
-   "wind": 6.2,
-   "gust": 5.8,
-   "temp": 73.7,
-   "precip_prob": 5
-  },
-  "San Francisco 49ers @ Los Angeles Rams": {
+  "Houston Texans @ Los Angeles Chargers": {
    "roof": "dome",
-   "kickoff_utc": "2026-09-11T00:35+00:00",
-   "stadium": "Melbourne Cricket Ground",
-   "wind": 0.0,
-   "gust": 0.0,
-   "temp": 70.0,
-   "precip_prob": 0,
-   "note": "indoors \u2014 neutral"
-  },
-  "Chicago Bears @ Carolina Panthers": {
-   "roof": "outdoors",
-   "kickoff_utc": "2026-09-13T17:00+00:00",
-   "stadium": "Bank of America Stadium",
-   "wind": 4.8,
-   "gust": 6.0,
-   "temp": 93.3,
-   "precip_prob": 6
-  },
-  "Tampa Bay Buccaneers @ Cincinnati Bengals": {
-   "roof": "outdoors",
-   "kickoff_utc": "2026-09-13T17:00+00:00",
-   "stadium": "Paycor Stadium",
-   "wind": 9.3,
-   "gust": 16.8,
-   "temp": 99.4,
-   "precip_prob": 8
-  },
-  "New Orleans Saints @ Detroit Lions": {
-   "roof": "dome",
-   "kickoff_utc": "2026-09-13T17:00+00:00",
-   "stadium": "Ford Field",
-   "wind": 0.0,
-   "gust": 0.0,
-   "temp": 70.0,
-   "precip_prob": 0,
-   "note": "indoors \u2014 neutral"
-  },
-  "Buffalo Bills @ Houston Texans": {
-   "roof": "closed",
-   "kickoff_utc": "2026-09-13T17:00+00:00",
-   "stadium": "Reliant Stadium",
-   "wind": 0.0,
-   "gust": 0.0,
-   "temp": 70.0,
-   "precip_prob": 0,
-   "note": "indoors \u2014 neutral"
-  },
-  "Baltimore Ravens @ Indianapolis Colts": {
-   "roof": "closed",
-   "kickoff_utc": "2026-09-13T17:00+00:00",
-   "stadium": "Lucas Oil Stadium",
-   "wind": 0.0,
-   "gust": 0.0,
-   "temp": 70.0,
-   "precip_prob": 0,
-   "note": "indoors \u2014 neutral"
-  },
-  "Cleveland Browns @ Jacksonville Jaguars": {
-   "roof": "outdoors",
-   "kickoff_utc": "2026-09-13T17:00+00:00",
-   "stadium": "EverBank Stadium",
-   "wind": 12.2,
-   "gust": 14.5,
-   "temp": 93.4,
-   "precip_prob": 8
-  },
-  "Atlanta Falcons @ Pittsburgh Steelers": {
-   "roof": "outdoors",
-   "kickoff_utc": "2026-09-13T17:00+00:00",
-   "stadium": "Acrisure Stadium",
-   "wind": 9.6,
-   "gust": 17.9,
-   "temp": 90.7,
-   "precip_prob": 8
-  },
-  "New York Jets @ Tennessee Titans": {
-   "roof": "outdoors",
-   "kickoff_utc": "2026-09-13T17:00+00:00",
-   "stadium": "Nissan Stadium",
-   "wind": 5.8,
-   "gust": 8.9,
-   "temp": 98.0,
-   "precip_prob": 5
-  },
-  "Arizona Cardinals @ Los Angeles Chargers": {
-   "roof": "dome",
-   "kickoff_utc": "2026-09-13T20:25+00:00",
+   "kickoff_utc": "2026-11-08T21:05+00:00",
    "stadium": "SoFi Stadium",
    "wind": 0.0,
    "gust": 0.0,
@@ -105,19 +11,45 @@
    "precip_prob": 0,
    "note": "indoors \u2014 neutral"
   },
-  "Miami Dolphins @ Las Vegas Raiders": {
-   "roof": "dome",
-   "kickoff_utc": "2026-09-13T20:25+00:00",
-   "stadium": "Allegiant Stadium",
-   "wind": 0.0,
-   "gust": 0.0,
-   "temp": 70.0,
-   "precip_prob": 0,
-   "note": "indoors \u2014 neutral"
+  "Las Vegas Raiders @ San Francisco 49ers": {
+   "roof": "outdoors",
+   "kickoff_utc": "2026-11-08T21:05+00:00",
+   "stadium": "Levi's Stadium",
+   "wind": 5.4,
+   "gust": 5.6,
+   "temp": 66.8,
+   "precip_prob": 0
   },
-  "Green Bay Packers @ Minnesota Vikings": {
+  "Green Bay Packers @ New England Patriots": {
+   "roof": "outdoors",
+   "kickoff_utc": "2026-11-08T21:25+00:00",
+   "stadium": "Gillette Stadium",
+   "wind": 8.5,
+   "gust": 20.8,
+   "temp": 53.1,
+   "precip_prob": 0
+  },
+  "Arizona Cardinals @ Seattle Seahawks": {
+   "roof": "outdoors",
+   "kickoff_utc": "2026-11-08T21:25+00:00",
+   "stadium": "Lumen Field",
+   "wind": 11.2,
+   "gust": 19.9,
+   "temp": 56.7,
+   "precip_prob": 3
+  },
+  "Tampa Bay Buccaneers @ Chicago Bears": {
+   "roof": "outdoors",
+   "kickoff_utc": "2026-11-09T01:20+00:00",
+   "stadium": "Soldier Field",
+   "wind": 7.2,
+   "gust": 15.9,
+   "temp": 47.2,
+   "precip_prob": 0
+  },
+  "Buffalo Bills @ Minnesota Vikings": {
    "roof": "dome",
-   "kickoff_utc": "2026-09-13T20:25+00:00",
+   "kickoff_utc": "2026-11-10T01:15+00:00",
    "stadium": "U.S. Bank Stadium",
    "wind": 0.0,
    "gust": 0.0,
@@ -125,32 +57,148 @@
    "precip_prob": 0,
    "note": "indoors \u2014 neutral"
   },
-  "Washington Commanders @ Philadelphia Eagles": {
+  "Washington Commanders @ New York Giants": {
    "roof": "outdoors",
-   "kickoff_utc": "2026-09-13T20:25+00:00",
-   "stadium": "Lincoln Financial Field",
-   "wind": 10.6,
-   "gust": 16.1,
-   "temp": 100.2,
-   "precip_prob": 10
-  },
-  "Dallas Cowboys @ New York Giants": {
-   "roof": "outdoors",
-   "kickoff_utc": "2026-09-14T00:20+00:00",
+   "kickoff_utc": "2026-11-13T01:15+00:00",
    "stadium": "MetLife Stadium",
-   "wind": 6.4,
-   "gust": 19.7,
-   "temp": 91.0,
+   "wind": 12.6,
+   "gust": 15.2,
+   "temp": 53.8,
+   "precip_prob": 69
+  },
+  "New England Patriots @ Detroit Lions": {
+   "roof": "dome",
+   "kickoff_utc": "2026-11-15T14:30+00:00",
+   "stadium": "FC Bayern Munich Stadium",
+   "wind": 0.0,
+   "gust": 0.0,
+   "temp": 70.0,
+   "precip_prob": 0,
+   "note": "indoors \u2014 neutral"
+  },
+  "Kansas City Chiefs @ Atlanta Falcons": {
+   "roof": "closed",
+   "kickoff_utc": "2026-11-15T18:00+00:00",
+   "stadium": "Mercedes-Benz Stadium",
+   "wind": 0.0,
+   "gust": 0.0,
+   "temp": 70.0,
+   "precip_prob": 0,
+   "note": "indoors \u2014 neutral"
+  },
+  "Houston Texans @ Cleveland Browns": {
+   "roof": "outdoors",
+   "kickoff_utc": "2026-11-15T18:00+00:00",
+   "stadium": "Huntington Bank Field",
+   "wind": 18.6,
+   "gust": 23.7,
+   "temp": 41.4,
    "precip_prob": 7
   },
-  "Denver Broncos @ Kansas City Chiefs": {
+  "Minnesota Vikings @ Green Bay Packers": {
    "roof": "outdoors",
-   "kickoff_utc": "2026-09-15T00:15+00:00",
-   "stadium": "GEHA Field at Arrowhead Stadium",
-   "wind": 5.4,
-   "gust": 10.1,
-   "temp": 95.2,
-   "precip_prob": 6
+   "kickoff_utc": "2026-11-15T18:00+00:00",
+   "stadium": "Lambeau Field",
+   "wind": 6.3,
+   "gust": 15.9,
+   "temp": 42.0,
+   "precip_prob": 1
+  },
+  "Miami Dolphins @ Indianapolis Colts": {
+   "roof": "closed",
+   "kickoff_utc": "2026-11-15T18:00+00:00",
+   "stadium": "Lucas Oil Stadium",
+   "wind": 0.0,
+   "gust": 0.0,
+   "temp": 70.0,
+   "precip_prob": 0,
+   "note": "indoors \u2014 neutral"
+  },
+  "Carolina Panthers @ New Orleans Saints": {
+   "roof": "dome",
+   "kickoff_utc": "2026-11-15T18:00+00:00",
+   "stadium": "Caesars Superdome",
+   "wind": 0.0,
+   "gust": 0.0,
+   "temp": 70.0,
+   "precip_prob": 0,
+   "note": "indoors \u2014 neutral"
+  },
+  "Buffalo Bills @ New York Jets": {
+   "roof": "outdoors",
+   "kickoff_utc": "2026-11-15T18:00+00:00",
+   "stadium": "MetLife Stadium",
+   "wind": 16.6,
+   "gust": 32.2,
+   "temp": 48.4,
+   "precip_prob": 2
+  },
+  "Jacksonville Jaguars @ Tennessee Titans": {
+   "roof": "outdoors",
+   "kickoff_utc": "2026-11-15T18:00+00:00",
+   "stadium": "Nissan Stadium",
+   "wind": 4.1,
+   "gust": 17.2,
+   "temp": 56.4,
+   "precip_prob": 1
+  },
+  "Los Angeles Rams @ Arizona Cardinals": {
+   "roof": "closed",
+   "kickoff_utc": "2026-11-15T21:05+00:00",
+   "stadium": "State Farm Stadium",
+   "wind": 0.0,
+   "gust": 0.0,
+   "temp": 70.0,
+   "precip_prob": 0,
+   "note": "indoors \u2014 neutral"
+  },
+  "Seattle Seahawks @ Las Vegas Raiders": {
+   "roof": "dome",
+   "kickoff_utc": "2026-11-15T21:05+00:00",
+   "stadium": "Allegiant Stadium",
+   "wind": 0.0,
+   "gust": 0.0,
+   "temp": 70.0,
+   "precip_prob": 0,
+   "note": "indoors \u2014 neutral"
+  },
+  "San Francisco 49ers @ Dallas Cowboys": {
+   "roof": "closed",
+   "kickoff_utc": "2026-11-15T21:25+00:00",
+   "stadium": "AT&T Stadium",
+   "wind": 0.0,
+   "gust": 0.0,
+   "temp": 70.0,
+   "precip_prob": 0,
+   "note": "indoors \u2014 neutral"
+  },
+  "Pittsburgh Steelers @ Cincinnati Bengals": {
+   "roof": "outdoors",
+   "kickoff_utc": "2026-11-16T01:20+00:00",
+   "stadium": "Paycor Stadium",
+   "wind": 2.7,
+   "gust": 29.5,
+   "temp": 40.9,
+   "precip_prob": 2
+  },
+  "Los Angeles Chargers @ Baltimore Ravens": {
+   "roof": "outdoors",
+   "kickoff_utc": "2026-11-17T01:15+00:00",
+   "stadium": "M&T Bank Stadium",
+   "wind": 9.0,
+   "gust": 19.0,
+   "temp": 47.0,
+   "precip_prob": 1
+  },
+  "Indianapolis Colts @ Houston Texans": {
+   "roof": "closed",
+   "kickoff_utc": "2026-11-20T01:15+00:00",
+   "stadium": "Reliant Stadium",
+   "wind": 0.0,
+   "gust": 0.0,
+   "temp": 70.0,
+   "precip_prob": 0,
+   "note": "indoors \u2014 neutral"
   }
  }
 }

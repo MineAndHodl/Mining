@@ -110,6 +110,57 @@
      }
     }
    }
+  },
+  {
+   "key": "2026_w10",
+   "season": 2026,
+   "week": 10,
+   "by_market": {
+    "pass_yds": {
+     "n": 2,
+     "beta": null,
+     "lag": {
+      "form3": 1.0,
+      "form1": 1.0,
+      "role_rr": 1.0,
+      "role_snap_d": 1.0
+     },
+     "note": "too few rows \u2014 tilts applied in full"
+    },
+    "rush_yds": {
+     "n": 3,
+     "beta": null,
+     "lag": {
+      "form3": 1.0,
+      "form1": 1.0,
+      "role_rr": 1.0,
+      "role_snap_d": 1.0
+     },
+     "note": "too few rows \u2014 tilts applied in full"
+    },
+    "rec_yds": {
+     "n": 5,
+     "beta": null,
+     "lag": {
+      "form3": 1.0,
+      "form1": 1.0,
+      "role_rr": 1.0,
+      "role_snap_d": 1.0
+     },
+     "note": "too few rows \u2014 tilts applied in full"
+    },
+    "receptions": {
+     "n": 1,
+     "beta": null,
+     "lag": {
+      "form3": 1.0,
+      "form1": 1.0,
+      "role_rr": 1.0,
+      "role_snap_d": 1.0
+     },
+     "note": "too few rows \u2014 tilts applied in full"
+    }
+   }
   }
  ],
  "pooled": {
